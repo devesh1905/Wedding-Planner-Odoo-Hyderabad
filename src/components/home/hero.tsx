@@ -1,20 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Magnetic } from "./magnetic";
 import { KnotMark } from "./knot-mark";
 
 /**
- * The page's one animated moment: a slow aurora of marigold, rose and gold behind the headline.
- * The ornament drifts a little slower than the page (controlled parallax) — felt more than seen.
+ * The page's one ambient moment: a slow aurora of marigold, rose and gold behind the headline.
+ * (The parallax ornament was removed so the aurora reads as the single moment.)
  */
 export function Hero() {
   const reduce = useReducedMotion();
-  const { scrollY } = useScroll();
-  const drift = useTransform(scrollY, [0, 600], [0, 90]);
-  const fade = useTransform(scrollY, [0, 500], [1, 0.4]);
 
   return (
     <section className="relative isolate flex min-h-[92svh] items-center overflow-hidden">
@@ -25,13 +22,12 @@ export function Hero() {
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-b from-transparent to-background" aria-hidden />
 
-      <motion.div
+      <div
         aria-hidden
-        style={reduce ? undefined : { y: drift, opacity: fade }}
         className="pointer-events-none absolute top-1/2 right-[-6rem] -z-10 hidden -translate-y-1/2 text-foreground/[0.06] lg:block"
       >
         <KnotMark className="h-[34rem] w-[56rem]" flameClassName="opacity-25" effects={false} />
-      </motion.div>
+      </div>
 
       <div className="mx-auto w-full max-w-6xl px-6 py-28">
         <motion.p
