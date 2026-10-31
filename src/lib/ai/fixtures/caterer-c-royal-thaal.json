@@ -1,0 +1,62 @@
+{
+  "vendorName": "Royal Thaal",
+  "currency": "INR",
+  "perPlate": 2600,
+  "guestCount": 400,
+  "extraHourRate": 18000,
+  "taxes": [
+    {
+      "label": "GST",
+      "percent": 18,
+      "amount": 187200
+    }
+  ],
+  "lines": [
+    {
+      "item": "Regional Rajasthani mains",
+      "category": "MAIN",
+      "qty": null,
+      "unit": null,
+      "unitPrice": null,
+      "included": true
+    },
+    {
+      "item": "Starters",
+      "category": "STARTER",
+      "qty": null,
+      "unit": null,
+      "unitPrice": null,
+      "included": true
+    },
+    {
+      "item": "Traditional desserts",
+      "category": "DESSERT",
+      "qty": null,
+      "unit": null,
+      "unitPrice": null,
+      "included": true
+    },
+    {
+      "item": "Welcome drinks",
+      "category": "BEVERAGE",
+      "qty": null,
+      "unit": null,
+      "unitPrice": null,
+      "included": true
+    },
+    {
+      "item": "Live counters",
+      "category": "LIVE_COUNTER",
+      "qty": null,
+      "unit": null,
+      "unitPrice": null,
+      "included": false
+    }
+  ],
+  "total": 1227200,
+  "notes": [
+    "Live counters are not included.",
+    "GST is separate from the food subtotal.",
+    "Extra hour rate is before tax."
+  ]
+}
