@@ -17,7 +17,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             <KnotMark mode="ignite" className="h-24 w-48 text-[oklch(0.93_0.03_80)]" />
             <span className="font-brand text-5xl text-[oklch(0.93_0.03_80)]">KnotOS</span>
           </div>
-          <p className="font-serif text-5xl leading-tight font-semibold">Every wedding, one calm place.</p>
+          <p className="pt-2 text-2xl leading-snug font-light tracking-tight text-[oklch(0.93_0.03_80/0.72)]">Every wedding, one calm place.</p>
           <div className="ornament w-40" />
           <p className="text-sidebar-foreground/80">
             Enquiries, vendors, plans, the big day and every rupee — from the first call to the final vendor payment.
