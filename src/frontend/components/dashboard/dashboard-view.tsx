@@ -7,6 +7,8 @@ import { formatDate, formatINRCompact } from "@/shared/format";
 import { cn } from "@/shared/utils";
 import { WhatsAppLink } from "@/frontend/components/common/whatsapp-link";
 import { reminderText } from "@/shared/reminders";
+import { ChartTip, TipBody } from "./chart-tip";
+import { RupeeRing } from "./rupee-ring";
 
 const pct = (x: number | null) => (x == null ? "—" : `${Math.round(x * 100)}%`);
 const JOURNEY = ["BOOKED", "PLANNING", "VENDORS", "BIG_DAY", "SETTLEMENT", "SETTLED"] as const;
@@ -21,8 +23,9 @@ const STAGE_TONE: Record<string, string> = {
 
 /**
  * Founder dashboard, laid out as a bento grid: the one number that matters (profit) gets the big
- * card, then where the money goes, then what needs a decision. Everything is server-rendered
- * HTML/SVG — no client charts — so the page paints complete in one go.
+ * card, then where the money goes, then what needs a decision. Charts are server-rendered HTML/SVG so
+ * the page paints complete in one go; only the small hover/tap read-outs (ChartTip, RupeeRing) run
+ * in the browser.
  * Shared by the dashboard and the read-only share page (links disabled there).
  */
 export function DashboardView({ report: r, readOnly }: { report: SeasonReport; readOnly?: boolean }) {
@@ -116,8 +119,14 @@ export function DashboardView({ report: r, readOnly }: { report: SeasonReport; r
                     <span className="font-medium">Next {h.days === 7 ? "week" : `${h.days / 7} weeks`}</span>
                     <span className={cn("text-xs font-semibold tabular", net < 0 ? "text-rose" : "text-teal")}>net {formatINRCompact(net)}</span>
                   </div>
-                  <Meter label="In" value={h.moneyIn} max={max} className="bg-teal" />
-                  <Meter label="Out" value={h.moneyOut} max={max} className="bg-rose" />
+                  <Meter label="In" value={h.moneyIn} max={max} className="bg-teal" tip={`Client payments falling due within ${h.days} days`} />
+                  <Meter
+                    label="Out"
+                    value={h.moneyOut}
+                    max={max}
+                    className="bg-rose"
+                    tip={`Vendor balances due within ${h.days} days (paid ~7 days after each event)`}
+                  />
                 </div>
               );
             })}
@@ -316,85 +325,46 @@ function Empty({ children }: { children: React.ReactNode }) {
 }
 
 /** Tiny column chart of profit per wedding in date order — the season's rhythm at a glance. */
+/** Season at a glance: one bar per wedding in date order, profit up (teal), loss down (rose). */
 function ProfitStrip({ rows }: { rows: SeasonReport["rows"] }) {
   const data = [...rows].sort((a, b) => +a.startDate - +b.startDate);
   if (data.length < 2) return null;
   const max = Math.max(...data.map((w) => Math.abs(w.profit)), 1);
-  const H = 56;
-  const bw = 100 / data.length;
   return (
-    <svg viewBox={`0 0 100 ${H}`} preserveAspectRatio="none" className="mt-5 h-14 w-full" aria-hidden>
-      <line x1="0" x2="100" y1={H / 2} y2={H / 2} className="stroke-border" strokeWidth="0.3" vectorEffect="non-scaling-stroke" />
+    <div className="group/strip relative mt-5 flex h-14 gap-[2px]">
+      <span className="absolute inset-x-0 top-1/2 h-px bg-border" aria-hidden />
       {data.map((w, i) => {
-        const h = (Math.abs(w.profit) / max) * (H / 2 - 2);
+        const h = (Math.abs(w.profit) / max) * 48; // % of the full height; each half is 50%
         return (
-          <rect
+          <ChartTip
             key={w.id}
-            x={i * bw + bw * 0.18}
-            width={bw * 0.64}
-            y={w.profit >= 0 ? H / 2 - h : H / 2}
-            height={Math.max(h, 0.8)}
-            rx="0.6"
-            className={cn("dash-grow-y", w.profit >= 0 ? "fill-teal" : "fill-rose")}
-            style={{ transformOrigin: `0 ${H / 2}px`, animationDelay: `${i * 30}ms` }}
-          />
+            className="relative flex-1 rounded-sm [&:hover>span]:!opacity-100 [&[data-active]>span]:!opacity-100"
+            content={
+              <TipBody
+                title={w.couple}
+                rows={[
+                  { label: formatDate(w.startDate), value: "" },
+                  { label: "Profit", value: formatINRCompact(w.profit), tone: w.profit < 0 ? "text-rose" : "text-teal", strong: true },
+                  { label: "Margin", value: pct(w.margin) },
+                ]}
+              />
+            }
+          >
+            <span
+              className={cn(
+                "dash-grow-y absolute inset-x-[15%] rounded-[2px] transition-opacity group-hover/strip:opacity-40",
+                w.profit >= 0 ? "bg-teal" : "bg-rose",
+              )}
+              style={{
+                [w.profit >= 0 ? "bottom" : "top"]: "50%",
+                height: `${Math.max(h, 1.5)}%`,
+                transformOrigin: w.profit >= 0 ? "bottom" : "top",
+                animationDelay: `${i * 30}ms`,
+              }}
+            />
+          </ChartTip>
         );
       })}
-    </svg>
-  );
-}
-
-/** Donut: of every rupee billed, how much went to vendors, the team, and what was left. */
-function RupeeRing({ revenue, vendor, team, profit }: { revenue: number; vendor: number; team: number; profit: number }) {
-  const total = Math.max(revenue, vendor + team, 1);
-  const parts = [
-    { label: "Vendors", value: vendor, cls: "stroke-marigold", dot: "bg-marigold" },
-    { label: "Team", value: team, cls: "stroke-muted-foreground/50", dot: "bg-muted-foreground/50" },
-    {
-      label: profit >= 0 ? "Profit" : "Loss",
-      value: Math.abs(profit),
-      cls: profit >= 0 ? "stroke-teal" : "stroke-rose",
-      dot: profit >= 0 ? "bg-teal" : "bg-rose",
-    },
-  ];
-  const C = 2 * Math.PI * 40;
-  let offset = 0;
-  return (
-    <div className="mt-3 flex items-center gap-5">
-      <svg viewBox="0 0 100 100" className="size-36 shrink-0 -rotate-90" aria-hidden>
-        <circle cx="50" cy="50" r="40" fill="none" className="stroke-muted" strokeWidth="11" />
-        {parts.map((p) => {
-          const len = (p.value / total) * C;
-          const el = (
-            <circle
-              key={p.label}
-              cx="50"
-              cy="50"
-              r="40"
-              fill="none"
-              strokeWidth="11"
-              className={cn("dash-ring", p.cls)}
-              strokeDasharray={`${Math.max(len - 1.2, 0)} ${C}`}
-              strokeDashoffset={-offset}
-            />
-          );
-          offset += len;
-          return el;
-        })}
-      </svg>
-      <div className="min-w-0 flex-1 space-y-2.5">
-        <div>
-          <p className="text-2xl font-semibold tabular">{formatINRCompact(revenue)}</p>
-          <p className="text-xs text-muted-foreground">billed to couples</p>
-        </div>
-        {parts.map((p) => (
-          <div key={p.label} className="flex items-center gap-2 text-sm">
-            <span className={cn("size-2 rounded-full", p.dot)} />
-            <span className="flex-1 text-muted-foreground">{p.label}</span>
-            <span className="font-medium tabular">{Math.round((p.value / total) * 100)}%</span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
@@ -407,11 +377,19 @@ function StageBar({ rows }: { rows: SeasonReport["rows"] }) {
     <div className="mt-4">
       <div className="flex h-2.5 overflow-hidden rounded-full bg-muted">
         {counts.map(({ s, n }) => (
-          <span
+          <ChartTip
             key={s}
-            className={cn("h-full border-r border-card last:border-0", STAGE_TONE[s])}
+            className={cn("h-full border-r border-card transition-opacity last:border-0 hover:opacity-80", STAGE_TONE[s])}
             style={{ width: `${(n / total) * 100}%` }}
-            title={`${statusLabel(s)}: ${n}`}
+            content={
+              <TipBody
+                title={statusLabel(s)}
+                rows={[
+                  { label: n === 1 ? "Wedding" : "Weddings", value: String(n), strong: true },
+                  { label: "Share", value: `${Math.round((n / total) * 100)}%` },
+                ]}
+              />
+            }
           />
         ))}
       </div>
@@ -437,11 +415,32 @@ function ProfitBars({ rows, W }: { rows: SeasonReport["rows"]; W: (p: { id: stri
       {rows.slice(0, 12).map((w, i) => {
         const len = (Math.abs(w.profit) / max) * (w.profit >= 0 ? 100 - zero : zero);
         return (
-          <li key={w.id} className="grid grid-cols-[9rem_1fr_5rem_3rem] items-center gap-3 text-sm">
+          <li
+            key={w.id}
+            className="-mx-2 grid grid-cols-[9rem_1fr_5rem_3rem] items-center gap-3 rounded-lg px-2 py-0.5 text-sm transition-colors hover:bg-muted/50"
+          >
             <W id={w.id} className="truncate font-medium">
               {w.couple}
             </W>
-            <div className="relative h-5 rounded-md bg-muted/50">
+            <ChartTip
+              className="relative block h-5 rounded-md bg-muted/50"
+              content={
+                <TipBody
+                  title={w.couple}
+                  rows={[
+                    { label: "Revenue", value: formatINRCompact(w.revenue) },
+                    { label: "Vendors", value: `− ${formatINRCompact(w.vendorCost)}` },
+                    { label: "Team hours", value: `− ${formatINRCompact(w.teamCost)}` },
+                    {
+                      label: w.profit < 0 ? "Loss" : "Profit",
+                      value: `${formatINRCompact(w.profit)} · ${pct(w.margin)}`,
+                      tone: w.profit < 0 ? "text-rose" : "text-teal",
+                      strong: true,
+                    },
+                  ]}
+                />
+              }
+            >
               {hasLoss && <span className="absolute inset-y-0 w-px bg-border" style={{ left: `${zero}%` }} />}
               <span
                 className={cn("dash-grow-x absolute inset-y-1 rounded", w.profit >= 0 ? "bg-teal" : "bg-rose")}
@@ -451,7 +450,7 @@ function ProfitBars({ rows, W }: { rows: SeasonReport["rows"]; W: (p: { id: stri
                     : { right: `${100 - zero}%`, width: `${Math.max(len, 0.6)}%`, transformOrigin: "right", animationDelay: `${i * 35}ms` }
                 }
               />
-            </div>
+            </ChartTip>
             <Amount rupees={w.profit} compact signed className="text-right" />
             <span className={cn("text-right text-xs tabular", w.margin < 0 ? "text-rose" : "text-muted-foreground")}>{pct(w.margin)}</span>
           </li>
@@ -462,16 +461,19 @@ function ProfitBars({ rows, W }: { rows: SeasonReport["rows"]; W: (p: { id: stri
   );
 }
 
-function Meter({ label, value, max, className }: { label: string; value: number; max: number; className: string }) {
+function Meter({ label, value, max, className, tip }: { label: string; value: number; max: number; className: string; tip: string }) {
   return (
     <div className="mt-1 flex items-center gap-2 text-xs">
       <span className="w-7 text-muted-foreground">{label}</span>
-      <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
+      <ChartTip
+        className="block h-2 flex-1 overflow-hidden rounded-full bg-muted"
+        content={<TipBody title={formatINRCompact(value)} rows={[{ label: tip, value: "" }]} />}
+      >
         <div
           className={cn("dash-grow-x h-full rounded-full", className)}
           style={{ width: `${Math.max(1.5, (value / max) * 100)}%`, transformOrigin: "left" }}
         />
-      </div>
+      </ChartTip>
       <span className="w-16 text-right font-medium tabular">{formatINRCompact(value)}</span>
     </div>
   );
