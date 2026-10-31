@@ -1,9 +1,12 @@
 import { createHash } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
 import { PDFParse } from 'pdf-parse';
 import { z } from 'zod';
 import { quoteExtractionSchema, type QuoteExtraction } from './quote-schema';
 import { systemPrompt } from './prompts';
+import manifest from './fixtures/manifest.json';
+import shahiRasoi from './fixtures/caterer-a-shahi-rasoi.json';
+import marwarFeasts from './fixtures/caterer-b-marwar-feasts.json';
+import royalThaal from './fixtures/caterer-c-royal-thaal.json';
 
 export async function extractTextFromPdf(buf: Buffer): Promise<string> {
   if (buf.length > 15 * 1024 * 1024 || !buf.subarray(0,1024).includes(Buffer.from('%PDF-'))) throw new Error('Upload a PDF smaller than 15 MB');
@@ -19,11 +22,15 @@ export function textFingerprint(text: string): string {
   return createHash('sha256').update(text.replace(/\s+/g,' ').trim()).digest('hex');
 }
 
+const fixtures: Record<string, unknown> = {
+  'caterer-a-shahi-rasoi.json': shahiRasoi,
+  'caterer-b-marwar-feasts.json': marwarFeasts,
+  'caterer-c-royal-thaal.json': royalThaal,
+};
 async function fixtureFor(text: string): Promise<QuoteExtraction | null> {
-  const manifest = JSON.parse(await readFile(new URL('./fixtures/manifest.json', import.meta.url),'utf8')) as Record<string,string>;
-  const filename = manifest[textFingerprint(text)];
-  if (!filename || !/^[a-z-]+\.json$/.test(filename)) return null;
-  return quoteExtractionSchema.parse(JSON.parse(await readFile(new URL(`./fixtures/${filename}`, import.meta.url),'utf8')));
+  // Static imports let server bundlers include every fixture in deployment output.
+  const filename = (manifest as Record<string,string>)[textFingerprint(text)];
+  return filename && fixtures[filename] ? quoteExtractionSchema.parse(fixtures[filename]) : null;
 }
 
 const responseSchema = z.object({ candidates: z.array(z.object({content:z.object({parts:z.array(z.object({text:z.string().optional()}))})})).optional(), choices:z.array(z.object({message:z.object({content:z.string()})})).optional(), content:z.array(z.object({type:z.string(),text:z.string().optional()})).optional() });

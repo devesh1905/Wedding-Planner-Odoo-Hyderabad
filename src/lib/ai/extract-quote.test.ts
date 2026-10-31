@@ -60,3 +60,26 @@ test('invalid service JSON gets one repair retry; network failure only falls bac
 test('invalid PDFs are rejected',async()=>{
   await assert.rejects(extractTextFromPdf(Buffer.from('not a PDF')),/Upload a PDF/);
 });
+
+test('configured chat and messages protocols validate their text responses',async()=>{
+  const previousFetch=globalThis.fetch;
+  const previous={...process.env};
+  const fixture=JSON.parse(await readFile(new URL('./fixtures/caterer-a-shahi-rasoi.json',import.meta.url),'utf8')) as unknown;
+  try {
+    process.env.AI_API_KEY='test-key'; process.env.AI_PROVIDER='custom';
+    process.env.AI_ENDPOINT='https://service.example/v1/quotes'; process.env.AI_MODEL='configured-model';
+    for(const protocol of ['chat','messages']) {
+      process.env.AI_PROTOCOL=protocol;
+      process.env.AI_HEADERS_JSON=JSON.stringify({'service-version':'2026-01-01'});
+      globalThis.fetch=async(url,init)=>{
+        assert.equal(String(url),'https://service.example/v1/quotes');
+        const body=JSON.parse(String(init?.body)) as {model:string;messages:{role:string}[]};
+        const headers=init?.headers as Record<string,string>;
+        assert.equal(body.model,'configured-model'); assert.equal(headers['service-version'],'2026-01-01');
+        assert.equal(protocol==='chat' ? headers.Authorization : headers['x-api-key'],protocol==='chat' ? 'Bearer test-key' : 'test-key');
+        return Response.json(protocol==='chat' ? {choices:[{message:{content:JSON.stringify(fixture)}}]} : {content:[{type:'text',text:JSON.stringify(fixture)}]});
+      };
+      assert.equal((await extractQuote('New quote text')).data.perPlate,2450);
+    }
+  } finally { globalThis.fetch=previousFetch; for(const key of Object.keys(process.env)) if(!(key in previous)) delete process.env[key]; Object.assign(process.env,previous); }
+});
