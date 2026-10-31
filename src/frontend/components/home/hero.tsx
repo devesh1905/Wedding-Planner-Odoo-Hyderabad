@@ -89,23 +89,18 @@ export function Hero() {
           <div className="squircle overflow-hidden rounded-3xl shadow-[0_30px_60px_-30px_rgb(60_20_10/0.55)] ring-1 ring-marigold/25">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/brand/city-palace-udaipur-night-1600.jpg"
-              srcSet="/brand/city-palace-udaipur-night-960.jpg 960w, /brand/city-palace-udaipur-night-1600.jpg 1600w"
+              src="/brand/wedding-pheras-1536.jpg"
+              srcSet="/brand/wedding-pheras-960.jpg 960w, /brand/wedding-pheras-1536.jpg 1536w"
               sizes="(min-width: 1024px) 30rem, 100vw"
-              width={1600}
-              height={1000}
-              alt="City Palace, Udaipur, lit gold at night and reflected in Lake Pichola"
-              className="aspect-[16/10] w-full object-cover object-[50%_48%]"
+              width={1536}
+              height={1024}
+              alt="A bride in maroon and a groom in ivory walk around the sacred fire in a palace courtyard at dusk"
+              className="aspect-[16/10] w-full object-cover object-[55%_55%]"
               fetchPriority="high"
             />
           </div>
-          {/* the photographer's licence (CC BY-SA 4.0) requires credit */}
-          <figcaption className="mt-2 text-[11px] text-muted-foreground">
-            City Palace, Udaipur · Photo: Ashwin Geet D&apos;Sa,{" "}
-            <a href="https://commons.wikimedia.org/wiki/File:Udaipur_City_Palace_at_Night.jpg" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">
-              CC BY-SA 4.0
-            </a>
-          </figcaption>
+          {/* generated image: labelled so nobody mistakes it for a past client's wedding */}
+          <figcaption className="mt-2 text-[11px] text-muted-foreground">The pheras, at dusk · Illustrative image</figcaption>
         </motion.figure>
         </div>
       </div>
