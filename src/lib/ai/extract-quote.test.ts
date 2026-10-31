@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { extractQuote, extractTextFromPdf } from './extract-quote';
 import { normalizeForComparison } from './compare';
-import { quoteExtractionSchema, rupeesToPaise } from './quote-schema';
+import { quoteExtractionSchema, toStoredRupees } from './quote-schema';
 
 test('three PDF layouts match validated fixtures, prices and missing inclusions',async()=>{
   const original = process.env.AI_API_KEY; delete process.env.AI_API_KEY;
@@ -24,8 +24,10 @@ test('three PDF layouts match validated fixtures, prices and missing inclusions'
     assert.deepEqual(comparison.rows.find(r=>r.key==='TAX')!.values.map(v=>v.value),[null,86000,187200]);
     await assert.rejects(extractQuote('Shahi Rasoi is quoting a different wedding for 100 guests'),/No service key/);
     await assert.rejects(extractQuote(''),/1 to 100000/);
-    assert.equal(rupeesToPaise(2450),245000);
-    assert.throws(()=>rupeesToPaise(Infinity));
+    assert.equal(toStoredRupees(2450),2450);
+    assert.equal(toStoredRupees(2450.5),2451);
+    assert.throws(()=>toStoredRupees(Infinity));
+    assert.throws(()=>toStoredRupees(3_000_000_000));
     assert.equal(quoteExtractionSchema.safeParse({...quotes[0],perPlate:-1}).success,false);
     assert.equal(normalizeForComparison([]).cheapestVendorIndex,null);
     assert.equal(normalizeForComparison([{...quotes[0]!,total:null}]).cheapestVendorIndex,null);

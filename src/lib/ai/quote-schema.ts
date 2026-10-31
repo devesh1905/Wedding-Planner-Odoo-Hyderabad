@@ -10,8 +10,8 @@ export const quoteExtractionSchema = z.object({
 }).strict();
 export type QuoteExtraction = z.infer<typeof quoteExtractionSchema>;
 export type QuoteCategory = typeof categories[number];
-export function rupeesToPaise(rupees: number): number {
-  const result = Math.round(rupees * 100);
-  if (!Number.isFinite(rupees) || rupees < 0 || !Number.isSafeInteger(result)) throw new Error('Invalid money amount');
+export function toStoredRupees(rupees: number): number {
+  const result = Math.round(rupees);
+  if (!Number.isFinite(rupees) || rupees < 0 || !Number.isSafeInteger(result) || result > 2_000_000_000) throw new Error('Invalid money amount');
   return result;
 }
