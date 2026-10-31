@@ -263,14 +263,14 @@ function Cave() {
 
       // draw the diya; the flame leans against the direction of travel
       const lean = Math.max(-18, Math.min(18, -st.vx * 0.02));
-      diya.style.transform = `translate3d(${st.x - 30}px, ${st.y - 44}px, 0)`;
+      diya.style.transform = `translate3d(${st.x - 36}px, ${st.y - 62}px, 0)`;
       diya.style.setProperty("--lean", `${lean.toFixed(1)}deg`);
 
       // light
       const t = now / 1000;
       const f = reduce ? 0 : flicker(t);
-      const lx = st.x + f * 1.2;
-      const ly = st.y - 20 + flicker(t + 9) * (reduce ? 0 : 1.2); // the flame sits above the bowl
+      const lx = st.x - 24 + f * 1.2; // the flame sits on the wick at the spout (left of centre)
+      const ly = st.y - 30 + flicker(t + 9) * (reduce ? 0 : 1.2);
       const r = st.radius * (1 + f * 0.05);
       html.style.setProperty("--lx", `${lx.toFixed(1)}px`);
       html.style.setProperty("--ly", `${ly.toFixed(1)}px`);
@@ -341,40 +341,35 @@ function Cave() {
   );
 }
 
-/** Brass diya bowl with the layered, swaying flame. The flame leans with --lean while carried. */
+/**
+ * HD brass diya (photo, transparent PNG) with our animated vector flame sitting on the wick tip.
+ * Element box 72×96: bowl image at the bottom, flame above the spout. The flame leans with --lean.
+ */
 function DiyaGraphic() {
   return (
-    <svg viewBox="0 0 60 70" className="block h-[70px] w-[60px]" aria-hidden>
-      <defs>
-        <radialGradient id="diya-bowl" cx="50%" cy="20%" r="80%">
-          <stop offset="0" stopColor="#f3c27a" />
-          <stop offset="0.45" stopColor="#c47b2b" />
-          <stop offset="1" stopColor="#6b3410" />
-        </radialGradient>
-        <linearGradient id="diya-outer" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#f0a03a" />
-          <stop offset="1" stopColor="#c2501d" />
-        </linearGradient>
-        <linearGradient id="diya-mid" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#ffc457" />
-          <stop offset="1" stopColor="#ea8a2c" />
-        </linearGradient>
-        <filter id="diya-glow" x="-100%" y="-100%" width="300%" height="300%">
-          <feGaussianBlur stdDeviation="5" />
-        </filter>
-      </defs>
-      <g className="diya-lean">
-        <ellipse cx="30" cy="26" rx="10" ry="13" fill="#f4a93c" opacity="0.45" filter="url(#diya-glow)" className="flame-halo" />
-        <g className="flame-body">
-          <path d="M30 6 C 36 13, 37.5 20, 34 26 C 32.8 28, 31.4 29.6, 30 32 C 28.6 29.6, 27.2 28, 26 26 C 22.5 20, 24 13, 30 6 Z" fill="url(#diya-outer)" className="flame-l1" />
-          <path d="M30 11 C 34.4 16, 35 21, 32.6 25.4 C 31.7 27, 30.8 28.4, 30 30.6 C 29.2 28.4, 28.3 27, 27.4 25.4 C 25 21, 25.6 16, 30 11 Z" fill="url(#diya-mid)" className="flame-l2" />
-          <path d="M30 17 C 32.4 20, 32.7 23, 31.3 26 C 30.8 27, 30.4 28, 30 29.3 C 29.6 28, 29.2 27, 28.7 26 C 27.3 23, 27.6 20, 30 17 Z" fill="#fff2bf" className="flame-l3" />
+    <>
+      <span className="diya-flame-glow" aria-hidden />
+      <svg viewBox="20 4 20 30" className="diya-flame" aria-hidden>
+        <defs>
+          <linearGradient id="diya-outer" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#f0a03a" />
+            <stop offset="1" stopColor="#c2501d" />
+          </linearGradient>
+          <linearGradient id="diya-mid" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#ffc457" />
+            <stop offset="1" stopColor="#ea8a2c" />
+          </linearGradient>
+        </defs>
+        <g className="diya-lean">
+          <g className="flame-body">
+            <path d="M30 6 C 36 13, 37.5 20, 34 26 C 32.8 28, 31.4 29.6, 30 32 C 28.6 29.6, 27.2 28, 26 26 C 22.5 20, 24 13, 30 6 Z" fill="url(#diya-outer)" className="flame-l1" />
+            <path d="M30 11 C 34.4 16, 35 21, 32.6 25.4 C 31.7 27, 30.8 28.4, 30 30.6 C 29.2 28.4, 28.3 27, 27.4 25.4 C 25 21, 25.6 16, 30 11 Z" fill="url(#diya-mid)" className="flame-l2" />
+            <path d="M30 17 C 32.4 20, 32.7 23, 31.3 26 C 30.8 27, 30.4 28, 30 29.3 C 29.6 28, 29.2 27, 28.7 26 C 27.3 23, 27.6 20, 30 17 Z" fill="#fff2bf" className="flame-l3" />
+          </g>
         </g>
-      </g>
-      {/* bowl: the wick sits behind the rim */}
-      <path d="M6 36 C 10 50, 20 56, 30 56 C 40 56, 50 50, 54 36 C 46 40, 38 41, 30 41 C 22 41, 14 40, 6 36 Z" fill="url(#diya-bowl)" />
-      <path d="M6 36 C 14 40, 22 41, 30 41 C 38 41, 46 40, 54 36" fill="none" stroke="#f6d39a" strokeWidth="1.2" opacity="0.8" />
-      <ellipse cx="30" cy="60" rx="9" ry="2.5" fill="#6b3410" opacity="0.8" />
-    </svg>
+      </svg>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/brand/diya-bowl.png" srcSet="/brand/diya-bowl.png 1x, /brand/diya-bowl@2x.png 2x" alt="" draggable={false} className="diya-bowl" />
+    </>
   );
 }

@@ -420,8 +420,8 @@ html { scroll-behavior: smooth; }
   left: 0;
   top: 0;
   z-index: 60;
-  width: 60px;
-  height: 70px;
+  width: 72px;
+  height: 96px;
   cursor: grab;
   touch-action: none; /* dragging the diya never scrolls the page */
   user-select: none;
@@ -429,8 +429,8 @@ html { scroll-behavior: smooth; }
   will-change: transform;
 }
 .cave-diya .diya-lean {
-  transform-box: view-box;
-  transform-origin: 30px 40px;
+  transform-box: fill-box;
+  transform-origin: 50% 96%;
   transform: rotate(var(--lean, 0deg));
   transition: transform 0.12s linear;
 }
@@ -440,9 +440,9 @@ html { scroll-behavior: smooth; }
 /* The niche: a small carved arch with a soot mark above it. */
 .diya-slot {
   position: relative;
-  width: 54px;
-  height: 66px;
-  border-radius: 27px 27px 10px 10px;
+  width: 84px;
+  height: 88px;
+  border-radius: 42px 42px 12px 12px;
   background: radial-gradient(ellipse at 50% 28%, rgb(0 0 0 / 0.55), rgb(20 10 6 / 0.35) 70%);
   border: 1px solid rgb(232 163 61 / 0.22);
   box-shadow:
@@ -511,3 +511,36 @@ html { scroll-behavior: smooth; }
   border-bottom: 1px solid rgb(232 163 61 / 0.45);
 }
 @media (prefers-reduced-motion: reduce) { .diya-hint { animation: none; } }
+
+/* HD diya: photo bowl + vector flame on the wick tip (spout, left side of the bowl). */
+.diya-bowl {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 72px;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 6px 8px rgb(0 0 0 / 0.55));
+}
+.diya-flame {
+  position: absolute;
+  left: -6px;
+  top: 12px;
+  width: 36px;
+  height: 54px;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 1;
+}
+.diya-flame-glow {
+  position: absolute;
+  left: -42px;
+  top: -12px;
+  width: 108px;
+  height: 108px;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: radial-gradient(circle, rgb(255 190 100 / 0.55) 0%, rgb(255 150 60 / 0.22) 35%, transparent 70%);
+  animation: halo-breathe 3.1s ease-in-out infinite;
+}
