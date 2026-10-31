@@ -46,7 +46,7 @@ export function Hero() {
           <span className="block sm:whitespace-nowrap">Not one thing forgotten.</span>
         </motion.h1>
         {/* sentence + actions on the left, a real venue on the right (stacked on phones) */}
-        <div className="mt-8 grid items-end gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)]">
+        <div className="mt-8 grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)]">
         <div>
         <motion.p
           initial={reduce ? false : { opacity: 0, y: 16 }}
