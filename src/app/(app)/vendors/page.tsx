@@ -1,14 +1,9 @@
-import { Construction } from "lucide-react";
-import { PageHeader } from "@/components/common/page-header";
-import { EmptyState } from "@/components/common/empty-state";
+import { requirePageUser } from "@/lib/auth";
+import { VendorDirectory } from "@/components/vendors/VendorDirectory";
 
 export const metadata = { title: "Vendors" };
 
-export default function Page() {
-  return (
-    <>
-      <PageHeader title="Vendors" subtitle="Decorators, caterers, DJs and everyone we hire" />
-      <EmptyState icon={Construction} title="Coming up next" hint="This screen is being built." />
-    </>
-  );
+export default async function Page() {
+  await requirePageUser();
+  return <VendorDirectory />;
 }
