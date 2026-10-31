@@ -11,7 +11,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <section className="relative hidden overflow-hidden bg-[oklch(0.13_0.025_18)] text-sidebar-foreground lg:flex lg:flex-col lg:justify-between lg:p-12">
         <div className="absolute inset-0 opacity-20 [background:radial-gradient(600px_300px_at_20%_10%,var(--marigold),transparent_70%),radial-gradient(500px_400px_at_90%_90%,var(--rose),transparent_70%)]" />
         <div className="relative flex items-center gap-3">
-          <KnotMark className="h-7 w-14 text-[oklch(0.93_0.03_80)]" />
+          <KnotMark mode="ignite" className="h-7 w-14 text-[oklch(0.93_0.03_80)]" />
           <span className="font-serif text-2xl font-semibold">KnotOS</span>
           <span className="text-sm text-sidebar-foreground/60">for The Royal Knot</span>
         </div>
