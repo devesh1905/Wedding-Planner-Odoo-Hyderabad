@@ -13,6 +13,7 @@ import { Magnetic } from "@/components/home/magnetic";
 import { MonogramButton } from "@/components/home/monogram-button";
 import { Reveal, RevealItem } from "@/components/home/reveal";
 import { ThemeToggle } from "@/components/common/theme-toggle";
+import { CaveMode, DiyaSlot } from "@/components/cave/cave-mode";
 
 export const metadata: Metadata = {
   title: { absolute: "The Royal Knot — Luxury weddings in Jaipur & Udaipur" },
@@ -32,6 +33,7 @@ export default async function Home() {
   return (
     <div className="bg-background">
       <Splash />
+      <CaveMode />
 
       <header className="fixed inset-x-0 top-0 z-50 border-b border-transparent bg-background/70 backdrop-blur-md supports-[backdrop-filter]:bg-background/55">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-5">
@@ -58,14 +60,17 @@ export default async function Home() {
       <main>
         <Hero />
 
-        <section className="mx-auto max-w-6xl px-6 py-24" aria-label="Our promise">
+        <section className="relative mx-auto max-w-6xl px-6 py-24" aria-label="Our promise">
+          <DiyaSlot id="promise" className="absolute top-6 right-6" />
           <Reveal className="grid gap-12 border-t border-border pt-12 md:grid-cols-3">
             {PROMISES.map((p) => (
               <RevealItem key={p.v}>
+                <div data-cast>
                 <p className="font-serif text-6xl font-semibold text-eyebrow"><NumberTicker value={p.k} from={p.from} />
                 </p>
                 <p className="mt-2 text-lg font-medium">{p.v}</p>
                 <p className="mt-2 leading-relaxed text-muted-foreground">{p.d}</p>
+                </div>
               </RevealItem>
             ))}
           </Reveal>
@@ -81,9 +86,10 @@ export default async function Home() {
               <span className="aurora-a" />
               <span className="aurora-b" />
             </div>
+            <DiyaSlot id="cta" className="absolute top-8 right-8" />
             <RevealItem className="relative">
               <p className="text-xs tracking-[0.35em] text-marigold uppercase">Begin</p>
-              <h2 className="mx-auto mt-4 max-w-2xl text-5xl leading-tight font-semibold sm:text-6xl">Tell us the date you're dreaming of</h2>
+              <h2 data-cast className="mx-auto mt-4 max-w-2xl text-5xl leading-tight font-semibold sm:text-6xl">Tell us the date you're dreaming of</h2>
               <p className="mx-auto mt-5 max-w-lg text-[oklch(0.95_0.02_80/0.75)]">Two minutes to share it. One day to hear from your planner.</p>
             </RevealItem>
             <RevealItem className="relative mt-10">

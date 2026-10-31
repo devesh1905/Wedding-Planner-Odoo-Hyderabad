@@ -6,6 +6,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Magnetic } from "./magnetic";
 import { KnotMark } from "./knot-mark";
+import { DiyaSlot } from "@/components/cave/cave-mode";
 
 /**
  * The page's one ambient moment: a slow aurora of marigold, rose and gold behind the headline.
@@ -30,6 +31,7 @@ export function Hero() {
         <KnotMark className="h-[34rem] w-[56rem]" flameClassName="opacity-25" effects={false} />
       </div>
 
+      <DiyaSlot id="hero" className="absolute top-[26%] right-[9%] z-10" />
       <div className="mx-auto w-full max-w-6xl px-6 py-28">
         <motion.p
           initial={reduce ? false : { opacity: 0, y: 12 }}
@@ -43,6 +45,7 @@ export function Hero() {
           initial={reduce ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          data-cast
           className="mt-6 max-w-4xl text-6xl leading-[0.95] font-semibold sm:text-7xl lg:text-8xl"
         >
           Three days. Four hundred guests. Not one thing forgotten.
@@ -51,6 +54,7 @@ export function Hero() {
           initial={reduce ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.5 }}
+          data-cast
           className="mt-8 max-w-xl text-lg leading-relaxed text-foreground/75"
         >
           We plan around twenty-five weddings a season — each with its own team, its own timeline and a clear view of every rupee.
@@ -60,6 +64,7 @@ export function Hero() {
           initial={reduce ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.75 }}
+          data-cast
           className="mt-10 flex flex-wrap items-center gap-5"
         >
           <Magnetic>

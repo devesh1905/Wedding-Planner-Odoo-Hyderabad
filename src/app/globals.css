@@ -383,3 +383,82 @@ html { scroll-behavior: smooth; }
   .venue-marquee { overflow-x: auto; }
   .venue-marquee-track { animation: none; }
 }
+
+/* ── Cave mode (couples' home, dark theme): one diya lights the page ─────────── */
+/* Darkness falls off with distance from the flame: soft core, long tail. Driven by --lx/--ly/--lr. */
+.cave-dark {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+  background: radial-gradient(
+    circle var(--lr, 240px) at var(--lx, 50%) var(--ly, 40%),
+    rgb(6 3 2 / 0) 0%,
+    rgb(6 3 2 / 0.12) 18%,
+    rgb(6 3 2 / 0.42) 40%,
+    rgb(6 3 2 / 0.74) 66%,
+    rgb(6 3 2 / 0.93) 100%
+  );
+}
+/* Firelight colour on whatever is lit (~1900 K), breathing with the flame. */
+.cave-warm {
+  position: fixed;
+  inset: 0;
+  z-index: 46;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  opacity: var(--li, 0.9);
+  background: radial-gradient(
+    circle calc(var(--lr, 240px) * 0.8) at var(--lx, 50%) var(--ly, 40%),
+    rgb(255 176 84 / 0.75) 0%,
+    rgb(255 140 50 / 0.3) 38%,
+    rgb(255 120 40 / 0) 75%
+  );
+}
+.cave-diya {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 60;
+  width: 0;
+  height: 0;
+  cursor: grab;
+  touch-action: none;
+  outline: none;
+}
+.cave-diya.is-carried { cursor: grabbing; }
+.cave-diya:focus-visible svg { filter: drop-shadow(0 0 6px rgb(255 200 120 / 0.9)); }
+@layer components {
+/* The niche: a small carved arch with a soot mark above it. */
+.diya-slot {
+  position: relative;
+  width: 54px;
+  height: 66px;
+  border-radius: 27px 27px 10px 10px;
+  background: radial-gradient(ellipse at 50% 28%, rgb(0 0 0 / 0.55), rgb(20 10 6 / 0.35) 70%);
+  border: 1px solid rgb(232 163 61 / 0.22);
+  box-shadow:
+    inset 0 8px 16px rgb(0 0 0 / 0.75),
+    inset 0 -2px 5px rgb(255 200 120 / 0.08),
+    0 1px 0 rgb(255 220 170 / 0.07);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.diya-slot::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -22px;
+  width: 30px;
+  height: 26px;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background: radial-gradient(ellipse at 50% 80%, rgb(0 0 0 / 0.35), transparent 70%);
+  pointer-events: none;
+}
+.diya-slot:hover, .diya-slot:focus-visible {
+  border-color: rgb(232 163 61 / 0.55);
+  box-shadow: inset 0 8px 16px rgb(0 0 0 / 0.75), 0 0 18px rgb(232 163 61 / 0.18);
+  outline: none;
+}
+}
+@media (prefers-reduced-motion: reduce) { .cave-warm { opacity: 0.85; } }

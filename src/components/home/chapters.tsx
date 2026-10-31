@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { DiyaSlot } from "@/components/cave/cave-mode";
 
 const CHAPTERS = [
   { n: "01", title: "Tell us your dream", body: "A date, a guest count, a feeling. Share it once — your planner calls within a day, and nothing you said gets lost." },
@@ -35,9 +36,10 @@ export function Chapters() {
   return (
     <section ref={ref} id="journey" className="relative md:h-[260vh]" aria-label="How it works">
       <div className="md:sticky md:top-0 md:flex md:h-svh md:flex-col md:justify-center md:overflow-hidden">
-        <div className="mx-auto w-full max-w-6xl px-6 pt-24 pb-10 md:pt-0">
+        <div className="relative mx-auto w-full max-w-6xl px-6 pt-24 pb-10 md:pt-0">
+          <DiyaSlot id="chapters" className="absolute right-6 bottom-6" />
           <p className="text-xs tracking-[0.3em] text-eyebrow uppercase">How it works</p>
-          <h2 className="mt-3 max-w-xl text-4xl leading-tight font-semibold sm:text-5xl">Your wedding, chapter by chapter</h2>
+          <h2 data-cast className="mt-3 max-w-xl text-4xl leading-tight font-semibold sm:text-5xl">Your wedding, chapter by chapter</h2>
         </div>
         <motion.ol
           style={reduce || !wide ? undefined : { x }}
@@ -46,6 +48,7 @@ export function Chapters() {
           {CHAPTERS.map((c) => (
             <li
               key={c.n}
+              data-cast
               className="group relative flex flex-col justify-between rounded-[28px] border border-border bg-surface p-8 text-foreground shadow-[0_1px_0_var(--border)] md:h-[22rem] md:w-[24rem]"
             >
               <span className="font-serif text-7xl leading-none font-semibold text-marigold/80 transition-colors group-hover:text-marigold">{c.n}</span>
