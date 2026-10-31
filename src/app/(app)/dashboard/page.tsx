@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { SearchButton } from "@/components/shell/search-button";
+import { SearchButton } from "@/frontend/components/shell/search-button";
 import { Download } from "lucide-react";
-import { requirePageUser } from "@/lib/auth";
-import { getReport, type Period } from "@/lib/reports";
-import { PageHeader } from "@/components/common/page-header";
-import { Button } from "@/components/ui/button";
-import { DashboardView } from "@/components/dashboard/dashboard-view";
-import { ShareDialog } from "@/components/dashboard/share-dialog";
-import { cn } from "@/lib/utils";
+import { requirePageUser } from "@/backend/auth";
+import { getReport, type Period } from "@/backend/reports";
+import { PageHeader } from "@/frontend/components/common/page-header";
+import { Button } from "@/frontend/components/ui/button";
+import { DashboardView } from "@/frontend/components/dashboard/dashboard-view";
+import { ShareDialog } from "@/frontend/components/dashboard/share-dialog";
+import { cn } from "@/shared/utils";
 
 export const metadata = { title: "Dashboard" };
 

@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import type { PrismaClient, EnquiryStatus, EnquirySource } from "@prisma/client";
-import { renderAgreement } from "../../src/lib/agreement";
+import { renderAgreement } from "../../src/backend/agreement";
 
 const PNG_1X1 =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";

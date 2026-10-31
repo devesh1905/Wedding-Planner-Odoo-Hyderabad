@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { LoginForm } from "./login-form";
-import { KnotMark } from "@/components/home/knot-mark";
+import { KnotMark } from "@/frontend/components/home/knot-mark";
 
 export const metadata: Metadata = { title: "Sign in" };
 

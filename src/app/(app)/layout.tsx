@@ -1,5 +1,5 @@
-import { AppShell } from "@/components/shell/app-shell";
-import { requirePageUser } from "@/lib/auth";
+import { AppShell } from "@/frontend/components/shell/app-shell";
+import { requirePageUser } from "@/backend/auth";
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const user = await requirePageUser();

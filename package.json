@@ -13,7 +13,7 @@
     "db:studio": "prisma studio",
     "typecheck": "tsc --noEmit",
     "postinstall": "prisma generate",
-    "test": "tsx --test src/lib/ai/*.test.ts src/lib/offline/*.test.ts src/lib/qr/*.test.ts prisma/seed-data/*.test.ts",
+    "test": "tsx --test src/backend/ai/*.test.ts src/frontend/lib/offline/*.test.ts src/frontend/lib/qr/*.test.ts prisma/seed-data/*.test.ts",
     "quotes": "tsx demo-assets/make-quotes.ts",
     "demo:today": "tsx prisma/seed/demo-today.ts"
   },

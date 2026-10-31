@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { SESSION_COOKIE, verifySession } from "@/lib/session";
+import { SESSION_COOKIE, verifySession } from "@/backend/session";
 
 // Staff pages need a session. Public: /login, /enquire, couple portal /p, vendor portal /v, share links /share.
 const PUBLIC = [/^\/login/, /^\/enquire/, /^\/p\//, /^\/v\//, /^\/share\//, /^\/api\/public\//, /^\/api\/auth\//];

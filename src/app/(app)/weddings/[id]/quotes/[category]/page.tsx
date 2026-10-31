@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation';
 import { z } from 'zod';
-import { db } from '@/lib/db';
-import { requirePageUser } from '@/lib/auth';
-import { vendorCategories } from '@/components/vendors/schema';
-import { PageHeader } from '@/components/common/page-header';
-import { QuoteComparison, type ComparisonRequest } from '@/components/quotes/QuoteComparison';
+import { db } from '@/backend/db';
+import { requirePageUser } from '@/backend/auth';
+import { vendorCategories } from '@/shared/schemas/vendors';
+import { PageHeader } from '@/frontend/components/common/page-header';
+import { QuoteComparison, type ComparisonRequest } from '@/frontend/components/quotes/QuoteComparison';
 export const metadata={title:'Compare vendor proposals'};
 export default async function ComparisonPage({params}:{params:Promise<{id:string;category:string}>}) {
   await requirePageUser();const {id,category}=await params;if(!z.string().uuid().safeParse(id).success)notFound();

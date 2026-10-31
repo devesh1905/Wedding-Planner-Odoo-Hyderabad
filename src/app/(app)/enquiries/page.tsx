@@ -1,7 +1,7 @@
-import { db } from "@/lib/db";
-import { PageHeader } from "@/components/common/page-header";
-import { EnquiryBoard } from "@/components/enquiries/enquiry-board";
-import { NewEnquiryDialog } from "@/components/enquiries/new-enquiry-dialog";
+import { db } from "@/backend/db";
+import { PageHeader } from "@/frontend/components/common/page-header";
+import { EnquiryBoard } from "@/frontend/components/enquiries/enquiry-board";
+import { NewEnquiryDialog } from "@/frontend/components/enquiries/new-enquiry-dialog";
 
 export const metadata = { title: "Enquiries" };
 

@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Icon } from "@/components/icons/icon";
-import { getSession } from "@/lib/auth";
+import { Icon } from "@/frontend/components/icons/icon";
+import { getSession } from "@/backend/auth";
 import { ViewTransition } from "react";
-import { Splash } from "@/components/home/splash";
-import { Hero } from "@/components/home/hero";
-import { Chapters } from "@/components/home/chapters";
-import { Celebrations } from "@/components/home/celebrations";
-import { VenueMarquee } from "@/components/home/venue-marquee";
-import { NumberTicker } from "@/components/home/number-ticker";
-import { Magnetic } from "@/components/home/magnetic";
-import { MonogramButton } from "@/components/home/monogram-button";
-import { Reveal, RevealItem } from "@/components/home/reveal";
-import { ThemeToggle } from "@/components/common/theme-toggle";
-import { CaveMode, DiyaSlot } from "@/components/cave/cave-mode";
+import { Splash } from "@/frontend/components/home/splash";
+import { Hero } from "@/frontend/components/home/hero";
+import { Chapters } from "@/frontend/components/home/chapters";
+import { Celebrations } from "@/frontend/components/home/celebrations";
+import { VenueMarquee } from "@/frontend/components/home/venue-marquee";
+import { NumberTicker } from "@/frontend/components/home/number-ticker";
+import { Magnetic } from "@/frontend/components/home/magnetic";
+import { MonogramButton } from "@/frontend/components/home/monogram-button";
+import { Reveal, RevealItem } from "@/frontend/components/home/reveal";
+import { ThemeToggle } from "@/frontend/components/common/theme-toggle";
+import { CaveMode, DiyaSlot } from "@/frontend/components/cave/cave-mode";
 
 export const metadata: Metadata = {
   title: { absolute: "The Royal Knot — Luxury weddings in Jaipur & Udaipur" },

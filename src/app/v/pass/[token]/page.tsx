@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { db } from "@/lib/db";
-import { KnotMark } from "@/components/home/knot-mark";
-import { formatDate, formatTime } from "@/lib/format";
+import { db } from "@/backend/db";
+import { KnotMark } from "@/frontend/components/home/knot-mark";
+import { formatDate, formatTime } from "@/shared/format";
 import { PassQr } from "./pass-qr";
 
 export const metadata: Metadata = { title: "Your gate pass", robots: { index: false, follow: false }, referrer: "no-referrer" };

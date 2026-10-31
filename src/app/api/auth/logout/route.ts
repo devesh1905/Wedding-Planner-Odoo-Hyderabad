@@ -1,8 +1,2 @@
-import { NextResponse } from "next/server";
-import { SESSION_COOKIE } from "@/lib/session";
-
-export async function POST() {
-  const res = NextResponse.json({ ok: true });
-  res.cookies.delete(SESSION_COOKIE);
-  return res;
-}
+// Routing only: the endpoint logic lives in src/backend/api/auth/logout/handler.ts
+export { POST } from "@/backend/api/auth/logout/handler";

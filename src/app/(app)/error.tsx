@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/frontend/components/ui/button";
 
 /** Catch-all for the staff app: a failed query shows a friendly card instead of a blank screen. */
 export default function AppError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {

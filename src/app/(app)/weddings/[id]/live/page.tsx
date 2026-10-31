@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
 import { z } from 'zod';
-import { requirePageUser } from '@/lib/auth';
-import { db } from '@/lib/db';
-import { PageHeader } from '@/components/common/page-header';
-import { LiveControlRoom } from '@/components/live/LiveControlRoom';
+import { requirePageUser } from '@/backend/auth';
+import { db } from '@/backend/db';
+import { PageHeader } from '@/frontend/components/common/page-header';
+import { LiveControlRoom } from '@/frontend/components/live/LiveControlRoom';
 export const metadata={title:'Wedding-day control room'};
 export default async function LivePage({params}:{params:Promise<{id:string}>}) {
   await requirePageUser();const {id}=await params;if(!z.string().uuid().safeParse(id).success)notFound();

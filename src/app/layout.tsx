@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/frontend/components/ui/sonner";
 // Fonts are bundled locally so the app looks right offline (venue Wi-Fi is unreliable).
 import "@fontsource-variable/inter";
 import "@fontsource-variable/geist";
 import "@fontsource/yeseva-one/400.css";
 import "./globals.css";
-import { SPLASH_PREFLIGHT } from "@/components/home/splash-preflight";
+import { SPLASH_PREFLIGHT } from "@/frontend/components/home/splash-preflight";
 
 export const metadata: Metadata = {
   title: { default: "KnotOS · The Royal Knot", template: "%s · KnotOS" },

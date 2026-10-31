@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { CalendarHeart, MapPin, Users } from "lucide-react";
-import { db } from "@/lib/db";
-import { PageHeader } from "@/components/common/page-header";
-import { StagePill, statusLabel } from "@/components/common/stage-pill";
-import { OwnerAvatar } from "@/components/common/owner-avatar";
-import { EmptyState } from "@/components/common/empty-state";
-import { Progress } from "@/components/ui/progress";
-import { formatDate, formatINRCompact, relativeDays } from "@/lib/format";
-import { cn } from "@/lib/utils";
+import { db } from "@/backend/db";
+import { PageHeader } from "@/frontend/components/common/page-header";
+import { StagePill, statusLabel } from "@/frontend/components/common/stage-pill";
+import { OwnerAvatar } from "@/frontend/components/common/owner-avatar";
+import { EmptyState } from "@/frontend/components/common/empty-state";
+import { Progress } from "@/frontend/components/ui/progress";
+import { formatDate, formatINRCompact, relativeDays } from "@/shared/format";
+import { cn } from "@/shared/utils";
 
 export const metadata = { title: "Weddings" };
 

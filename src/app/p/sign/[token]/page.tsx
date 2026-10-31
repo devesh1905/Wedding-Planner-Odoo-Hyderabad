@@ -1,10 +1,10 @@
 import { ViewTransition } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { db } from "@/lib/db";
-import { formatDateTime } from "@/lib/format";
+import { db } from "@/backend/db";
+import { formatDateTime } from "@/shared/format";
 import { SignForm } from "./sign-form";
-import { WaxSeal } from "@/components/portal/wax-seal";
+import { WaxSeal } from "@/frontend/components/portal/wax-seal";
 
 export const metadata: Metadata = { title: { absolute: "Your service agreement · The Royal Knot" }, robots: { index: false } };
 

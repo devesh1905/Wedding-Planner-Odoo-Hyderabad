@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { EnquireForm } from "./enquire-form";
 import { ViewTransition } from "react";
-import { KnotMark } from "@/components/home/knot-mark";
+import { KnotMark } from "@/frontend/components/home/knot-mark";
 
 export const metadata: Metadata = { title: { absolute: "Plan your wedding · The Royal Knot" } };
 

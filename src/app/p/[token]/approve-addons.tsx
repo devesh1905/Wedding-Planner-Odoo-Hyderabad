@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { api } from "@/lib/api-client";
-import { cue } from "@/lib/sound";
+import { Button } from "@/frontend/components/ui/button";
+import { api } from "@/frontend/lib/api-client";
+import { cue } from "@/frontend/lib/sound";
 
 export function ApproveAddons({ token, milestoneId }: { token: string; milestoneId: string }) {
   const router = useRouter();
