@@ -177,6 +177,14 @@ function Cave() {
     const onDown = (e: PointerEvent) => {
       e.preventDefault();
       if (hintRef.current === "grab") setHint("drop");
+      if (diya.classList.contains("at-dock")) {
+        // hand over from CSS pinning to JS: start exactly where the diya is drawn right now
+        const c = homePos();
+        st.x = st.tx = c.x;
+        st.y = st.ty = c.y;
+        diya.classList.remove("at-dock");
+        diya.style.transform = `translate3d(${st.x - 36}px, ${st.y - 62}px, 0)`;
+      }
       // can throw if the touch already ended (very quick taps); dragging still works without it
       try {
         diya.setPointerCapture(e.pointerId);
@@ -310,9 +318,16 @@ function Cave() {
 
       // draw the diya; the flame leans against the direction of travel
       const lean = Math.max(-18, Math.min(18, -st.vx * 0.02));
-      diya.style.transform = `translate3d(${st.x - 36}px, ${st.y - 62}px, 0)`;
+      if (!diya.classList.contains("at-dock")) diya.style.transform = `translate3d(${st.x - 36}px, ${st.y - 62}px, 0)`;
       diya.style.setProperty("--lean", `${lean.toFixed(1)}deg`);
       flameState.lean = (lean / 18) * 0.6;
+
+      // Phone, resting in the corner niche: CSS pins the diya to the niche (.at-dock), so both move
+      // together when the browser's address bar slides in or out mid-scroll — no JS lag, no drift.
+      if (phone) {
+        const atDock = st.mode === "docked" && st.slotId === HOME;
+        if (atDock !== diya.classList.contains("at-dock")) diya.classList.toggle("at-dock", atDock);
+      }
 
       // Phone: once settled, nothing moves — skip the frame's style writes entirely.
       const settled = Math.abs(st.tx - st.x) < 0.3 && Math.abs(st.ty - st.y) < 0.3 && Math.abs(st.radiusTarget - st.radius) < 1;
