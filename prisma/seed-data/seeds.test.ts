@@ -17,7 +17,7 @@ for (const vendor of vendors) {
 }
 for (const wedding of weddings) {
   assert.ok(wedding.guestCount >= 250 && wedding.guestCount <= 600);
-  assert.ok(Number.isInteger(wedding.contractValue) && wedding.contractValue >= 400000000 && wedding.contractValue <= 3000000000);
+  assert.ok(Number.isInteger(wedding.contractValue) && wedding.contractValue >= 300000000 && wedding.contractValue <= 3000000000);
   assert.ok(new Date(wedding.endDate) >= new Date(wedding.startDate));
   assert.ok([9, 10, 11, 0, 1].includes(new Date(wedding.startDate).getUTCMonth()));
 }

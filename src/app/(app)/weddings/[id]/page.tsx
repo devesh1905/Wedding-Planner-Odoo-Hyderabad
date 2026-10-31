@@ -76,13 +76,13 @@ export default async function WeddingPage({
           ← All weddings
         </Link>
         <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
-          <div className="space-y-2">
+          <div className="min-w-0 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <StagePill status={wedding.stage} />
               <span className="text-xs text-muted-foreground tabular">{wedding.code}</span>
               <span className="rounded-md bg-muted px-2 py-0.5 text-xs">{wedding.package.name}</span>
             </div>
-            <h1 className="text-4xl font-semibold sm:text-5xl">
+            <h1 className="text-3xl font-semibold break-words sm:text-5xl">
               {wedding.partner1} & {wedding.partner2}
             </h1>
             <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted-foreground">
@@ -103,7 +103,7 @@ export default async function WeddingPage({
               )}
             </div>
           </div>
-          <div className="flex flex-col items-end gap-3">
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:items-end">
             <div className="flex items-center gap-4">
               <div className="text-right">
                 <p className="text-xs text-muted-foreground">Contract</p>

@@ -15,6 +15,8 @@ export type EnquiryCardData = {
   updatedAt: string;
   assignedTo: { id: string; name: string; avatarColor: string | null } | null;
   wedding: { id: string } | null;
+  /** Another enquiry or booked wedding with the same mobile number (likely a repeat contact). */
+  duplicateOf?: string | null;
 };
 
 export type Planner = { id: string; name: string };

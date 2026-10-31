@@ -134,6 +134,9 @@ function Column({ status, items, onOpen }: { status: string; items: EnquiryCardD
         <span className="ml-auto rounded-full bg-background px-2 text-xs text-muted-foreground tabular">{items.length}</span>
       </header>
       <div className="flex min-h-24 flex-col gap-2">
+        {items.length === 0 && (
+          <p className="rounded-xl border border-dashed px-3 py-6 text-center text-xs text-muted-foreground">Nothing here yet</p>
+        )}
         {items.map((e) => (
           <DraggableCard key={e.id} e={e} onOpen={onOpen} />
         ))}
@@ -179,6 +182,11 @@ function Card({ e, onClick, overlay }: { e: EnquiryCardData; onClick?: () => voi
           <OwnerAvatar name={e.assignedTo?.name} color={e.assignedTo?.avatarColor} size="xs" />
         </span>
       </div>
+      {e.duplicateOf && (
+        <p className="mt-2 flex items-center gap-1 rounded-md bg-marigold-soft px-2 py-1 text-xs text-foreground" title="Same mobile number">
+          <Phone className="size-3 shrink-0" /> <span className="truncate">Same phone as {e.duplicateOf}</span>
+        </p>
+      )}
       {warn && (
         <p className="mt-2 flex items-center gap-1 rounded-md bg-rose-soft px-2 py-1 text-xs text-rose">
           <AlertTriangle className="size-3" /> Follow-up overdue
