@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { checkinUrl, qrDataUrl } from "@/lib/qr";
+import { checkinUrl, qrDataUrl } from "@/frontend/lib/qr";
 
 /** The vendor's check-in QR, drawn in the browser so the link uses the address this page is on. */
 export function PassQr({ token, label }: { token: string; label: string }) {

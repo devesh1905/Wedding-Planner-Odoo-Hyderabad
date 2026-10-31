@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { db } from "@/lib/db";
-import { getReport } from "@/lib/reports";
-import { formatDateTime } from "@/lib/format";
-import { DashboardView } from "@/components/dashboard/dashboard-view";
+import { db } from "@/backend/db";
+import { getReport } from "@/backend/reports";
+import { formatDateTime } from "@/shared/format";
+import { DashboardView } from "@/frontend/components/dashboard/dashboard-view";
 
 export const metadata: Metadata = { title: "Season report", robots: { index: false } };
 

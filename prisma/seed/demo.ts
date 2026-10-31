@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { PrismaClient, Prisma, WeddingStage as DbStage, VendorCategory as DbCategory } from "@prisma/client";
-import { newToken } from "../../src/lib/tokens";
+import { newToken } from "../../src/backend/tokens";
 import { vendors } from "../seed-data/vendors";
 import { weddings, weddingFinance } from "../seed-data/weddings";
 import { weddingEvents, schedule } from "../seed-data/schedule";

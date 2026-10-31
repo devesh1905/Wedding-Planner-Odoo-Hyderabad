@@ -2,18 +2,18 @@ import { ViewTransition } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CalendarHeart, MapPin, MessageCircle, Phone } from "lucide-react";
-import { KnotMark } from "@/components/home/knot-mark";
-import { Icon } from "@/components/icons/icon";
-import { db } from "@/lib/db";
-import { formatDate, formatINR, relativeDays } from "@/lib/format";
-import { extraClientCharge } from "@/lib/settlement";
-import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
+import { KnotMark } from "@/frontend/components/home/knot-mark";
+import { Icon } from "@/frontend/components/icons/icon";
+import { db } from "@/backend/db";
+import { formatDate, formatINR, relativeDays } from "@/shared/format";
+import { extraClientCharge } from "@/shared/settlement";
+import { Progress } from "@/frontend/components/ui/progress";
+import { cn } from "@/shared/utils";
 import { ApproveAddons } from "./approve-addons";
 import { SoundToggle } from "./sound-toggle";
-import { Reveal, RevealItem } from "@/components/home/reveal";
-import { FlipCountdown } from "@/components/portal/flip-countdown";
-import { CheckDraw } from "@/components/portal/check-draw";
+import { Reveal, RevealItem } from "@/frontend/components/home/reveal";
+import { FlipCountdown } from "@/frontend/components/portal/flip-countdown";
+import { CheckDraw } from "@/frontend/components/portal/check-draw";
 
 export const metadata: Metadata = { title: { absolute: "Your wedding · The Royal Knot" }, robots: { index: false } };
 

@@ -2,12 +2,12 @@
 
 import { startTransition, useState, ViewTransition } from "react";
 import { CheckCircle2, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { EnquiryFields, emptyEnquiry, toPayload, type EnquiryValues } from "@/components/enquiries/enquiry-fields";
-import { enquiryInput } from "@/lib/validation/enquiry";
-import { api, ApiError } from "@/lib/api-client";
-import { cue } from "@/lib/sound";
-import { petalShower } from "@/components/home/petals";
+import { Button } from "@/frontend/components/ui/button";
+import { EnquiryFields, emptyEnquiry, toPayload, type EnquiryValues } from "@/frontend/components/enquiries/enquiry-fields";
+import { enquiryInput } from "@/shared/validation/enquiry";
+import { api, ApiError } from "@/frontend/lib/api-client";
+import { cue } from "@/frontend/lib/sound";
+import { petalShower } from "@/frontend/components/home/petals";
 
 export function EnquireForm() {
   const [values, setValues] = useState<EnquiryValues>(emptyEnquiry);

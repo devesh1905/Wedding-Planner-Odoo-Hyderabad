@@ -1,6 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
-import { extractTextFromPdf, textFingerprint } from '../src/lib/ai/extract-quote';
-import { quoteExtractionSchema, type QuoteExtraction, type QuoteCategory } from '../src/lib/ai/quote-schema';
+import { extractTextFromPdf, textFingerprint } from '../src/backend/ai/extract-quote';
+import { quoteExtractionSchema, type QuoteExtraction, type QuoteCategory } from '../src/backend/ai/quote-schema';
 const vendors = [
   {file:'caterer-a-shahi-rasoi',name:'Shahi Rasoi',price:2450,hour:15000,total:980000,taxes:[],included:['MAIN','STARTER','DESSERT','LIVE_COUNTER'],notes:['Additional hours billed only when used.','No taxes apply.']},
   {file:'caterer-b-marwar-feasts',name:'Marwar Feasts',price:2150,hour:12000,total:946000,taxes:[{label:'Service charge',percent:10,amount:86000}],included:['MAIN','STARTER'],notes:['Desserts, live counters and welcome drinks are not included.','Service charge applies to food.','Extra hours are billed separately.']},
@@ -13,6 +13,6 @@ for (const vendor of vendors) {
   const data = quoteExtractionSchema.parse({vendorName:vendor.name,currency:'INR',perPlate:vendor.price,guestCount:400,extraHourRate:vendor.hour,taxes:vendor.taxes,lines,total:vendor.total,notes:vendor.notes});
   const text = await extractTextFromPdf(await readFile(new URL(`./quotes/${vendor.file}.pdf`,import.meta.url)));
   manifest[textFingerprint(text)] = `${vendor.file}.json`;
-  await writeFile(new URL(`../src/lib/ai/fixtures/${vendor.file}.json`,import.meta.url),JSON.stringify(data,null,2)+'\n');
+  await writeFile(new URL(`../src/backend/ai/fixtures/${vendor.file}.json`,import.meta.url),JSON.stringify(data,null,2)+'\n');
 }
-await writeFile(new URL('../src/lib/ai/fixtures/manifest.json',import.meta.url),JSON.stringify(manifest,null,2)+'\n');
+await writeFile(new URL('../src/backend/ai/fixtures/manifest.json',import.meta.url),JSON.stringify(manifest,null,2)+'\n');

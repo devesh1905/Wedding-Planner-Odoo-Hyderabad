@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/frontend/components/ui/skeleton";
 
 /** Shown the instant the dashboard is opened or the period changes, while numbers load. */
 export default function Loading() {

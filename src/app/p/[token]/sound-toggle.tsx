@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Volume2, VolumeX } from "lucide-react";
-import { cue, setSoundEnabled, soundEnabled } from "@/lib/sound";
+import { cue, setSoundEnabled, soundEnabled } from "@/frontend/lib/sound";
 
 export function SoundToggle() {
   const [on, setOn] = useState(true);

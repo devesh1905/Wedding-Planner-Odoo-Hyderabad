@@ -4,13 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import SignaturePad from "signature_pad";
 import { Eraser, Loader2, PenLine } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Field } from "@/components/common/field";
-import { api, ApiError } from "@/lib/api-client";
-import { cue } from "@/lib/sound";
-import { petalShower } from "@/components/home/petals";
+import { Button } from "@/frontend/components/ui/button";
+import { Input } from "@/frontend/components/ui/input";
+import { Checkbox } from "@/frontend/components/ui/checkbox";
+import { Field } from "@/frontend/components/common/field";
+import { api, ApiError } from "@/frontend/lib/api-client";
+import { cue } from "@/frontend/lib/sound";
+import { petalShower } from "@/frontend/components/home/petals";
 
 export function SignForm({ token, defaultName }: { token: string; defaultName: string }) {
   const router = useRouter();

@@ -294,34 +294,44 @@ Camera (QR scanning), IndexedDB and the service worker need HTTPS or `localhost`
 
 ## Project structure
 
+The code is split into **backend**, **frontend** and **shared** folders. `src/app/` only does
+routing: pages render frontend components, and each `src/app/api/**/route.ts` is a one-line
+wrapper that re-exports the real handler from `src/backend/api/`.
+
 ```
 knotos/
 ├── prisma/
-│   ├── schema.prisma        # 24 tables
-│   ├── migrations/          # init + enable_rls
-│   ├── seed/                # seed entry, demo data, demo-today
-│   └── seed-data/           # realistic vendors, schedules, weddings
-├── public/sw.js             # offline service worker
-├── demo-assets/             # demo caterer quote PDFs and generators
+│   ├── schema.prisma          # 24 tables
+│   ├── migrations/            # init + enable_rls
+│   ├── seed/  seed-data/      # demo data (realistic vendors, weddings, money)
+├── public/sw.js               # offline service worker
+├── demo-assets/               # demo quote PDFs and their generators
+├── docker-compose.yml         # local Postgres
+├── .github/workflows/ci.yml   # typecheck, lint, test, migrate+seed, build
 └── src/
-    ├── proxy.ts             # session gate for staff pages
-    ├── app/
-    │   ├── (app)/           # staff app: dashboard, enquiries, weddings, vendors
-    │   ├── api/             # REST route handlers
-    │   ├── enquire/         # public enquiry form
-    │   ├── login/
-    │   ├── p/               # couple portal and agreement signing
-    │   ├── v/               # vendor portal
-    │   └── share/           # read-only share links
-    ├── components/
-    │   ├── common/  dashboard/  enquiries/  live/
-    │   ├── quotes/  shell/  ui/  vendors/  weddings/
-    └── lib/
-        ├── ai/              # quote reader, schema, fallbacks
-        ├── offline/         # IndexedDB queue, auto sync, service worker tests
-        ├── qr/              # QR pass generation and parsing
-        ├── validation/      # shared Zod schemas
-        └── agreement.ts  plan.ts  settlement.ts  reports.ts  auth.ts  db.ts ...
+    ├── proxy.ts               # session gate for staff pages
+    ├── app/                   # ROUTING ONLY (Next.js App Router)
+    │   ├── (app)/             # staff pages: dashboard, enquiries, weddings, vendors
+    │   ├── enquire/  login/  p/  v/  share/   # public pages
+    │   └── api/**/route.ts    # 1-line wrappers → src/backend/api/**/handler.ts
+    │
+    ├── backend/               # SERVER ONLY — never shipped to the browser
+    │   ├── api/**/handler.ts  # every REST endpoint: auth → Zod → transaction → JSON
+    │   ├── db.ts  auth.ts  session.ts         # Prisma client, guards, JWT sessions
+    │   ├── reports.ts  plan.ts  agreement.ts  # dashboard maths, task plans, agreement text
+    │   ├── activity.ts  tokens.ts  weddings.ts
+    │   └── ai/                # PDF → Gemini → validated quote, fallbacks
+    │
+    ├── frontend/              # BROWSER UI
+    │   ├── components/        # common, dashboard, enquiries, home, live, portal,
+    │   │                      # quotes, shell, ui (shadcn), vendors, weddings, cave
+    │   └── lib/               # api-client, offline queue (IndexedDB), QR, sound
+    │
+    └── shared/                # USED BY BOTH SIDES
+        ├── schemas/           # Zod schemas for quotes, live day, vendors
+        ├── validation/        # Zod schemas for enquiries, common fields
+        ├── settlement.ts      # money maths (guards on the server, display in the UI)
+        └── format.ts  utils.ts
 ```
 
 ---

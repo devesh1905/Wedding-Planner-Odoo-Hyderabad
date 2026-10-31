@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
 import { z } from 'zod';
-import { requirePageUser } from '@/lib/auth';
-import { db } from '@/lib/db';
-import { PageHeader } from '@/components/common/page-header';
-import { QrPassSheet } from '@/components/live/QrPassSheet';
+import { requirePageUser } from '@/backend/auth';
+import { db } from '@/backend/db';
+import { PageHeader } from '@/frontend/components/common/page-header';
+import { QrPassSheet } from '@/frontend/components/live/QrPassSheet';
 export const metadata={title:'Vendor QR passes'};
 export default async function QrPassesPage({params}:{params:Promise<{id:string}>}){
   await requirePageUser();const {id}=await params;if(!z.string().uuid().safeParse(id).success)notFound();

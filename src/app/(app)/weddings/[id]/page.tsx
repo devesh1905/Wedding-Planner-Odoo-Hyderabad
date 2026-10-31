@@ -1,23 +1,23 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Icon, type IconName } from "@/components/icons/icon";
-import { db } from "@/lib/db";
-import { requirePageUser } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
-import { StagePill } from "@/components/common/stage-pill";
-import { OwnerAvatar } from "@/components/common/owner-avatar";
-import { Amount } from "@/components/common/amount";
-import { CopyLinkButton } from "@/components/common/copy-link-button";
-import { WhatsAppLink } from "@/components/common/whatsapp-link";
-import { formatDate, relativeDays } from "@/lib/format";
-import { cn } from "@/lib/utils";
-import { PlanTab } from "@/components/weddings/plan-tab";
-import { PaymentsTab } from "@/components/weddings/payments-tab";
-import { OverviewTab } from "@/components/weddings/overview-tab";
-import { VendorsTab } from "@/components/weddings/vendors-tab";
-import { SettlementTab } from "@/components/weddings/settlement-tab";
-import { QuoteRequestPanel } from "@/components/quotes/QuoteRequestPanel";
-import { HoursTab } from "@/components/weddings/hours-tab";
+import { Icon, type IconName } from "@/frontend/components/icons/icon";
+import { db } from "@/backend/db";
+import { requirePageUser } from "@/backend/auth";
+import { Button } from "@/frontend/components/ui/button";
+import { StagePill } from "@/frontend/components/common/stage-pill";
+import { OwnerAvatar } from "@/frontend/components/common/owner-avatar";
+import { Amount } from "@/frontend/components/common/amount";
+import { CopyLinkButton } from "@/frontend/components/common/copy-link-button";
+import { WhatsAppLink } from "@/frontend/components/common/whatsapp-link";
+import { formatDate, relativeDays } from "@/shared/format";
+import { cn } from "@/shared/utils";
+import { PlanTab } from "@/frontend/components/weddings/plan-tab";
+import { PaymentsTab } from "@/frontend/components/weddings/payments-tab";
+import { OverviewTab } from "@/frontend/components/weddings/overview-tab";
+import { VendorsTab } from "@/frontend/components/weddings/vendors-tab";
+import { SettlementTab } from "@/frontend/components/weddings/settlement-tab";
+import { QuoteRequestPanel } from "@/frontend/components/quotes/QuoteRequestPanel";
+import { HoursTab } from "@/frontend/components/weddings/hours-tab";
 
 const TABS: readonly { key: string; label: string; icon: IconName }[] = [
   { key: "overview", label: "Overview", icon: "grid" },
