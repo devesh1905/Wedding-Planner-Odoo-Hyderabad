@@ -643,6 +643,8 @@ html { scroll-behavior: smooth; }
      bottom 16, flame anchor 36px from the diya's left and 62px from its top, diya box 72×96) */
   /* keep the halo inside the diya's own box so it can't poke past a narrow screen edge */
   .diya-flame-glow { left: -6px; top: -4px; width: 76px; height: 76px; }
+  /* the warm halo behind the header logo stays inside the screen on a narrow phone */
+  .diya-ambient { width: 6.5rem; height: 6.5rem; }
   .cave-diya.at-dock {
     left: auto;
     top: auto;
