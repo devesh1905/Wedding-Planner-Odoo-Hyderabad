@@ -155,7 +155,18 @@ function Cave() {
     const html = document.documentElement;
     const diya = diyaRef.current!;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const phone = matchMedia(PHONE_QUERY).matches;
+    // Phone or desktop is re-decided live (window resized, tablet rotated): start over in the right mode.
+    const phoneMq = matchMedia(PHONE_QUERY);
+    let phone = phoneMq.matches;
+    const onMode = () => {
+      phone = phoneMq.matches;
+      st.placed = false;
+      st.slotId = null;
+      wrote = false;
+      diya.classList.remove("at-dock");
+      for (const el of document.querySelectorAll<HTMLElement>("[data-cast]")) el.style.filter = "";
+    };
+    phoneMq.addEventListener("change", onMode);
     const target = (id: string) => (id === HOME ? homePos() : slotCenter(slots.get(id)!));
     // docked light reaches well past the far edge, so the whole page is readable
     const bigRadius = () => Math.hypot(innerWidth, innerHeight) * 2.6;
@@ -382,6 +393,7 @@ function Cave() {
       diya.removeEventListener("pointercancel", onUp);
       removeEventListener("scroll", onScroll);
       window.visualViewport?.removeEventListener("resize", onResize);
+      phoneMq.removeEventListener("change", onMode);
       removeEventListener("diya:slot", onSlot);
       removeEventListener("keydown", onKey);
       for (const el of document.querySelectorAll<HTMLElement>("[data-cast]")) el.style.filter = "";
