@@ -40,7 +40,7 @@ export function AppShell({ user, children }: { user: { name: string; role: strin
   return (
     <TooltipProvider delayDuration={200}>
     <div className="app-ui flex min-h-svh">
-      <aside className={`sticky top-0 hidden h-svh shrink-0 transition-[width] duration-200 ease-out md:block ${rail ? "w-16" : "w-56"}`}>
+      <aside className={`sticky top-0 z-40 hidden h-svh shrink-0 transition-[width] duration-200 ease-out md:block ${rail ? "w-16" : "w-56"}`}>
         <AppSidebar user={user} rail={rail} onToggle={toggle} />
       </aside>
 
