@@ -32,6 +32,7 @@ import { api, ApiError } from "@/frontend/lib/api-client";
 import { formatDate, formatDateTime, formatINR, formatINRCompact, relativeDays } from "@/shared/format";
 import { EVENT_LABELS, PLANNING, serviceByKey, type EventKey } from "@/shared/package-builder";
 import { ConvertDialog } from "./convert-dialog";
+import { CallPrepPanel } from "./call-prep-panel";
 import type { Planner } from "./types";
 
 type Detail = {
@@ -162,6 +163,8 @@ export function EnquiryDrawer({ id, planners, onClose }: { id: string | null; pl
               </section>
 
               {data.services.length > 0 && <RequestedPackage data={data} />}
+
+              <CallPrepPanel key={data.id} enquiryId={data.id} />
 
               <section className="grid gap-4 sm:grid-cols-2">
                 <Field label="Assigned planner">

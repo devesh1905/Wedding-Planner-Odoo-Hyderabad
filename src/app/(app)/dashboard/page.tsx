@@ -7,6 +7,7 @@ import { PageHeader } from "@/frontend/components/common/page-header";
 import { Button } from "@/frontend/components/ui/button";
 import { DashboardView } from "@/frontend/components/dashboard/dashboard-view";
 import { ShareDialog } from "@/frontend/components/dashboard/share-dialog";
+import { RiskBrief } from "@/frontend/components/dashboard/risk-brief";
 import { cn } from "@/shared/utils";
 
 export const metadata = { title: "Dashboard" };
@@ -52,6 +53,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           </>
         }
       />
+      <RiskBrief className="mb-4" />
       <DashboardView report={report} />
     </>
   );

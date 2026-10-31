@@ -111,7 +111,7 @@ export function EnquiryBoard({ enquiries, planners }: { enquiries: EnquiryCardDa
         <ScrollRail target={boardRef} className="ml-auto" />
       </div>
 
-      <DndContext
+      <DndContext id="enquiry-board"
         sensors={sensors}
         onDragStart={(e) => setDragging(items.find((i) => i.id === e.active.id) ?? null)}
         onDragEnd={onDragEnd}

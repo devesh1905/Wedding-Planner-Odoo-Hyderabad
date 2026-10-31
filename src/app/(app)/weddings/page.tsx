@@ -1,3 +1,4 @@
+import { RiskBrief } from "@/frontend/components/dashboard/risk-brief";
 import Link from "next/link";
 import { CalendarHeart, MapPin, Users } from "lucide-react";
 import { db } from "@/backend/db";
@@ -32,6 +33,7 @@ export default async function WeddingsPage({ searchParams }: { searchParams: Pro
   return (
     <>
       <PageHeader title="Weddings" subtitle={`${weddings.length} weddings this season · from booking to settlement`} />
+      <RiskBrief className="mb-6" />
 
       {/* Journey tracker: where every wedding is right now. Equal segments, so the bar reads as one
           pipeline; the thin meter under each stage shows its share of the season. */}

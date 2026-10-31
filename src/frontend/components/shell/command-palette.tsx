@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Command } from "cmdk";
 import { Dialog as DialogPrimitive } from "radix-ui";
-import { ChevronRight, CornerDownLeft, Search, X } from "lucide-react";
+import { ChevronRight, CornerDownLeft, Loader2, Search, X } from "lucide-react";
 import { Icon, type IconName } from "@/frontend/components/icons/icon";
 import { statusLabel } from "@/frontend/components/common/stage-pill";
 import { formatDate } from "@/shared/format";
@@ -43,12 +43,22 @@ function match(value: string, search: string, keywords?: string[]) {
   return hay.startsWith(words[0]!) || hay.includes(` ${words[0]}`) ? 1 : 0.5;
 }
 
+type Answer =
+  | { state: "loading"; question: string }
+  | { state: "done"; question: string; meaning: string; rows: { id: string; title: string; meta: string; href: string; icon: IconName }[] }
+  | { state: "error"; question: string; error: string };
+
+// Questions get the "Ask" row: three or more words, or anything ending in "?".
+const looksLikeQuestion = (q: string) => q.endsWith("?") || q.split(/\s+/).filter(Boolean).length >= 3;
+
 const couple = (x: { partner1: string; partner2: string }) => `${x.partner1} & ${x.partner2}`;
 const tidy = (s: string) => s.toLowerCase().replace(/_/g, " ");
 
 /**
  * Global search (Ctrl/⌘ K): pages, couples (booked weddings and open enquiries), a wedding's
  * sections, vendors and a few actions. The index loads once per open; cmdk filters as you type.
+ * A typed question can also be *asked*: the server turns it into a fixed filter plan and answers
+ * with real rows (see src/backend/ai/ask.ts).
  */
 export function CommandPalette({
   open,
@@ -64,10 +74,12 @@ export function CommandPalette({
   const router = useRouter();
   const [index, setIndex] = useState<Index | null>(null);
   const [query, setQuery] = useState("");
+  const [answer, setAnswer] = useState<Answer | null>(null);
 
   useEffect(() => {
     if (!open) return;
     setQuery("");
+    setAnswer(null);
     fetch("/api/search")
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => d && setIndex(d))
@@ -77,6 +89,20 @@ export function CommandPalette({
   const go = (href: string) => {
     onOpenChange(false);
     router.push(href);
+  };
+
+  const askQuestion = async (question: string) => {
+    setAnswer({ state: "loading", question });
+    try {
+      const res = await fetch("/api/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question }) });
+      const data = await res.json();
+      // ignore a late answer if the box has moved on to another question
+      setAnswer((cur) =>
+        cur?.question !== question ? cur : res.ok ? { state: "done", question, meaning: data.meaning, rows: data.rows } : { state: "error", question, error: data.error ?? "Could not answer that" },
+      );
+    } catch {
+      setAnswer((cur) => (cur?.question !== question ? cur : { state: "error", question, error: "You seem to be offline" }));
+    }
   };
 
   const q = query.trim().toLowerCase();
@@ -104,9 +130,12 @@ export function CommandPalette({
               <Search className="size-4 shrink-0 text-muted-foreground" />
               <Command.Input
                 value={query}
-                onValueChange={setQuery}
+                onValueChange={(v) => {
+                  setQuery(v);
+                  setAnswer(null);
+                }}
                 autoFocus
-                placeholder="Search couples, vendors, pages…"
+                placeholder="Search, or ask “December weddings that still owe us”"
                 className="h-14 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground"
               />
               <DialogPrimitive.Close className="grid size-7 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground" aria-label="Close">
@@ -123,9 +152,22 @@ export function CommandPalette({
                 "[&_[cmdk-group-items]]:ml-[11px] [&_[cmdk-group-items]]:space-y-0.5 [&_[cmdk-group-items]]:border-l [&_[cmdk-group-items]]:pl-2",
               )}
             >
-              <Command.Empty className="py-12 text-center text-sm text-muted-foreground">
-                {index ? `Nothing matches “${query}”.` : "Loading…"}
-              </Command.Empty>
+              {answer ? (
+                <AnswerView answer={answer} go={go} onRetry={() => askQuestion(answer.question)} />
+              ) : (
+              <>
+              {/* a question always has the Ask row, so "nothing matches" would be wrong there */}
+              {!looksLikeQuestion(q) && (
+                <Command.Empty className="py-12 text-center text-sm text-muted-foreground">
+                  {index ? `Nothing matches “${query}”.` : "Loading…"}
+                </Command.Empty>
+              )}
+
+              {looksLikeQuestion(q) && (
+                <Command.Group heading="Ask KnotOS" forceMount>
+                  <Item forceMount value="__ask" icon="idea" title={`Ask: “${query.trim()}”`} meta="Answered from live data" onSelect={() => askQuestion(query.trim())} />
+                </Command.Group>
+              )}
 
               <Command.Group heading="Pages">
                 {PAGES.filter((p) => !p.founderOnly || role === "FOUNDER").map((p) => (
@@ -212,6 +254,8 @@ export function CommandPalette({
                   />
                 ))}
               </Command.Group>
+              </>
+              )}
             </Command.List>
 
             <div className="flex items-center gap-4 border-t px-5 py-3 text-xs text-muted-foreground">
@@ -236,6 +280,45 @@ export function CommandPalette({
   );
 }
 
+/** The answer to an asked question: what was understood, then the matching records. */
+function AnswerView({ answer, go, onRetry }: { answer: Answer; go: (href: string) => void; onRetry: () => void }) {
+  if (answer.state === "loading")
+    return (
+      <div className="flex items-center gap-3 px-3 py-10 text-sm text-muted-foreground" role="status">
+        <Loader2 className="size-4 animate-spin" /> Reading your data…
+      </div>
+    );
+  if (answer.state === "error")
+    return (
+      <div className="px-3 py-10 text-center text-sm">
+        <p className="text-rose">{answer.error}</p>
+        <p className="mt-1 text-muted-foreground">Plain search still works: try a name, phone or city.</p>
+        <button type="button" onClick={onRetry} className="mt-3 text-sm font-medium underline underline-offset-4">
+          Try again
+        </button>
+      </div>
+    );
+  return (
+    <>
+      <p className="mx-2 mb-1 flex items-start gap-2 rounded-xl bg-muted/50 px-3 py-2.5 text-sm">
+        <Icon name="idea" className="mt-0.5 size-4 shrink-0 text-cta" />
+        <span>
+          {answer.meaning} <span className="text-muted-foreground">· {answer.rows.length === 25 ? "first 25" : answer.rows.length} found</span>
+        </span>
+      </p>
+      {answer.rows.length === 0 ? (
+        <p className="py-8 text-center text-sm text-muted-foreground">Nothing in KnotOS matches that right now.</p>
+      ) : (
+        <Command.Group heading="Answer" forceMount>
+          {answer.rows.map((r) => (
+            <Item key={r.id} forceMount value={`ans-${r.id}`} icon={r.icon} title={r.title} meta={r.meta} wideMeta onSelect={() => go(r.href)} />
+          ))}
+        </Command.Group>
+      )}
+    </>
+  );
+}
+
 function Item({
   value,
   keywords,
@@ -243,6 +326,8 @@ function Item({
   title,
   meta,
   onSelect,
+  forceMount,
+  wideMeta,
 }: {
   value: string;
   keywords?: string[];
@@ -250,9 +335,29 @@ function Item({
   title: string;
   meta?: string;
   onSelect: () => void;
+  forceMount?: boolean;
+  /** answers carry long facts: show them under the title instead of truncated on the right */
+  wideMeta?: boolean;
 }) {
+  if (wideMeta)
+    return (
+      <Command.Item
+        value={value}
+        forceMount={forceMount}
+        onSelect={onSelect}
+        className="group flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-foreground/85 outline-none data-[selected=true]:bg-muted data-[selected=true]:text-foreground"
+      >
+        <Icon name={icon} className="size-4 shrink-0 text-muted-foreground group-data-[selected=true]:text-cta" />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate font-medium">{title}</span>
+          {meta && <span className="block truncate text-xs text-muted-foreground">{meta}</span>}
+        </span>
+        <ChevronRight className="size-4 shrink-0 text-muted-foreground opacity-0 group-data-[selected=true]:opacity-100" />
+      </Command.Item>
+    );
   return (
     <Command.Item
+      forceMount={forceMount}
       value={value}
       keywords={keywords}
       onSelect={onSelect}
