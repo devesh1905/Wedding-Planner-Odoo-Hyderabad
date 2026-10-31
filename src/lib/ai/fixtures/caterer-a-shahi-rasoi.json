@@ -1,0 +1,47 @@
+{
+  "vendorName": "Shahi Rasoi",
+  "currency": "INR",
+  "perPlate": 2450,
+  "guestCount": 400,
+  "extraHourRate": 15000,
+  "taxes": [],
+  "lines": [
+    {
+      "item": "Regional Rajasthani mains",
+      "category": "MAIN",
+      "qty": null,
+      "unit": null,
+      "unitPrice": null,
+      "included": true
+    },
+    {
+      "item": "Starters",
+      "category": "STARTER",
+      "qty": null,
+      "unit": null,
+      "unitPrice": null,
+      "included": true
+    },
+    {
+      "item": "Traditional desserts",
+      "category": "DESSERT",
+      "qty": null,
+      "unit": null,
+      "unitPrice": null,
+      "included": true
+    },
+    {
+      "item": "Live counters",
+      "category": "LIVE_COUNTER",
+      "qty": null,
+      "unit": null,
+      "unitPrice": null,
+      "included": true
+    }
+  ],
+  "total": 980000,
+  "notes": [
+    "Additional hours billed only when used.",
+    "No taxes apply."
+  ]
+}

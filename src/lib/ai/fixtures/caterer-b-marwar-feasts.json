@@ -1,0 +1,62 @@
+{
+  "vendorName": "Marwar Feasts",
+  "currency": "INR",
+  "perPlate": 2150,
+  "guestCount": 400,
+  "extraHourRate": 12000,
+  "taxes": [
+    {
+      "label": "Service charge",
+      "percent": 10,
+      "amount": 86000
+    }
+  ],
+  "lines": [
+    {
+      "item": "Regional Rajasthani mains",
+      "category": "MAIN",
+      "qty": null,
+      "unit": null,
+      "unitPrice": null,
+      "included": true
+    },
+    {
+      "item": "Starters",
+      "category": "STARTER",
+      "qty": null,
+      "unit": null,
+      "unitPrice": null,
+      "included": true
+    },
+    {
+      "item": "Traditional desserts",
+      "category": "DESSERT",
+      "qty": null,
+      "unit": null,
+      "unitPrice": null,
+      "included": false
+    },
+    {
+      "item": "Welcome drinks",
+      "category": "BEVERAGE",
+      "qty": null,
+      "unit": null,
+      "unitPrice": null,
+      "included": false
+    },
+    {
+      "item": "Live counters",
+      "category": "LIVE_COUNTER",
+      "qty": null,
+      "unit": null,
+      "unitPrice": null,
+      "included": false
+    }
+  ],
+  "total": 946000,
+  "notes": [
+    "Desserts, live counters and welcome drinks are not included.",
+    "Service charge applies to food.",
+    "Extra hours are billed separately."
+  ]
+}
