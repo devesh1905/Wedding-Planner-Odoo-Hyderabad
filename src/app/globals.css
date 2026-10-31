@@ -420,11 +420,19 @@ html { scroll-behavior: smooth; }
   left: 0;
   top: 0;
   z-index: 60;
-  width: 0;
-  height: 0;
+  width: 60px;
+  height: 70px;
   cursor: grab;
-  touch-action: none;
+  touch-action: none; /* dragging the diya never scrolls the page */
+  user-select: none;
   outline: none;
+  will-change: transform;
+}
+.cave-diya .diya-lean {
+  transform-box: view-box;
+  transform-origin: 30px 40px;
+  transform: rotate(var(--lean, 0deg));
+  transition: transform 0.12s linear;
 }
 .cave-diya.is-carried { cursor: grabbing; }
 .cave-diya:focus-visible svg { filter: drop-shadow(0 0 6px rgb(255 200 120 / 0.9)); }

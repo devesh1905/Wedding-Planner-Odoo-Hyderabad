@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { LayoutGroup, motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
+import { DiyaSlot } from "@/components/cave/cave-mode";
 
 // Theme "moodboards" rendered from gradients and pattern — no stock photos.
 const THEMES = [
@@ -111,10 +112,11 @@ export function Celebrations() {
 
   return (
     <section id="celebrations" className="py-24" aria-label="Celebration styles">
-      <div className="mx-auto max-w-6xl px-6">
+      <div className="relative mx-auto max-w-6xl px-6">
+        <DiyaSlot id="celebrations" className="absolute -top-6 right-6" />
         <p className="text-xs tracking-[0.3em] text-eyebrow uppercase">Celebrations</p>
         <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
-          <h2 className="max-w-xl text-4xl leading-tight font-semibold sm:text-5xl">Every wedding has its own light</h2>
+          <h2 data-cast className="max-w-xl text-4xl leading-tight font-semibold sm:text-5xl">Every wedding has its own light</h2>
           <div className="flex flex-col items-start gap-4 sm:items-end">
             <div role="group" aria-label="Celebrations view" className="inline-flex rounded-full border border-border bg-surface p-1 text-sm">
               {(["wander", "scan"] as const).map((v) => (

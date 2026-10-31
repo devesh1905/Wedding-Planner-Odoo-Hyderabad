@@ -1,35 +1,39 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { animate, motion, useMotionValue, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 /**
  * Cave mode (couples' home, dark theme only).
  *
- * One light — the diya's flame — drives everything, updated once per frame:
- *  • darkness: a full-screen layer whose transparency falls off with distance from the flame
- *    (soft core, long tail ≈ 1 / (1 + (d/r)²)); radius is huge when slotted (room lit), small when carried
- *  • warmth: a firelight tint blended over what's lit
- *  • shadows: every [data-cast] element gets a drop-shadow pointing away from the flame;
- *    longer, softer and fainter with distance
- *  • flicker: smooth noise nudges intensity and position, so light and shadows breathe together
+ * One light — the diya's flame — drives everything. A single animation loop owns all motion:
+ * every frame the diya eases toward ONE live target (the pointer while dragging, the niche's
+ * current on-screen position while docked or gliding, or where it was dropped), so there are no
+ * competing animations, no stale targets and nothing to get stuck.
  *
- * The diya lives in <DiyaSlot> niches. Slotted = light switch on for the page. Grab it = the room
- * goes dark and it becomes a lamp you carry. Near a slot it's pulled in. Scrolling glides it to the
- * slot nearest the middle of the screen.
+ * From the flame position + light radius the loop also updates:
+ *  • darkness that falls off with distance (soft core, long tail)
+ *  • a warm firelight tint
+ *  • drop-shadows on every [data-cast] element, pointing away from the flame
+ *  • a gentle flicker shared by light and shadows
+ *
+ * Docked in a niche = the page's light is on. Grab it = the room dims and it becomes a lamp you
+ * carry. Near a niche it's pulled in. Scrolling glides it to the niche nearest mid-screen.
  */
 
 const slots = new Map<string, HTMLElement>();
 const CARRY_RADIUS = 230;
-const SNAP_DISTANCE = 110;
+const SNAP_DISTANCE = 120;
 const IDLE_RETURN_MS = 6000;
+// Follow speeds (per second) for exponential easing: higher = snappier.
+const FOLLOW_DRAG = 28;
+const FOLLOW_GLIDE = 6.5;
+const FOLLOW_RADIUS = 4.5;
 
 export function DiyaSlot({ id, className, label = "Place the diya here" }: { id: string; className?: string; label?: string }) {
   const ref = useRef<HTMLButtonElement>(null);
   useEffect(() => {
-    const el = ref.current!;
-    slots.set(id, el);
+    slots.set(id, ref.current!);
     return () => {
       slots.delete(id);
     };
@@ -46,13 +50,31 @@ export function DiyaSlot({ id, className, label = "Place the diya here" }: { id:
   );
 }
 
-// smooth 1D noise for flicker (sum of incommensurate sines — cheap, never repeats visibly)
+// smooth 1D noise for flicker (sum of incommensurate sines — cheap, never visibly repeats)
 const flicker = (t: number) => 0.5 * Math.sin(t * 2.1) + 0.3 * Math.sin(t * 5.3 + 1.7) + 0.2 * Math.sin(t * 11.7 + 0.4);
+const ease = (k: number, dt: number) => 1 - Math.exp(-k * dt);
+
+function slotCenter(el: HTMLElement) {
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height * 0.6 };
+}
+
+function nearestSlot(px: number, py: number, visibleOnly: boolean) {
+  let best: { id: string; d: number } | null = null;
+  for (const [id, el] of slots) {
+    const r = el.getBoundingClientRect();
+    if (r.width === 0) continue;
+    const c = slotCenter(el);
+    // only niches comfortably on screen count as visible
+    if (visibleOnly && (c.y < 70 || c.y > innerHeight - 70 || c.x < 0 || c.x > innerWidth)) continue;
+    const d = Math.hypot(c.x - px, c.y - py);
+    if (!best || d < best.d) best = { id, d };
+  }
+  return best;
+}
 
 export function CaveMode() {
   const [dark, setDark] = useState(false);
-  const reduce = useReducedMotion();
-
   useEffect(() => {
     const html = document.documentElement;
     const update = () => setDark(html.classList.contains("dark"));
@@ -61,153 +83,189 @@ export function CaveMode() {
     mo.observe(html, { attributes: true, attributeFilter: ["class"] });
     return () => mo.disconnect();
   }, []);
-
-  if (!dark) return null;
-  return <Cave reduce={!!reduce} />;
+  return dark ? <Cave /> : null;
 }
 
-function Cave({ reduce }: { reduce: boolean }) {
-  const x = useMotionValue(-200);
-  const y = useMotionValue(-200);
-  const radius = useMotionValue(CARRY_RADIUS);
-  const [mode, setMode] = useState<"slotted" | "carried" | "flying">("flying");
-  const slotId = useRef<string | null>(null);
-  const flying = useRef(false);
-  const dragging = useRef(false);
-  const idleTimer = useRef<number>(0);
-  const darkRef = useRef<HTMLDivElement>(null);
-  const warmRef = useRef<HTMLDivElement>(null);
+type Mode = "docked" | "gliding" | "dragging" | "carried";
 
-  const bigRadius = () => Math.hypot(innerWidth, innerHeight) * 1.25;
-  const slotCenter = (el: HTMLElement) => {
-    const r = el.getBoundingClientRect();
-    return { x: r.left + r.width / 2, y: r.top + r.height * 0.55 };
-  };
+function Cave() {
+  const diyaRef = useRef<HTMLDivElement>(null);
+  // All live state lives in one ref, read and written only by the loop and event handlers.
+  const s = useRef({
+    mode: "gliding" as Mode,
+    slotId: null as string | null,
+    x: -100,
+    y: -100,
+    tx: -100,
+    ty: -100,
+    vx: 0,
+    radius: CARRY_RADIUS,
+    radiusTarget: CARRY_RADIUS,
+    pointer: { x: 0, y: 0, ox: 0, oy: 0 },
+    idleTimer: 0,
+    placed: false,
+  });
 
-  const nearestSlot = useCallback((px: number, py: number, visibleOnly: boolean) => {
-    let best: { id: string; d: number } | null = null;
-    for (const [id, el] of slots) {
-      const r = el.getBoundingClientRect();
-      if (visibleOnly && (r.bottom < 0 || r.top > innerHeight)) continue;
-      const c = slotCenter(el);
-      const d = Math.hypot(c.x - px, c.y - py);
-      if (!best || d < best.d) best = { id, d };
-    }
-    return best;
-  }, []);
-
-  // Fly into a slot, then switch the room's light on.
-  const dock = useCallback(
-    (id: string) => {
-      const el = slots.get(id);
-      if (!el) return;
-      slotId.current = id;
-      const c = slotCenter(el);
-      flying.current = true;
-      setMode("flying");
-      const opts = reduce ? { duration: 0 } : { type: "spring" as const, stiffness: 140, damping: 20, mass: 0.9 };
-      Promise.all([animate(x, c.x, opts).finished, animate(y, c.y, opts).finished]).then(() => {
-        flying.current = false;
-        if (slotId.current !== id || dragging.current) return;
-        setMode("slotted");
-        animate(radius, bigRadius(), { duration: reduce ? 0 : 0.8, ease: [0.3, 0, 0.2, 1] });
-      });
-    },
-    [radius, reduce, x, y],
-  );
-
-  // Start in the slot nearest the top of the page.
   useEffect(() => {
-    const t = setTimeout(() => {
-      const first = nearestSlot(innerWidth / 2, 0, true) ?? nearestSlot(innerWidth / 2, 0, false);
-      if (first) {
-        const c = slotCenter(slots.get(first.id)!);
-        x.set(c.x);
-        y.set(c.y);
-        dock(first.id);
-      }
-    }, 60);
-    return () => clearTimeout(t);
-  }, [dock, nearestSlot, x, y]);
+    const st = s.current;
+    const html = document.documentElement;
+    const diya = diyaRef.current!;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const bigRadius = () => Math.hypot(innerWidth, innerHeight) * 1.3;
 
-  // Scrolling: follow the docked slot; glide to the slot nearest mid-screen when it changes.
-  useEffect(() => {
-    let raf = 0;
+    const goToSlot = (id: string) => {
+      if (!slots.has(id)) return;
+      clearTimeout(st.idleTimer);
+      st.slotId = id;
+      st.mode = "gliding";
+      diya.classList.remove("is-carried");
+    };
+    const goToNearest = () => {
+      const best = nearestSlot(innerWidth / 2, innerHeight / 2, true) ?? nearestSlot(innerWidth / 2, innerHeight / 2, false);
+      if (best) goToSlot(best.id);
+    };
+
+    // ── pointer: grab, carry, drop ──
+    const onDown = (e: PointerEvent) => {
+      e.preventDefault();
+      diya.setPointerCapture(e.pointerId);
+      clearTimeout(st.idleTimer);
+      st.mode = "dragging";
+      st.slotId = null;
+      st.radiusTarget = CARRY_RADIUS;
+      st.pointer = { x: e.clientX, y: e.clientY, ox: st.x - e.clientX, oy: st.y - e.clientY };
+      diya.classList.add("is-carried");
+    };
+    const onMove = (e: PointerEvent) => {
+      if (st.mode !== "dragging") return;
+      st.pointer.x = e.clientX;
+      st.pointer.y = e.clientY;
+    };
+    const onUp = (e: PointerEvent) => {
+      if (st.mode !== "dragging") return;
+      diya.releasePointerCapture?.(e.pointerId);
+      const best = nearestSlot(st.x, st.y, true);
+      if (best && best.d < SNAP_DISTANCE) return goToSlot(best.id);
+      st.mode = "carried";
+      st.tx = st.x;
+      st.ty = st.y;
+      st.idleTimer = window.setTimeout(() => st.mode === "carried" && goToNearest(), IDLE_RETURN_MS);
+    };
+    diya.addEventListener("pointerdown", onDown);
+    diya.addEventListener("pointermove", onMove);
+    diya.addEventListener("pointerup", onUp);
+    diya.addEventListener("pointercancel", onUp);
+
+    // ── scroll: glide to the niche nearest mid-screen (never while dragging) ──
+    let scrollQueued = false;
     const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        if (dragging.current) return;
+      if (scrollQueued) return;
+      scrollQueued = true;
+      requestAnimationFrame(() => {
+        scrollQueued = false;
+        if (st.mode === "dragging") return;
         const best = nearestSlot(innerWidth / 2, innerHeight / 2, true);
-        if (best && best.id !== slotId.current) dock(best.id);
+        if (best && best.id !== st.slotId) goToSlot(best.id);
       });
     };
-    addEventListener("scroll", onScroll, { passive: true });
-    const onSlot = (e: Event) => dock((e as CustomEvent<string>).detail);
-    addEventListener("diya:slot", onSlot);
-    return () => {
-      removeEventListener("scroll", onScroll);
-      removeEventListener("diya:slot", onSlot);
-      cancelAnimationFrame(raf);
-    };
-  }, [dock, nearestSlot]);
-
-  // Keyboard: L toggles between lamp-in-hand and slotted.
-  useEffect(() => {
+    const onSlot = (e: Event) => goToSlot((e as CustomEvent<string>).detail);
     const onKey = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() !== "l" || e.metaKey || e.ctrlKey || (e.target as HTMLElement)?.closest("input,textarea")) return;
-      if (mode === "slotted") {
-        setMode("carried");
-        slotId.current = null;
-        animate(radius, CARRY_RADIUS, { duration: reduce ? 0 : 0.5 });
-      } else {
-        const best = nearestSlot(x.get(), y.get(), true);
-        if (best) dock(best.id);
-      }
+      if (st.mode === "docked" || st.mode === "gliding") {
+        st.mode = "carried";
+        st.slotId = null;
+        st.tx = st.x;
+        st.ty = st.y;
+        diya.classList.add("is-carried");
+      } else goToNearest();
     };
+    addEventListener("scroll", onScroll, { passive: true });
+    addEventListener("diya:slot", onSlot);
     addEventListener("keydown", onKey);
-    return () => removeEventListener("keydown", onKey);
-  }, [dock, mode, nearestSlot, radius, reduce, x, y]);
 
-  // The light loop: one source of truth → darkness, warmth and every cast shadow.
-  useEffect(() => {
+    // ── the loop ──
     let raf = 0;
+    let last = performance.now();
     let casters: HTMLElement[] = [];
     let lastScan = 0;
-    const html = document.documentElement;
     const tick = (now: number) => {
-      // keep the diya glued to its slot while the page scrolls
-      if (mode === "slotted" && slotId.current && !flying.current && !dragging.current) {
-        const el = slots.get(slotId.current);
-        if (el) {
-          const c = slotCenter(el);
-          x.set(c.x);
-          y.set(c.y);
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+
+      // first frame: start already sitting in the top-most niche
+      if (!st.placed) {
+        const first = nearestSlot(innerWidth / 2, 0, true) ?? nearestSlot(innerWidth / 2, 0, false);
+        if (first) {
+          const c = slotCenter(slots.get(first.id)!);
+          st.x = st.tx = c.x;
+          st.y = st.ty = c.y;
+          st.slotId = first.id;
+          st.mode = "docked";
+          st.radius = st.radiusTarget = bigRadius();
+          st.placed = true;
         }
       }
+
+      // target for this frame
+      let k = FOLLOW_GLIDE;
+      if (st.mode === "dragging") {
+        st.tx = st.pointer.x + st.pointer.ox;
+        st.ty = st.pointer.y + st.pointer.oy;
+        // magnetic: near a niche, the diya is drawn into it
+        const best = nearestSlot(st.tx, st.ty, true);
+        if (best && best.d < SNAP_DISTANCE) {
+          const c = slotCenter(slots.get(best.id)!);
+          const pull = Math.pow(1 - best.d / SNAP_DISTANCE, 2) * 0.6;
+          st.tx += (c.x - st.tx) * pull;
+          st.ty += (c.y - st.ty) * pull;
+        }
+        k = FOLLOW_DRAG;
+      } else if (st.slotId && slots.has(st.slotId)) {
+        const c = slotCenter(slots.get(st.slotId)!); // live position, follows scrolling
+        st.tx = c.x;
+        st.ty = c.y;
+        k = st.mode === "docked" ? 40 : FOLLOW_GLIDE;
+      }
+
+      const px = st.x;
+      const a = reduce ? 1 : ease(k, dt);
+      st.x += (st.tx - st.x) * a;
+      st.y += (st.ty - st.y) * a;
+      st.vx = dt > 0 ? (st.x - px) / dt : 0;
+
+      // arrived in a niche → light switch on
+      if (st.mode === "gliding" && Math.hypot(st.tx - st.x, st.ty - st.y) < 2) st.mode = "docked";
+      st.radiusTarget = st.mode === "docked" ? bigRadius() : st.mode === "gliding" ? bigRadius() * 0.45 : CARRY_RADIUS;
+      st.radius += (st.radiusTarget - st.radius) * (reduce ? 1 : ease(FOLLOW_RADIUS, dt));
+
+      // draw the diya; the flame leans against the direction of travel
+      const lean = Math.max(-18, Math.min(18, -st.vx * 0.02));
+      diya.style.transform = `translate3d(${st.x - 30}px, ${st.y - 44}px, 0)`;
+      diya.style.setProperty("--lean", `${lean.toFixed(1)}deg`);
+
+      // light
       const t = now / 1000;
       const f = reduce ? 0 : flicker(t);
-      const lx = x.get() + (reduce ? 0 : f * 1.2);
-      const ly = y.get() - 18 + (reduce ? 0 : flicker(t + 9) * 1.2); // the flame sits above the bowl
-      const r = radius.get() * (1 + f * 0.05);
-      html.style.setProperty("--lx", `${lx}px`);
-      html.style.setProperty("--ly", `${ly}px`);
-      html.style.setProperty("--lr", `${r}px`);
-      html.style.setProperty("--li", `${0.9 + f * 0.08}`);
+      const lx = st.x + f * 1.2;
+      const ly = st.y - 20 + flicker(t + 9) * (reduce ? 0 : 1.2); // the flame sits above the bowl
+      const r = st.radius * (1 + f * 0.05);
+      html.style.setProperty("--lx", `${lx.toFixed(1)}px`);
+      html.style.setProperty("--ly", `${ly.toFixed(1)}px`);
+      html.style.setProperty("--lr", `${r.toFixed(1)}px`);
+      html.style.setProperty("--li", `${(0.9 + f * 0.08).toFixed(3)}`);
 
+      // shadows
       if (now - lastScan > 800) {
         casters = Array.from(document.querySelectorAll<HTMLElement>("[data-cast]"));
         lastScan = now;
       }
-      const lit = r > CARRY_RADIUS * 2; // shadows are subtler when the whole room is lit
+      const lit = r > CARRY_RADIUS * 2;
       for (const el of casters) {
         const b = el.getBoundingClientRect();
         if (b.bottom < -50 || b.top > innerHeight + 50) continue;
-        const cx = b.left + b.width / 2;
-        const cy = b.top + b.height / 2;
-        const dx = cx - lx;
-        const dy = cy - ly;
+        const dx = b.left + b.width / 2 - lx;
+        const dy = b.top + b.height / 2 - ly;
         const d = Math.max(1, Math.hypot(dx, dy));
-        // shadow length grows with distance, capped; blur grows too; strength fades
         const len = Math.min(28, 3 + d * 0.035) * (lit ? 0.8 : 1);
         const blur = 2 + d * 0.012;
         const alpha = Math.max(0.12, Math.min(0.6, 0.62 - d / 2600)) * (lit ? 0.75 : 1);
@@ -216,72 +274,49 @@ function Cave({ reduce }: { reduce: boolean }) {
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
+
     return () => {
       cancelAnimationFrame(raf);
+      clearTimeout(st.idleTimer);
+      diya.removeEventListener("pointerdown", onDown);
+      diya.removeEventListener("pointermove", onMove);
+      diya.removeEventListener("pointerup", onUp);
+      diya.removeEventListener("pointercancel", onUp);
+      removeEventListener("scroll", onScroll);
+      removeEventListener("diya:slot", onSlot);
+      removeEventListener("keydown", onKey);
       for (const el of document.querySelectorAll<HTMLElement>("[data-cast]")) el.style.filter = "";
       for (const p of ["--lx", "--ly", "--lr", "--li"]) html.style.removeProperty(p);
     };
-  }, [mode, radius, reduce, x, y]);
-
-  function scheduleReturn() {
-    clearTimeout(idleTimer.current);
-    idleTimer.current = window.setTimeout(() => {
-      if (dragging.current) return;
-      const best = nearestSlot(x.get(), y.get(), true);
-      if (best) dock(best.id);
-    }, IDLE_RETURN_MS);
-  }
+  }, []);
 
   return (
     <>
-      <div ref={darkRef} aria-hidden className="cave-dark" />
-      <div ref={warmRef} aria-hidden className="cave-warm" />
-      <motion.div
+      <div aria-hidden className="cave-dark" />
+      <div aria-hidden className="cave-warm" />
+      <div
+        ref={diyaRef}
         role="button"
         tabIndex={0}
-        aria-label={mode === "slotted" ? "Diya — drag to carry the light" : "Diya — drop it in a niche to light the page"}
-        className={cn("cave-diya", mode === "carried" && "is-carried")}
-        style={{ x, y }}
-        drag
-        dragMomentum={false}
-        dragElastic={0}
-        onDragStart={() => {
-          dragging.current = true;
-          clearTimeout(idleTimer.current);
-          slotId.current = null;
-          setMode("carried");
-          animate(radius, CARRY_RADIUS, { duration: reduce ? 0 : 0.5, ease: [0.4, 0, 0.2, 1] });
-        }}
-        onDrag={() => {
-          // magnetic pull: close to a niche, the diya is drawn towards it
-          const best = nearestSlot(x.get(), y.get(), true);
-          if (best && best.d < SNAP_DISTANCE) {
-            const c = slotCenter(slots.get(best.id)!);
-            const pull = (1 - best.d / SNAP_DISTANCE) * 0.25;
-            x.set(x.get() + (c.x - x.get()) * pull);
-            y.set(y.get() + (c.y - y.get()) * pull);
-          }
-        }}
-        onDragEnd={() => {
-          dragging.current = false;
-          const best = nearestSlot(x.get(), y.get(), true);
-          if (best && best.d < SNAP_DISTANCE) dock(best.id);
-          else scheduleReturn();
-        }}
+        aria-label="Diya — drag to carry the light, drop it in a niche to light the page (or press L)"
+        className="cave-diya"
         onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") window.dispatchEvent(new KeyboardEvent("keydown", { key: "l" }));
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            window.dispatchEvent(new KeyboardEvent("keydown", { key: "l" }));
+          }
         }}
       >
         <DiyaGraphic />
-      </motion.div>
+      </div>
     </>
   );
 }
 
-/** Brass diya bowl with the layered, swaying flame. Origin (0,0) of the wrapper = bowl centre. */
+/** Brass diya bowl with the layered, swaying flame. The flame leans with --lean while carried. */
 function DiyaGraphic() {
   return (
-    <svg viewBox="0 0 60 70" className="pointer-events-none block h-[70px] w-[60px] -translate-x-1/2 -translate-y-[62%]" aria-hidden>
+    <svg viewBox="0 0 60 70" className="block h-[70px] w-[60px]" aria-hidden>
       <defs>
         <radialGradient id="diya-bowl" cx="50%" cy="20%" r="80%">
           <stop offset="0" stopColor="#f3c27a" />
@@ -300,13 +335,15 @@ function DiyaGraphic() {
           <feGaussianBlur stdDeviation="5" />
         </filter>
       </defs>
-      <ellipse cx="30" cy="26" rx="10" ry="13" fill="#f4a93c" opacity="0.45" filter="url(#diya-glow)" className="flame-halo" />
-      <g className="flame-body">
-        <path d="M30 6 C 36 13, 37.5 20, 34 26 C 32.8 28, 31.4 29.6, 30 32 C 28.6 29.6, 27.2 28, 26 26 C 22.5 20, 24 13, 30 6 Z" fill="url(#diya-outer)" className="flame-l1" />
-        <path d="M30 11 C 34.4 16, 35 21, 32.6 25.4 C 31.7 27, 30.8 28.4, 30 30.6 C 29.2 28.4, 28.3 27, 27.4 25.4 C 25 21, 25.6 16, 30 11 Z" fill="url(#diya-mid)" className="flame-l2" />
-        <path d="M30 17 C 32.4 20, 32.7 23, 31.3 26 C 30.8 27, 30.4 28, 30 29.3 C 29.6 28, 29.2 27, 28.7 26 C 27.3 23, 27.6 20, 30 17 Z" fill="#fff2bf" className="flame-l3" />
+      <g className="diya-lean">
+        <ellipse cx="30" cy="26" rx="10" ry="13" fill="#f4a93c" opacity="0.45" filter="url(#diya-glow)" className="flame-halo" />
+        <g className="flame-body">
+          <path d="M30 6 C 36 13, 37.5 20, 34 26 C 32.8 28, 31.4 29.6, 30 32 C 28.6 29.6, 27.2 28, 26 26 C 22.5 20, 24 13, 30 6 Z" fill="url(#diya-outer)" className="flame-l1" />
+          <path d="M30 11 C 34.4 16, 35 21, 32.6 25.4 C 31.7 27, 30.8 28.4, 30 30.6 C 29.2 28.4, 28.3 27, 27.4 25.4 C 25 21, 25.6 16, 30 11 Z" fill="url(#diya-mid)" className="flame-l2" />
+          <path d="M30 17 C 32.4 20, 32.7 23, 31.3 26 C 30.8 27, 30.4 28, 30 29.3 C 29.6 28, 29.2 27, 28.7 26 C 27.3 23, 27.6 20, 30 17 Z" fill="#fff2bf" className="flame-l3" />
+        </g>
       </g>
-      {/* bowl: wick sits behind the rim */}
+      {/* bowl: the wick sits behind the rim */}
       <path d="M6 36 C 10 50, 20 56, 30 56 C 40 56, 50 50, 54 36 C 46 40, 38 41, 30 41 C 22 41, 14 40, 6 36 Z" fill="url(#diya-bowl)" />
       <path d="M6 36 C 14 40, 22 41, 30 41 C 38 41, 46 40, 54 36" fill="none" stroke="#f6d39a" strokeWidth="1.2" opacity="0.8" />
       <ellipse cx="30" cy="60" rx="9" ry="2.5" fill="#6b3410" opacity="0.8" />
