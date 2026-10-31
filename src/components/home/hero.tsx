@@ -30,7 +30,7 @@ export function Hero() {
         style={reduce ? undefined : { y: drift, opacity: fade }}
         className="pointer-events-none absolute top-1/2 right-[-6rem] -z-10 hidden -translate-y-1/2 text-maroon/[0.07] lg:block"
       >
-        <KnotMark className="h-[34rem] w-[56rem]" />
+        <KnotMark className="h-[34rem] w-[56rem]" flameClassName="text-marigold/25" />
       </motion.div>
 
       <div className="mx-auto w-full max-w-6xl px-6 py-28">

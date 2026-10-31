@@ -243,7 +243,9 @@ html { scroll-behavior: smooth; }
 
 /* ── Flame: only the gold thread + flame animate ───────────────────────── */
 .flame-halo { opacity: 0.3; transform-box: fill-box; transform-origin: 50% 85%; }
-.flame-body { transform-box: fill-box; transform-origin: 50% 100%; }
+.flame-body { transform-box: fill-box; transform-origin: 50% 100%; animation: flame-wave 3.4s ease-in-out infinite; }
+.flame-core { transform-box: fill-box; transform-origin: 50% 100%; animation: flame-core-wave 2.3s ease-in-out infinite; }
+.flame-halo { animation: halo-breathe 3.6s ease-in-out infinite; }
 .flame-animate { --d: 0.15s; }
 .flame-late { --d: 1.05s; }
 @keyframes thread-light {
@@ -255,10 +257,16 @@ html { scroll-behavior: smooth; }
   55% { opacity: 1; transform: scale(1.06, 1.14); }
   100% { opacity: 1; transform: scale(1, 1); }
 }
-@keyframes flame-breathe {
-  0%, 100% { transform: scale(1, 1) rotate(0deg); }
-  30% { transform: scale(0.985, 1.035) rotate(-1.2deg); }
-  65% { transform: scale(1.015, 0.975) rotate(0.8deg); }
+@keyframes flame-wave {
+  0%, 100% { transform: rotate(0deg) skewX(0deg) scale(1, 1); }
+  22% { transform: rotate(-2.6deg) skewX(2.2deg) scale(0.985, 1.035); }
+  48% { transform: rotate(1.8deg) skewX(-1.8deg) scale(1.012, 0.975); }
+  74% { transform: rotate(-1.1deg) skewX(1deg) scale(0.995, 1.02); }
+}
+@keyframes flame-core-wave {
+  0%, 100% { transform: translateX(0) scale(1, 1); }
+  35% { transform: translateX(-0.5px) scale(0.94, 1.06); }
+  70% { transform: translateX(0.4px) scale(1.04, 0.95); }
 }
 @keyframes halo-in {
   0% { opacity: 0; transform: scale(0.35); }
@@ -277,7 +285,7 @@ html { scroll-behavior: smooth; }
   opacity: 0;
   animation:
     flame-ignite 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.15) calc(var(--d) + 0.55s) forwards,
-    flame-breathe 3.2s ease-in-out calc(var(--d) + 1.5s) infinite;
+    flame-wave 3.4s ease-in-out calc(var(--d) + 1.45s) infinite;
 }
 .flame-animate .flame-halo {
   opacity: 0;
@@ -286,6 +294,6 @@ html { scroll-behavior: smooth; }
     halo-breathe 3.6s ease-in-out calc(var(--d) + 1.8s) infinite;
 }
 @media (prefers-reduced-motion: reduce) {
-  .flame-animate .flame-thread, .flame-animate .flame-body, .flame-animate .flame-halo { animation: none; opacity: 1; stroke-dashoffset: 0; }
+  .flame-body, .flame-core, .flame-halo, .flame-animate .flame-thread, .flame-animate .flame-body, .flame-animate .flame-halo { animation: none; opacity: 1; stroke-dashoffset: 0; }
   .flame-animate .flame-halo { opacity: 0.32; }
 }
