@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SearchButton } from "@/components/shell/search-button";
 import { Download } from "lucide-react";
 import { requirePageUser } from "@/lib/auth";
 import { getReport, type Period } from "@/lib/reports";
@@ -41,6 +42,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                 </Link>
               ))}
             </div>
+            <SearchButton />
             <Button asChild variant="outline">
               <a href="/api/reports/season.csv">
                 <Download /> CSV
