@@ -89,7 +89,7 @@ export default async function Home() {
       </header>
 
       <ViewTransition enter="page-rise" exit="page-fade" default="none">
-      <main>
+      <main data-snap-page>
         <Hero />
 
         <section className="relative mx-auto max-w-6xl px-6 pt-6 pb-24" aria-label="Our promise">
