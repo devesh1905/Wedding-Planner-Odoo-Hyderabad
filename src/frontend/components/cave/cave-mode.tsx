@@ -59,9 +59,11 @@ const ease = (k: number, dt: number) => 1 - Math.exp(-k * dt);
 // page scrolls (touch scrolling runs off the main thread, so chasing niches made it lag and jump).
 const PHONE_QUERY = "(max-width: 767px), (pointer: coarse)";
 const HOME = "home";
+let dockEl: HTMLElement | null = null; // the fixed bottom-right niche, shown on phones only
 const homePos = () => {
+  if (dockEl && dockEl.getBoundingClientRect().width > 0) return slotCenter(dockEl);
   const h = window.visualViewport?.height ?? innerHeight;
-  return { x: innerWidth - 40, y: h - 64 };
+  return { x: innerWidth - 54, y: h - 51 };
 };
 
 function slotCenter(el: HTMLElement) {
@@ -100,6 +102,13 @@ type Mode = "docked" | "gliding" | "dragging" | "carried";
 
 function Cave() {
   const diyaRef = useRef<HTMLDivElement>(null);
+  const dockRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    dockEl = dockRef.current;
+    return () => {
+      dockEl = null;
+    };
+  }, []);
   // Hint on every visit to the page: "grab" while docked, "drop" while carrying. It waits for the
   // splash to finish (so it is never hidden behind it) and fades by itself if nobody tries.
   const [hint, setHint] = useState<"grab" | "drop" | null>(null);
@@ -212,7 +221,12 @@ function Cave() {
       scrollQueued = true;
       requestAnimationFrame(() => {
         scrollQueued = false;
-        if (st.mode === "dragging" || phone) return;
+        if (st.mode === "dragging") return;
+        if (phone) {
+          // scrolling away from a lamp left lying on the page sends it home to the dock
+          if (st.mode === "carried") goToSlot(HOME);
+          return;
+        }
         const best = nearestSlot(innerWidth / 2, innerHeight / 2, true);
         if (best && best.id !== st.slotId) goToSlot(best.id);
       });
@@ -363,6 +377,8 @@ function Cave() {
   return (
     <>
       <div aria-hidden className="cave-dark" />
+      {/* phones: a niche fixed at the bottom-right where the diya rests (hidden on desktop) */}
+      <div ref={dockRef} aria-hidden className="diya-slot diya-dock" />
       <div aria-hidden className="cave-warm" />
       <div
         ref={diyaRef}
