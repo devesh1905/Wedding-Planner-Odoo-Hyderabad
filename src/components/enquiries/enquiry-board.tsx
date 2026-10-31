@@ -52,6 +52,7 @@ export function EnquiryBoard({ enquiries, planners }: { enquiries: EnquiryCardDa
   const [query, setQuery] = useState("");
   // `?open=<id>` (from global search) opens that enquiry straight away
   const [openId, setOpenId] = useState<string | null>(null);
+  const boardRef = useRef<HTMLDivElement>(null);
   const openParam = useSearchParams().get("open");
   useEffect(() => {
     if (openParam) setOpenId(openParam);
@@ -99,8 +100,6 @@ export function EnquiryBoard({ enquiries, planners }: { enquiries: EnquiryCardDa
   if (items.length === 0) {
     return <EmptyState icon={Inbox} title="No enquiries yet" hint="Share the enquiry form link or add one from a call." />;
   }
-
-  const boardRef = useRef<HTMLDivElement>(null);
 
   return (
     <>
