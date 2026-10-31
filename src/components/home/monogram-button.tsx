@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import Link from "next/link";
+import { ViewTransition } from "react";
 import { cue } from "@/lib/sound";
 import { KnotMark } from "./knot-mark";
 import { petalShower } from "./petals";
@@ -25,7 +26,9 @@ export function MonogramButton() {
       <span className="relative">
         {/* In dark mode the diya softly lights the area around it. */}
         <span aria-hidden className="diya-ambient" />
-        <KnotMark mode="ignite" className="relative h-7 w-14 text-maroon dark:text-[oklch(0.93_0.03_80)]" />
+        <ViewTransition name="brand-mark" share="morph" default="none">
+          <KnotMark mode="ignite" className="relative h-7 w-14 text-maroon dark:text-[oklch(0.93_0.03_80)]" />
+        </ViewTransition>
       </span>
       <span className="font-serif text-2xl font-semibold tracking-tight">The Royal Knot</span>
     </Link>

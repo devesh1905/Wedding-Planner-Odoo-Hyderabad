@@ -1,17 +1,21 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { EnquireForm } from "./enquire-form";
+import { ViewTransition } from "react";
 import { KnotMark } from "@/components/home/knot-mark";
 
 export const metadata: Metadata = { title: { absolute: "Plan your wedding · The Royal Knot" } };
 
 export default function EnquirePage() {
   return (
+    <ViewTransition enter="page-rise" exit="page-fade" default="none">
     <main className="min-h-svh bg-paper">
       <div className="mx-auto max-w-2xl px-4 py-10 sm:py-16">
         <header className="mb-8 space-y-3 text-center">
           <Link href="/" aria-label="The Royal Knot — home" className="mx-auto block w-fit text-maroon transition-transform hover:scale-105">
-            <KnotMark mode="ignite" className="h-10 w-20" />
+            <ViewTransition name="brand-mark" share="morph" default="none">
+              <KnotMark mode="ignite" className="h-10 w-20" />
+            </ViewTransition>
           </Link>
           <p className="text-xs tracking-[0.25em] text-eyebrow uppercase">The Royal Knot · Jaipur & Udaipur</p>
           <h1 className="text-4xl font-semibold sm:text-5xl">Tell us about your wedding</h1>
@@ -21,5 +25,6 @@ export default function EnquirePage() {
         <EnquireForm />
       </div>
     </main>
+    </ViewTransition>
   );
 }

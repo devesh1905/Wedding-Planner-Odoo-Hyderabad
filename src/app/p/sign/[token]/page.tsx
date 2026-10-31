@@ -1,3 +1,4 @@
+import { ViewTransition } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
@@ -16,6 +17,7 @@ export default async function SignPage({ params }: { params: Promise<{ token: st
   const { partner1, partner2 } = agreement.enquiry;
 
   return (
+    <ViewTransition enter="page-rise" exit="page-fade" default="none">
     <main className="min-h-svh bg-paper">
       <div className="mx-auto max-w-2xl px-4 py-8 sm:py-14">
         <header className="mb-6 space-y-2 text-center">
@@ -49,5 +51,6 @@ export default async function SignPage({ params }: { params: Promise<{ token: st
         </div>
       </div>
     </main>
+    </ViewTransition>
   );
 }

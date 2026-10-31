@@ -1,3 +1,4 @@
+import { ViewTransition } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CalendarHeart, Check, MapPin, MessageCircle, Phone } from "lucide-react";
@@ -33,6 +34,7 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
   const agreement = w.enquiry?.agreement;
 
   return (
+    <ViewTransition enter="page-rise" exit="page-fade" default="none">
     <main className="min-h-svh bg-paper">
       <div className="mx-auto max-w-xl space-y-5 px-4 py-8">
         <header className="space-y-3 text-center">
@@ -170,5 +172,6 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
         )}
       </div>
     </main>
+    </ViewTransition>
   );
 }

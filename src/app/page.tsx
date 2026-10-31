@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { getSession } from "@/lib/auth";
+import { ViewTransition } from "react";
 import { Splash } from "@/components/home/splash";
 import { Hero } from "@/components/home/hero";
 import { Chapters } from "@/components/home/chapters";
@@ -51,6 +52,7 @@ export default async function Home() {
         </div>
       </header>
 
+      <ViewTransition enter="page-rise" exit="page-fade" default="none">
       <main>
         <Hero />
 
@@ -94,6 +96,7 @@ export default async function Home() {
           </Reveal>
         </section>
       </main>
+      </ViewTransition>
 
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8 text-sm text-muted-foreground">
