@@ -15,7 +15,7 @@ export default async function EnquirePage({ searchParams }: { searchParams: Prom
   return (
     <ViewTransition enter="page-rise" exit="page-fade" default="none">
     <main className="min-h-svh bg-paper">
-      <div className="mx-auto max-w-2xl px-6 py-12 sm:py-16">
+      <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 sm:py-16 lg:max-w-6xl">
         <header className="mb-10 space-y-4 text-center">
           <Link href="/" aria-label="The Royal Knot — home" className="mx-auto block w-fit rounded-lg text-maroon transition-transform hover:scale-105 motion-reduce:transition-none motion-reduce:hover:scale-100 outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
             <ViewTransition name="brand-mark" share="morph" default="none">
