@@ -6,6 +6,7 @@ import { Field } from "@/frontend/components/common/field";
 import { CITIES, THEMES } from "@/shared/validation/enquiry";
 import { cn } from "@/shared/utils";
 import { cue } from "@/frontend/lib/sound";
+import { DEFAULT_GUESTS } from "@/shared/package-builder";
 
 export type EnquiryValues = {
   partner1: string;
@@ -96,7 +97,7 @@ export function EnquiryFields({
         {input("roughDate", { type: "date", min: new Date().toISOString().slice(0, 10) })}
       </Field>
       <Field label="Expected guests" icon="guests" htmlFor="guestCount" error={errors.guestCount}>
-        {input("guestCount", { type: "number", inputMode: "numeric", min: 1, max: 5000, placeholder: "400" })}
+        {input("guestCount", { type: "number", inputMode: "numeric", min: 1, max: 5000, placeholder: String(DEFAULT_GUESTS) })}
       </Field>
 
       <Field label="Theme in mind" icon="palette" error={errors.theme} className="sm:col-span-2">

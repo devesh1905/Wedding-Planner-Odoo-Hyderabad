@@ -33,5 +33,14 @@ export const POST = handle(async (req: Request) => {
   });
   await logActivity(db, { entity: "enquiry", entityId: enquiry.id, action: "created", payload: { source: "WEB_FORM" } });
 
-  return NextResponse.json({ id: enquiry.id, reference: enquiry.id.slice(0, 8).toUpperCase() }, { status: 201 });
+  // Echo back what was saved so the thank-you screen shows the authoritative figures, not the browser's.
+  const { partner1, partner2, roughDate, city, guestCount, theme, planning, events, services, estimateLow, estimateHigh } = enquiry;
+  return NextResponse.json(
+    {
+      id: enquiry.id,
+      reference: enquiry.id.slice(0, 8).toUpperCase(),
+      saved: { partner1, partner2, roughDate, city, guestCount, theme, planning, events, services, estimateLow, estimateHigh },
+    },
+    { status: 201 },
+  );
 });
