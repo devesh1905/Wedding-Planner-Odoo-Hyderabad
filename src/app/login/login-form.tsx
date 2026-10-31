@@ -32,22 +32,22 @@ export function LoginForm({ next }: { next?: string }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4" noValidate>
+    <form onSubmit={onSubmit} className="space-y-5" noValidate>
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
-        <Input id="email" name="email" type="email" autoComplete="email" required placeholder="you@royalknot.in" />
+        <Input id="email" name="email" type="email" autoComplete="email" required placeholder="you@royalknot.in" aria-invalid={!!error || undefined} className="h-11 md:h-10" />
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
-        <Input id="password" name="password" type="password" autoComplete="current-password" required />
+        <Input id="password" name="password" type="password" autoComplete="current-password" required aria-invalid={!!error || undefined} className="h-11 md:h-10" />
       </div>
       {error && (
-        <p role="alert" className="rounded-md bg-rose-soft px-3 py-2 text-sm text-rose">
+        <p role="alert" className="rounded-lg bg-rose-soft px-3 py-2.5 text-sm text-rose">
           {error}
         </p>
       )}
-      <Button type="submit" className="w-full" size="lg" disabled={pending}>
-        {pending && <Loader2 className="animate-spin" />} Sign in
+      <Button type="submit" className="squircle h-12 w-full rounded-xl text-base" size="lg" disabled={pending} aria-busy={pending}>
+        {pending && <Loader2 className="animate-spin" />} {pending ? "Signing in…" : "Sign in"}
       </Button>
     </form>
   );

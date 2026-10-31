@@ -6,6 +6,7 @@ import "@fontsource/cormorant-garamond/500.css";
 import "@fontsource/cormorant-garamond/600.css";
 import "@fontsource/cormorant-garamond/700.css";
 import "./globals.css";
+import { SPLASH_PREFLIGHT } from "@/components/home/splash-preflight";
 
 export const metadata: Metadata = {
   title: { default: "KnotOS · The Royal Knot", template: "%s · KnotOS" },
@@ -18,7 +19,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: SPLASH_PREFLIGHT }} />
+      </head>
       <body className="min-h-full flex flex-col">
         {children}
         <Toaster richColors position="top-right" />

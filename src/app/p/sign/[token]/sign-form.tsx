@@ -78,50 +78,50 @@ export function SignForm({ token, defaultName }: { token: string; defaultName: s
   }
 
   return (
-    <form onSubmit={submit} noValidate className="space-y-5 rounded-2xl border bg-card p-5 shadow-sm sm:p-8">
+    <form onSubmit={submit} noValidate className="squircle space-y-6 rounded-2xl border bg-card p-5 shadow-sm sm:p-8">
       <Field label="Your full name" htmlFor="signerName" error={errors.signerName}>
-        <Input id="signerName" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
+        <Input id="signerName" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" aria-invalid={!!errors.signerName} className="h-11 md:h-10" />
       </Field>
 
       <Field label="Sign here" error={errors.signature}>
         <div className="relative">
           <canvas
             ref={canvasRef}
-            className="h-44 w-full touch-none rounded-xl border-2 border-dashed border-maroon/30 bg-[oklch(0.99_0.005_85)]"
+            className="h-48 w-full touch-none rounded-xl border-2 border-dashed border-maroon/40 bg-white"
             aria-label="Signature box — draw your signature with your finger or mouse"
           />
           {!hasInk && (
-            <span className="pointer-events-none absolute inset-0 grid place-items-center text-sm text-muted-foreground">
+            <span className="pointer-events-none absolute inset-0 grid place-items-center text-sm text-stone-500">
               <span className="flex items-center gap-2">
-                <PenLine className="size-4" /> Draw your signature
+                <PenLine className="size-4" aria-hidden /> Draw your signature
               </span>
             </span>
           )}
-          <Button type="button" size="sm" variant="ghost" onClick={clear} className="absolute right-2 bottom-2">
+          <Button type="button" size="sm" variant="ghost" onClick={clear} className="absolute right-2 bottom-2 h-9 px-3 text-stone-600 hover:bg-stone-100 hover:text-stone-900 dark:hover:bg-stone-100">
             <Eraser /> Clear
           </Button>
         </div>
       </Field>
 
-      <label className="flex items-start gap-3 text-sm">
+      <label className="flex cursor-pointer items-start gap-3 py-1 text-sm leading-relaxed">
         <Checkbox
           checked={agree}
           onCheckedChange={(v) => {
             cue("toggle");
             setAgree(v === true);
           }}
-          className="mt-0.5"
+          className="mt-0.5 size-5"
         />
         <span>
           I have read and accept this service agreement.
-          {errors.agree && <span className="block text-xs text-rose">{errors.agree}</span>}
+          {errors.agree && <span role="alert" className="mt-1 block text-xs text-rose">{errors.agree}</span>}
         </span>
       </label>
 
-      {errors.form && <p className="rounded-md bg-rose-soft px-3 py-2 text-sm text-rose">{errors.form}</p>}
+      {errors.form && <p role="alert" className="rounded-lg bg-rose-soft px-3 py-2.5 text-sm text-rose">{errors.form}</p>}
 
-      <Button type="submit" size="lg" className="w-full" disabled={pending}>
-        {pending && <Loader2 className="animate-spin" />} Sign agreement
+      <Button type="submit" size="lg" className="squircle h-12 w-full rounded-xl text-base" disabled={pending} aria-busy={pending}>
+        {pending && <Loader2 className="animate-spin" />} {pending ? "Signing…" : "Sign agreement"}
       </Button>
     </form>
   );

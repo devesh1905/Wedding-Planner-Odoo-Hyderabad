@@ -11,9 +11,9 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <section className="relative hidden overflow-hidden bg-[oklch(0.13_0.025_18)] text-sidebar-foreground lg:flex lg:flex-col lg:justify-between lg:p-12">
         <div className="absolute inset-0 opacity-20 [background:radial-gradient(600px_300px_at_20%_10%,var(--marigold),transparent_70%),radial-gradient(500px_400px_at_90%_90%,var(--rose),transparent_70%)]" />
         <div className="relative flex items-center gap-3">
-          <KnotMark mode="ignite" className="h-7 w-14 text-[oklch(0.93_0.03_80)]" />
+          <KnotMark mode="ignite" className="h-7 w-14 text-sidebar-foreground" />
           <span className="font-serif text-2xl font-semibold">KnotOS</span>
-          <span className="text-sm text-sidebar-foreground/60">for The Royal Knot</span>
+          <span className="text-sm text-sidebar-foreground/70">for The Royal Knot</span>
         </div>
         <div className="relative max-w-md space-y-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -24,21 +24,21 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             Enquiries, vendors, plans, the big day and every rupee — from the first call to the final vendor payment.
           </p>
         </div>
-        <p className="relative text-sm text-sidebar-foreground/60">Jaipur · Udaipur</p>
+        <p className="relative text-sm text-sidebar-foreground/70">Jaipur · Udaipur</p>
       </section>
 
-      <section className="flex items-center justify-center bg-paper p-6">
+      <section className="flex items-center justify-center bg-paper px-6 py-12">
         <div className="w-full max-w-sm space-y-8">
-          <div className="space-y-2 text-center lg:text-left">
-            <div className="mx-auto w-fit lg:hidden">
+          <div className="space-y-3 text-center lg:text-left">
+            <div className="mx-auto mb-4 w-fit lg:hidden">
               <Logo />
             </div>
             <h1 className="text-4xl font-semibold">Welcome back</h1>
             <p className="text-muted-foreground">Sign in to KnotOS</p>
           </div>
           <LoginForm next={typeof next === "string" ? next : undefined} />
-          <p className="rounded-lg border bg-card p-3 text-xs text-muted-foreground">
-            Demo: <b>founder@royalknot.in</b> or <b>ananya@royalknot.in</b> · password <b>knot@2026</b>
+          <p className="squircle rounded-xl border bg-card px-4 py-3 text-xs leading-relaxed text-muted-foreground">
+            Demo: <b className="font-semibold text-foreground">founder@royalknot.in</b> or <b className="font-semibold text-foreground">ananya@royalknot.in</b> · password <b className="font-semibold text-foreground">knot@2026</b>
           </p>
         </div>
       </section>

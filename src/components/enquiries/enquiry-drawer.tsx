@@ -15,6 +15,7 @@ import {
   Sparkles,
   XCircle,
 } from "lucide-react";
+import { Icon, type IconName } from "@/components/icons/icon";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -143,13 +144,13 @@ export function EnquiryDrawer({ id, planners, onClose }: { id: string | null; pl
 
             <div className="space-y-6 p-6">
               <section className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-                <Fact label="Rough date" value={data.roughDate ? formatDate(data.roughDate) : "—"} />
-                <Fact label="City" value={data.city ?? "—"} />
-                <Fact label="Guests" value={data.guestCount ?? "—"} />
-                <Fact label="Budget" value={data.maxBudget ? `up to ${formatINR(data.maxBudget)}` : "—"} />
-                <Fact label="Theme" value={data.theme ?? "—"} />
-                <Fact label="Email" value={data.email ?? "—"} />
-                {data.notes && <Fact label="Notes" value={data.notes} wide />}
+                <Fact icon="calendar" label="Rough date" value={data.roughDate ? formatDate(data.roughDate) : "—"} />
+                <Fact icon="pin" label="City" value={data.city ?? "—"} />
+                <Fact icon="guests" label="Guests" value={data.guestCount ?? "—"} />
+                <Fact icon="wallet" label="Budget" value={data.maxBudget ? `up to ${formatINR(data.maxBudget)}` : "—"} />
+                <Fact icon="palette" label="Theme" value={data.theme ?? "—"} />
+                <Fact icon="mail" label="Email" value={data.email ?? "—"} />
+                {data.notes && <Fact icon="notes" label="Notes" value={data.notes} wide />}
               </section>
 
               <section className="grid gap-4 sm:grid-cols-2">
@@ -188,7 +189,9 @@ export function EnquiryDrawer({ id, planners, onClose }: { id: string | null; pl
                 <>
                   <Separator />
                   <section>
-                    <h3 className="mb-3 text-lg font-semibold">Timeline</h3>
+                    <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
+                      <Icon name="clock" className="size-4" /> Timeline
+                    </h3>
                     <ol className="space-y-3 border-l pl-4">
                       {data.activity.map((a) => (
                         <li key={a.id} className="relative text-sm">
@@ -212,10 +215,12 @@ export function EnquiryDrawer({ id, planners, onClose }: { id: string | null; pl
   );
 }
 
-function Fact({ label, value, wide }: { label: string; value: React.ReactNode; wide?: boolean }) {
+function Fact({ icon, label, value, wide }: { icon: IconName; label: string; value: React.ReactNode; wide?: boolean }) {
   return (
     <div className={wide ? "col-span-2" : undefined}>
-      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <Icon name={icon} className="size-3.5" /> {label}
+      </p>
       <p className="font-medium">{value}</p>
     </div>
   );
@@ -253,7 +258,9 @@ function Meetings({ data, onDone }: { data: Detail; onDone: () => Promise<void> 
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Meetings</h3>
+        <h3 className="flex items-center gap-2 text-lg font-semibold">
+          <Icon name="calendar" className="size-4" /> Meetings
+        </h3>
         {!open && (
           <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
             <CalendarPlus /> Book meeting
@@ -324,7 +331,9 @@ function AgreementPanel({ data, onDone }: { data: Detail; onDone: () => Promise<
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Service agreement</h3>
+        <h3 className="flex items-center gap-2 text-lg font-semibold">
+          <Icon name="sign" className="size-4" /> Service agreement
+        </h3>
         {a && <StagePill status={a.status === "SENT" ? "AGREEMENT_SENT" : a.status} label={a.status === "SENT" ? "Awaiting signature" : undefined} />}
       </div>
 

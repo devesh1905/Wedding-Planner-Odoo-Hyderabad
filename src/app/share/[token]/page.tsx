@@ -19,7 +19,7 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
         <header className="mb-6 flex flex-wrap items-end justify-between gap-2">
           <div>
-            <p className="text-xs tracking-[0.25em] text-maroon uppercase">The Royal Knot · shared report</p>
+            <p className="text-xs tracking-[0.25em] text-eyebrow uppercase">The Royal Knot · shared report</p>
             <h1 className="text-4xl font-semibold">Season at a glance</h1>
           </div>
           <p className="text-sm text-muted-foreground">

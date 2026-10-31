@@ -1,0 +1,5 @@
+// Runs in <head> before first paint, so nothing flashes:
+//  • theme: saved choice (toggle or ?theme=dark|light), else the system setting
+//  • splash: returning visitors (or reduced-motion users) skip the splash
+// Kept outside client components so it ships as plain server HTML.
+export const SPLASH_PREFLIGHT = `try{var q=new URLSearchParams(location.search).get('theme');if(q==='dark'||q==='light')localStorage.setItem('knot:theme',q);var t=localStorage.getItem('knot:theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}try{if(sessionStorage.getItem('knot:splash-seen')==='1'||matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.dataset.nosplash='1'}catch(e){}`;

@@ -4,6 +4,8 @@ import { renderAgreement } from "../../src/lib/agreement";
 
 const PNG_1X1 =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+// A believable ink signature for the demo (inline SVG data URL).
+const SIGNATURE_SVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 80'><path d='M12 52c14-22 22-34 30-30 9 5-10 38 0 40 9 2 18-30 28-28 8 2-4 26 4 27 7 1 13-14 20-14 6 0 2 12 8 12 8 0 12-16 22-18 11-2 6 18 16 18 12 0 22-20 36-22 10-1 18 6 30 2' fill='none' stroke='%233b0f17' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/><path d='M150 60c20 4 46 2 70-6' fill='none' stroke='%233b0f17' stroke-width='2' stroke-linecap='round'/></svg>";
 
 const DAY = 24 * 60 * 60 * 1000;
 const HOUR = 60 * 60 * 1000;
@@ -149,7 +151,7 @@ export async function seedEnquiries(db: PrismaClient) {
           sentAt,
           signedAt: signed ? signedAt : null,
           signerName: signed ? s.p1 : null,
-          signatureUrl: signed ? PNG_1X1 : null,
+          signatureUrl: signed ? SIGNATURE_SVG : null,
           signerIp: signed ? "203.0.113.24" : null,
         },
       });

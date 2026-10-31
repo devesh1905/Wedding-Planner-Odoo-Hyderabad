@@ -1,20 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ViewTransition } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { Icon } from "@/components/icons/icon";
 import { Magnetic } from "./magnetic";
 import { KnotMark } from "./knot-mark";
+import { DiyaSlot } from "@/components/cave/cave-mode";
 
 /**
- * The page's one animated moment: a slow aurora of marigold, rose and gold behind the headline.
- * The ornament drifts a little slower than the page (controlled parallax) — felt more than seen.
+ * The page's one ambient moment: a slow aurora of marigold, rose and gold behind the headline.
+ * (The parallax ornament was removed so the aurora reads as the single moment.)
  */
 export function Hero() {
   const reduce = useReducedMotion();
-  const { scrollY } = useScroll();
-  const drift = useTransform(scrollY, [0, 600], [0, 90]);
-  const fade = useTransform(scrollY, [0, 500], [1, 0.4]);
 
   return (
     <section className="relative isolate flex min-h-[92svh] items-center overflow-hidden">
@@ -25,20 +24,20 @@ export function Hero() {
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-b from-transparent to-background" aria-hidden />
 
-      <motion.div
+      <div
         aria-hidden
-        style={reduce ? undefined : { y: drift, opacity: fade }}
-        className="pointer-events-none absolute top-1/2 right-[-6rem] -z-10 hidden -translate-y-1/2 text-maroon/[0.07] lg:block"
+        className="pointer-events-none absolute top-1/2 right-[-6rem] -z-10 hidden -translate-y-1/2 text-foreground/[0.06] lg:block"
       >
-        <KnotMark className="h-[34rem] w-[56rem]" flameClassName="text-marigold/25" />
-      </motion.div>
+        <KnotMark className="h-[34rem] w-[56rem]" flameClassName="opacity-25" effects={false} />
+      </div>
 
+      <DiyaSlot id="hero" className="absolute top-[26%] right-[9%] z-10" />
       <div className="mx-auto w-full max-w-6xl px-6 py-28">
         <motion.p
           initial={reduce ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-xs tracking-[0.35em] text-maroon uppercase"
+          className="text-xs tracking-[0.35em] text-eyebrow uppercase"
         >
           Luxury weddings · Jaipur & Udaipur
         </motion.p>
@@ -46,6 +45,7 @@ export function Hero() {
           initial={reduce ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          data-cast
           className="mt-6 max-w-4xl text-6xl leading-[0.95] font-semibold sm:text-7xl lg:text-8xl"
         >
           Three days. Four hundred guests. Not one thing forgotten.
@@ -54,6 +54,7 @@ export function Hero() {
           initial={reduce ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.5 }}
+          data-cast
           className="mt-8 max-w-xl text-lg leading-relaxed text-foreground/75"
         >
           We plan around twenty-five weddings a season — each with its own team, its own timeline and a clear view of every rupee.
@@ -63,19 +64,22 @@ export function Hero() {
           initial={reduce ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.75 }}
+          data-cast
           className="mt-10 flex flex-wrap items-center gap-5"
         >
           <Magnetic>
+            <ViewTransition name="enquiry-card" share="morph" default="none">
             <Link
               href="/enquire"
-              className="group inline-flex items-center gap-3 rounded-full bg-maroon px-8 py-4 text-base font-medium text-primary-foreground shadow-[0_10px_30px_-10px_oklch(0.38_0.12_18/0.6)] transition-colors hover:bg-[oklch(0.33_0.12_18)]"
+              className="group inline-flex items-center gap-3 rounded-full bg-cta px-8 py-4 text-base font-medium text-cta-foreground shadow-[0_10px_30px_-10px_oklch(0.38_0.12_18/0.6)] transition-colors hover:bg-cta/90"
             >
               Plan your wedding
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+              <Icon name="arrow" className="size-5 transition-transform group-hover:translate-x-1" />
             </Link>
+            </ViewTransition>
           </Magnetic>
-          <a href="#journey" className="text-sm font-medium text-foreground/70 underline-offset-4 hover:text-foreground hover:underline">
-            See how it works
+          <a href="#journey" className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground/70 underline-offset-4 hover:text-foreground hover:underline">
+            <Icon name="route" />See how it works
           </a>
         </motion.div>
       </div>
