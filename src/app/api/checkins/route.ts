@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { handle, HttpError, requireUser } from "@/lib/auth";
 import { checkinSchema, liveQuerySchema } from "@/components/live/schema";
-import { checkinSelect, issueSelect, itemSelect, liveTransaction, parseJson, requireActiveWedding, staffSelect } from "./shared";
+import { checkinSelect, issueSelect, itemSelect, liveTransaction, parseJson, requireActiveWedding, scanKey, staffSelect } from "./shared";
 
 export const GET = handle(async (request: Request) => {
   await requireUser();
@@ -12,10 +12,12 @@ export const GET = handle(async (request: Request) => {
     const events = await tx.weddingEvent.findMany({ where: { weddingId }, orderBy: [{ sortOrder: "asc" }, { startsAt: "asc" }], select: {
       id: true, name: true, startsAt: true, scheduleItems: { select: itemSelect, orderBy: [{ startsAt: "asc" }, { id: "asc" }] },
     } });
-    const bookings = await tx.booking.findMany({ where: { weddingId }, orderBy: [{ expectedArrival: "asc" }, { id: "asc" }], select: {
-      id: true, expectedArrival: true, vendor: { select: { id: true, name: true, phone: true, category: true, backupVendor: { select: { id: true, name: true, phone: true } } } },
+    const rawBookings = await tx.booking.findMany({ where: { weddingId }, orderBy: [{ expectedArrival: "asc" }, { id: "asc" }], select: {
+      id: true, expectedArrival: true, checkinToken: true, vendor: { select: { id: true, name: true, phone: true, category: true, backupVendor: { select: { id: true, name: true, phone: true } } } },
       checkins: { orderBy: { arrivedAt: "asc" }, take: 1, select: { arrivedAt: true, method: true } },
     } });
+    // The raw token is a credential, so it is never sent to the device cache; a hash lets offline scans find the booking.
+    const bookings = rawBookings.map(({ checkinToken, ...booking }) => ({ ...booking, scanKey: scanKey(checkinToken) }));
     const issues = await tx.issue.findMany({ where: { weddingId }, orderBy: [{ status: "asc" }, { createdAt: "desc" }], select: issueSelect });
     const staff = await tx.user.findMany({ orderBy: { name: "asc" }, select: staffSelect });
     return { events, bookings, issues, staff };

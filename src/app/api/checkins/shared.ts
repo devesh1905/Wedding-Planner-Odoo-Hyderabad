@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { HttpError } from "@/lib/auth";
@@ -36,3 +37,4 @@ export const itemSelect = {
 export const checkinSelect = {
   id: true, bookingId: true, clientId: true, arrivedAt: true, expectedAt: true, method: true,
 } satisfies Prisma.CheckinSelect;
+export function scanKey(token: string): string { return createHash("sha256").update(token).digest("hex"); }
