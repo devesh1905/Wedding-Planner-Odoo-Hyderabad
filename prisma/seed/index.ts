@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { PACKAGES } from "./templates";
 import { seedDemo } from "./demo";
+import { seedEnquiries } from "./enquiries";
 
 const db = new PrismaClient();
 
@@ -37,6 +38,7 @@ async function main() {
   }
 
   await seedDemo(db);
+  await seedEnquiries(db);
 
   console.log(`Seeded ${users.length} users, ${PACKAGES.length} packages`);
 }
