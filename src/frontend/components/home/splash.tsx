@@ -7,7 +7,7 @@ const KEY = "knot:splash-seen";
 // CSS timeline: knot draws (0–1.2s), flame catches (~1.1–2.1s) and breathes a moment.
 const LIT_AT = 2900;
 const SPREAD_MS = 1500; // the dark burns away outward from the flame, revealing the site
-const AFTERGLOW_MS = 700; // warm glow lingers over the page, then settles
+const AFTERGLOW_MS = 100; // the warm glow has already faded during the spread; just unmount
 
 type Phase = "show" | "spread" | "afterglow" | "gone";
 

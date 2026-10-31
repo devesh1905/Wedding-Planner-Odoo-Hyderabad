@@ -242,8 +242,15 @@
   transition: --spread 1.5s cubic-bezier(0.6, 0, 0.25, 1), opacity 0.35s ease;
 }
 .splash-dark.splash-open, .splash-front.splash-open { --spread: 185%; }
-.splash-front.splash-open { opacity: 1; }
-.splash-front.splash-settle { opacity: 0; transition: opacity 0.7s ease; }
+/* the warmth flares as the flame catches, then fades while the dark burns away, so nothing lingers after */
+.splash-front.splash-open { animation: splash-warmth 1.5s ease-out forwards; }
+.splash-front.splash-settle { opacity: 0; }
+@keyframes splash-warmth {
+  0% { opacity: 0; }
+  12% { opacity: 1; }
+  45% { opacity: 0.8; }
+  100% { opacity: 0; }
+}
 
 /* Slow aurora: three soft blobs drifting on long, offset loops. */
 @keyframes aurora-drift {
