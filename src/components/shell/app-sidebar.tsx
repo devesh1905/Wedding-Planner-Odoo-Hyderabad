@@ -27,9 +27,7 @@ export function AppSidebar({ user, onNavigate }: { user: { name: string; role: s
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-3 px-5 py-6">
-        <div className="grid size-9 place-items-center rounded-full bg-marigold text-maroon">
-          <KnotMark className="h-4 w-7" />
-        </div>
+        <KnotMark className="h-6 w-12 shrink-0 text-[oklch(0.93_0.03_80)]" />
         <div className="leading-tight">
           <p className="font-serif text-xl font-semibold">The Royal Knot</p>
           <p className="text-[11px] tracking-widest text-sidebar-foreground/60 uppercase">KnotOS</p>

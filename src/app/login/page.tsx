@@ -8,13 +8,16 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const { next } = await searchParams;
   return (
     <main className="grid min-h-svh lg:grid-cols-2">
-      <section className="relative hidden overflow-hidden bg-sidebar text-sidebar-foreground lg:flex lg:flex-col lg:justify-between lg:p-12">
-        <div className="absolute inset-0 opacity-30 [background:radial-gradient(600px_300px_at_20%_10%,var(--marigold),transparent_70%),radial-gradient(500px_400px_at_90%_90%,var(--rose),transparent_70%)]" />
+      <section className="relative hidden overflow-hidden bg-[oklch(0.13_0.025_18)] text-sidebar-foreground lg:flex lg:flex-col lg:justify-between lg:p-12">
+        <div className="absolute inset-0 opacity-20 [background:radial-gradient(600px_300px_at_20%_10%,var(--marigold),transparent_70%),radial-gradient(500px_400px_at_90%_90%,var(--rose),transparent_70%)]" />
         <div className="relative flex items-center gap-3">
-          <Logo />
-          <span className="font-serif text-2xl font-semibold">The Royal Knot</span>
+          <KnotMark className="h-7 w-14 text-[oklch(0.93_0.03_80)]" />
+          <span className="font-serif text-2xl font-semibold">KnotOS</span>
+          <span className="text-sm text-sidebar-foreground/60">for The Royal Knot</span>
         </div>
         <div className="relative max-w-md space-y-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/knotos-glow.png" alt="KnotOS" className="-ml-8 mb-2 w-80" />
           <p className="font-serif text-5xl leading-tight font-semibold">Every wedding, one calm place.</p>
           <div className="ornament w-40" />
           <p className="text-sidebar-foreground/80">
@@ -44,9 +47,5 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
 }
 
 function Logo() {
-  return (
-    <div className="grid size-10 place-items-center rounded-full bg-marigold text-maroon shadow-sm">
-      <KnotMark className="h-5 w-8" />
-    </div>
-  );
+  return <KnotMark className="h-9 w-[4.4rem] text-maroon" />;
 }
