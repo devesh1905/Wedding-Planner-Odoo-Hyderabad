@@ -7,4 +7,4 @@
 7. Other services use AI_ENDPOINT and AI_PROTOCOL=chat or messages; AI_HEADERS_JSON supplies version headers.
 8. Known demo text fingerprints select fixtures without a key or during a service outage; unknown documents never match.
 9. Comparison preserves exclusions and unknown prices; quoted totals determine the cheapest vendor.
-10. Extraction money is rupees; rupeesToPaise converts once before database storage, and planners review before saving.
+10. Extraction and database money are rupees; round fractional amounts once on save, and planners review before saving.
