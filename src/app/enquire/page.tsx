@@ -2,11 +2,16 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { EnquireForm } from "./enquire-form";
 import { ViewTransition } from "react";
+import { THEMES } from "@/shared/validation/enquiry";
 import { KnotMark } from "@/frontend/components/home/knot-mark";
 
 export const metadata: Metadata = { title: { absolute: "Plan your wedding · The Royal Knot" } };
 
-export default function EnquirePage() {
+export default async function EnquirePage({ searchParams }: { searchParams: Promise<{ theme?: string | string[] }> }) {
+  // /enquire?theme=Royal%20Heritage preselects that theme chip (ignored if it is not a known theme)
+  const raw = (await searchParams).theme;
+  const asked = Array.isArray(raw) ? raw[0] : raw;
+  const initialTheme = THEMES.find((t) => t === asked);
   return (
     <ViewTransition enter="page-rise" exit="page-fade" default="none">
     <main className="min-h-svh bg-paper">
@@ -21,7 +26,7 @@ export default function EnquirePage() {
           <div className="ornament mx-auto w-32" />
           <p className="text-pretty text-muted-foreground">Share a few details and a planner will call you within 24 hours.</p>
         </header>
-        <EnquireForm />
+        <EnquireForm initialTheme={initialTheme} />
       </div>
     </main>
     </ViewTransition>

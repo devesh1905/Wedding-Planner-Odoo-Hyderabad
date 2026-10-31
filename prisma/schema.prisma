@@ -190,6 +190,12 @@ model Enquiry {
   lostReason    String?
   nextFollowUp  DateTime?
   assignedToId  String?       @db.Uuid
+  // "Build your package" selection from the public form; the estimate is recomputed server-side.
+  services      String[]      @default([])
+  events        String[]      @default([])
+  planning      String? // FULL | DAY_OF
+  estimateLow   Int? // rupees
+  estimateHigh  Int? // rupees
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 

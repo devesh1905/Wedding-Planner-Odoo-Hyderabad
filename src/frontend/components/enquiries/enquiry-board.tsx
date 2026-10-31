@@ -191,6 +191,11 @@ function Card({ e, onClick, overlay }: { e: EnquiryCardData; onClick?: () => voi
           <OwnerAvatar name={e.assignedTo?.name} color={e.assignedTo?.avatarColor} size="xs" />
         </span>
       </div>
+      {!!e.services?.length && (
+        <p className="mt-2 inline-flex items-center gap-1 rounded-md bg-maroon-soft px-2 py-1 text-xs font-medium text-maroon">
+          Custom package · {e.services.length} {e.services.length === 1 ? "service" : "services"}
+        </p>
+      )}
       {e.duplicateOf && (
         <p className="mt-2 flex items-center gap-1 rounded-md bg-marigold-soft px-2 py-1 text-xs text-foreground" title="Same mobile number">
           <Phone className="size-3 shrink-0" /> <span className="truncate">Same phone as {e.duplicateOf}</span>

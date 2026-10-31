@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import type { PrismaClient, EnquiryStatus, EnquirySource } from "@prisma/client";
+import { estimate } from "../../src/shared/package-builder";
 import { renderAgreement } from "../../src/backend/agreement";
 
 const PNG_1X1 =
@@ -27,16 +28,18 @@ type Seed = {
   lostReason?: string;
   meetingInDays?: number;
   overdue?: boolean;
+  /** "Build your package" selection, to demo the planner's Requested package view */
+  pkg?: { planning: "FULL" | "DAY_OF"; events: string[]; services: string[] };
 };
 
 const SEEDS: Seed[] = [
   // NEW x4
-  { p1: "Aarohi Kapoor", p2: "Vihaan Malhotra", phone: "9810045521", email: "aarohi.kapoor@example.com", source: "WEB_FORM", date: "2027-02-12", guests: 350, theme: "Royal Heritage", budget: 15000000, city: "Jaipur", notes: "Wants a palace venue with a grand baraat entry.", status: "NEW", createdDaysAgo: 3, overdue: true },
+  { p1: "Aarohi Kapoor", p2: "Vihaan Malhotra", phone: "9810045521", email: "aarohi.kapoor@example.com", source: "WEB_FORM", date: "2027-02-12", guests: 350, theme: "Royal Heritage", budget: 15000000, city: "Jaipur", notes: "Wants a palace venue with a grand baraat entry.", status: "NEW", createdDaysAgo: 3, overdue: true, pkg: { planning: "FULL", events: ["Mehendi", "Sangeet", "Wedding", "Reception"], services: ["venue", "decor", "catering", "photo", "makeup", "music", "invites"] } },
   { p1: "Diya Agarwal", p2: "Rohan Bansal", phone: "9928817734", source: "INSTAGRAM", date: "2027-01-24", guests: 220, theme: "Pastel Garden", budget: 7500000, city: "Udaipur", notes: "Found us via a reel. Prefers a lakeside garden ceremony.", status: "NEW", createdDaysAgo: 1 },
   { p1: "Meera Joshi", p2: "Karan Purohit", phone: "9414203318", email: "meera.joshi@example.com", source: "PHONE", date: "2026-12-18", guests: 180, theme: "Desert Boho", budget: 4500000, city: "Jodhpur", status: "NEW", createdDaysAgo: 0 },
   { p1: "Sanya Khanna", p2: "Arjun Tandon", phone: "7042266190", source: "WHATSAPP", date: "2027-03-06", guests: 500, theme: "Modern Minimal", budget: 22000000, city: "Jaipur", notes: "Two-day affair; sangeet at a separate venue.", status: "NEW", createdDaysAgo: 2 },
   // CONTACTED x3
-  { p1: "Kavya Rathore", p2: "Siddharth Chauhan", phone: "9602518847", email: "kavya.r@example.com", source: "REFERRAL", date: "2027-02-20", guests: 400, theme: "Royal Heritage", budget: 30000000, city: "Udaipur", notes: "Referred by a past client. Budget is flexible for the right venue.", status: "CONTACTED", createdDaysAgo: 6 },
+  { p1: "Kavya Rathore", p2: "Siddharth Chauhan", phone: "9602518847", email: "kavya.r@example.com", source: "REFERRAL", date: "2027-02-20", guests: 400, theme: "Royal Heritage", budget: 30000000, city: "Udaipur", notes: "Referred by a past client. Budget is flexible for the right venue.", status: "CONTACTED", createdDaysAgo: 6, pkg: { planning: "DAY_OF", events: ["Sangeet", "Wedding", "Reception"], services: ["decor", "catering", "hospitality", "choreo"] } },
   { p1: "Ishani Gupta", p2: "Nikhil Saxena", phone: "8239914406", source: "INSTAGRAM", date: "2027-01-10", guests: 160, theme: "Beach Chic", budget: 6000000, city: "Jaipur", notes: "Wants a tropical feel with white and teal tones.", status: "CONTACTED", createdDaysAgo: 8 },
   { p1: "Tanvi Shekhawat", p2: "Pranav Mehra", phone: "9784432065", email: "tanvi.s@example.com", source: "WEB_FORM", date: "2026-12-30", guests: 280, theme: "Pastel Garden", budget: 11000000, city: "Jodhpur", status: "CONTACTED", createdDaysAgo: 5 },
   // MEETING_BOOKED x2
@@ -53,6 +56,11 @@ const SEEDS: Seed[] = [
   { p1: "Zoya Siddiqui", p2: "Imran Qureshi", phone: "8561029374", source: "INSTAGRAM", date: "2027-01-17", guests: 150, theme: "Pastel Garden", budget: 4000000, city: "Udaipur", status: "LOST", createdDaysAgo: 20, lostReason: "Budget too low for the venue they wanted" },
   { p1: "Preeti Solanki", p2: "Manav Trivedi", phone: "9460581129", source: "PHONE", date: "2027-03-02", guests: 200, theme: "Modern Minimal", budget: 8000000, city: "Jodhpur", status: "LOST", createdDaysAgo: 18, lostReason: "Went with another planner" },
 ];
+
+function pkgEstimate(s: Seed) {
+  const e = estimate({ guests: s.guests, ...s.pkg! });
+  return { estimateLow: e.low, estimateHigh: e.high };
+}
 
 const FLOW: EnquiryStatus[] = ["NEW", "CONTACTED", "MEETING_BOOKED", "AGREEMENT_SENT", "SIGNED"];
 
@@ -106,6 +114,12 @@ export async function seedEnquiries(db: PrismaClient) {
         assignedToId,
         createdAt,
         updatedAt,
+        ...(s.pkg && {
+          planning: s.pkg.planning,
+          events: s.pkg.events,
+          services: s.pkg.services,
+          ...pkgEstimate(s),
+        }),
       },
     });
 

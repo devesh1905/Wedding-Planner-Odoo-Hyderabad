@@ -21,6 +21,7 @@ export default async function EnquiriesPage() {
         maxBudget: true,
         city: true,
         theme: true,
+        services: true,
         nextFollowUp: true,
         createdAt: true,
         updatedAt: true,

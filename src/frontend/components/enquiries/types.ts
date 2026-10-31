@@ -10,6 +10,7 @@ export type EnquiryCardData = {
   maxBudget: number | null;
   city: string | null;
   theme: string | null;
+  services?: string[];
   nextFollowUp: string | null;
   createdAt: string;
   updatedAt: string;
