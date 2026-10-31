@@ -15,7 +15,9 @@ export function normalizeForComparison(extractions: QuoteExtraction[]): {rows:Co
   });
   for (const category of categories) {
     const values = extractions.map(q=>{
-      const items = q.lines.filter(line=>line.category===category);
+      let items = q.lines.filter(line=>line.category===category);
+      // Tax summaries need comparison cells even when the PDF has no separate tax line.
+      if (category==='TAX' && items.length===0) items=q.taxes.map(tax=>({item:tax.label,category:'TAX',qty:1,unit:'lot',unitPrice:tax.amount,included:true}));
       const included = items.filter(line=>line.included);
       // A bundled inclusion has no standalone price; null keeps it from appearing free.
       const priced = included.length > 0 && included.every(line=>line.qty!==null && line.unitPrice!==null);

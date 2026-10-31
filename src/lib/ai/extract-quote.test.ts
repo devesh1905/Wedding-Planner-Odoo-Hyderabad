@@ -21,6 +21,7 @@ test('three PDF layouts match validated fixtures, prices and missing inclusions'
     assert.equal(comparison.cheapestVendorIndex,1);
     assert.deepEqual(comparison.rows.find(r=>r.key==='DESSERT')!.values.map(v=>v.missing),[false,true,false]);
     assert.equal(comparison.rows.find(r=>r.key==='DESSERT')!.values[0]!.value,null);
+    assert.deepEqual(comparison.rows.find(r=>r.key==='TAX')!.values.map(v=>v.value),[null,86000,187200]);
     await assert.rejects(extractQuote('Shahi Rasoi is quoting a different wedding for 100 guests'),/No service key/);
     await assert.rejects(extractQuote(''),/1 to 100000/);
     assert.equal(rupeesToPaise(2450),245000);
