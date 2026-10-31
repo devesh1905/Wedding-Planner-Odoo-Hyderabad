@@ -280,6 +280,12 @@ html { scroll-behavior: smooth; }
 
 [data-nosplash] .splash { display: none; }
 
+/* Small text links keep their look but get a 44px-tall hit area (Apple HIG touch target). */
+.hit-44 { position: relative; }
+.hit-44::after { content: ""; position: absolute; left: -6px; right: -6px; top: 50%; height: 44px; translate: 0 -50%; }
+/* Section heads never end on a one-word stub. */
+main h2 { text-wrap: balance; }
+
 /* Home page, desktop mouse/trackpad only: each section is gently magnetic. Proximity snapping settles
    on a section start when you stop near one, and snap-stop keeps a fast flick from skipping a whole
    section. "How it works" pins its card track; it snaps at its start, two midpoints and its end (.snap-mark). */

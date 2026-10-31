@@ -47,7 +47,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
       title={dark ? "Daylight — switch to light mode" : "Light the lamp — switch to night mode"}
       aria-pressed={dark}
-      className={cn("relative grid size-9 place-items-center overflow-hidden rounded-full transition-colors hover:bg-foreground/5", className)}
+      className={cn("relative grid size-11 place-items-center overflow-hidden rounded-full transition-colors hover:bg-foreground/5", className)}
     >
       <AnimatePresence mode="wait" initial={false}>
         {!dark ? (
