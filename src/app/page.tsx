@@ -39,21 +39,28 @@ export default async function Home() {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-3 sm:gap-4 sm:px-6 sm:py-5">
           <MonogramButton />
           <nav className="flex items-center gap-3 text-sm sm:gap-6">
-            <a href="#journey" className="hidden items-center gap-1.5 text-foreground/70 hover:text-foreground sm:inline-flex">
+            <a href="#journey" className="hidden items-center gap-1.5 text-foreground/85 hover:text-foreground md:inline-flex">
               <Icon name="route" />How it works
             </a>
-            <a href="#celebrations" className="hidden items-center gap-1.5 text-foreground/70 hover:text-foreground sm:inline-flex">
+            <a href="#celebrations" className="hidden items-center gap-1.5 text-foreground/85 hover:text-foreground md:inline-flex">
               <Icon name="confetti" />Celebrations
             </a>
             <ThemeToggle className="-my-2" />
             <Link
               href={session ? (session.role === "FOUNDER" ? "/dashboard" : "/weddings") : "/login"}
               aria-label={session ? "Open KnotOS" : "Team sign in"}
-              className="inline-flex items-center gap-1.5 text-foreground/50 hover:text-foreground"
+              className="inline-flex items-center gap-1.5 text-foreground/70 hover:text-foreground"
             >
               <Icon name={session ? "grid" : "login"} className="size-5 sm:size-4" />
               {/* icon only on phones so the header stays one line */}
               <span className="hidden sm:inline">{session ? "Open KnotOS" : "Team sign in"}</span>
+            </Link>
+            {/* the one action couples come for, always in reach */}
+            <Link
+              href="/enquire"
+              className="hidden items-center gap-1.5 rounded-full bg-cta px-4 py-2 text-sm font-medium text-cta-foreground transition-colors hover:bg-cta/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:inline-flex"
+            >
+              Plan your wedding
             </Link>
           </nav>
         </div>
@@ -63,9 +70,9 @@ export default async function Home() {
       <main>
         <Hero />
 
-        <section className="relative mx-auto max-w-6xl px-6 py-24" aria-label="Our promise">
+        <section className="relative mx-auto max-w-6xl px-6 pt-6 pb-24" aria-label="Our promise">
           <DiyaSlot id="promise" className="absolute top-6 right-6" />
-          <Reveal className="grid gap-12 border-t border-border pt-12 md:grid-cols-3">
+          <Reveal className="grid gap-12 border-t border-border pt-10 md:grid-cols-3">
             {PROMISES.map((p) => (
               <RevealItem key={p.v}>
                 <div data-cast>
