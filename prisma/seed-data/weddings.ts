@@ -42,5 +42,6 @@ export const weddingFinance: WeddingFinanceSeed[] = weddings.map((wedding, index
   // Vendors take 80–86% of the contract (a 14–20% gross margin is typical for planners). One wedding
   // ran over — extras the family asked for weren't billed — so it shows as a small loss.
   vendorCosts: Math.round(wedding.contractValue * (index === 2 ? 0.99 : 0.8 + (index % 3) * 0.03)),
-  teamHours: 140 + index * 9, hourlyCost: 75000,
+  // ~250–450 planner hours a wedding at a blended ₹1,500/hr (paise) → ₹4–7 L team cost.
+  teamHours: 250 + index * 8, hourlyCost: 150000,
 }));
