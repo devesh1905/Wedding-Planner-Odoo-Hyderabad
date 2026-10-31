@@ -66,7 +66,13 @@ export function startAutoSync(): () => void {
   window.addEventListener("online", sync);
   const interval = window.setInterval(sync, 30_000);
   sync();
-  return stopAutoSync = () => { window.removeEventListener("online", sync); window.clearInterval(interval); stopAutoSync = undefined; };
+  let stopped = false;
+  return stopAutoSync = () => {
+    // Old React effect cleanups must not clear a newer registration after a remount.
+    if (stopped) return;
+    stopped = true;
+    window.removeEventListener("online", sync); window.clearInterval(interval); stopAutoSync = undefined;
+  };
 }
 export function useOnlineStatus(): boolean {
   const [online, setOnline] = useState(true);

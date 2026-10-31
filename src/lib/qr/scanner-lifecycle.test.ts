@@ -23,6 +23,14 @@ unmounted.dispose(); unmountPermission.resolve(); await unfinished; await unmoun
 assert.equal(unmountCamera.stops, 1); assert.deepEqual(unmountedPhases, ["starting"]);
 assert.equal(await unmounted.start(create), false);
 
+let fails = true;
+const retryCamera = { isScanning: true, async stop() { if (fails) throw new Error("Busy"); this.isScanning = false; } };
+const retryLifecycle = new CameraLifecycle(() => {});
+await retryLifecycle.start(async () => retryCamera);
+await assert.rejects(retryLifecycle.stop());
+assert.equal(await retryLifecycle.start(create), false);
+fails = false; await retryLifecycle.stop();
+
 const delivery = new ScanDelivery(); let submitted = 0;
 const submit = () => { submitted++; };
 assert.equal(delivery.deliver("first", submit), true); assert.equal(delivery.deliver("first", submit), false);

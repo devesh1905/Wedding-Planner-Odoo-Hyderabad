@@ -34,7 +34,11 @@ export class CameraLifecycle {
     this.stopping = (async () => {
       await this.starting?.catch(() => {});
       try { if (this.engine?.isScanning) await this.engine.stop(); }
-      finally { this.engine = undefined; this.starting = undefined; this.setPhase("idle"); }
+      finally {
+        this.starting = undefined;
+        if (!this.engine?.isScanning) this.engine = undefined;
+        this.setPhase(this.engine ? "active" : "idle");
+      }
     })().finally(() => { this.stopping = undefined; });
     return this.stopping;
   }
