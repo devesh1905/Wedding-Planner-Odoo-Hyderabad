@@ -614,3 +614,7 @@ html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   .dash-grow-x, .dash-grow-y, .dash-ring { animation: none; }
 }
+
+/* Hide a native scrollbar where a custom scroller (ScrollRail) is shown instead. */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }

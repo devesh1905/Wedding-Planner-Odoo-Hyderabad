@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { ScrollRail } from "@/components/common/scroll-rail";
 import { useRouter } from "next/navigation";
 import {
   DndContext,
@@ -93,6 +94,8 @@ export function EnquiryBoard({ enquiries, planners }: { enquiries: EnquiryCardDa
     return <EmptyState icon={Inbox} title="No enquiries yet" hint="Share the enquiry form link or add one from a call." />;
   }
 
+  const boardRef = useRef<HTMLDivElement>(null);
+
   return (
     <>
       <div className="mb-4 flex items-center gap-2">
@@ -100,6 +103,7 @@ export function EnquiryBoard({ enquiries, planners }: { enquiries: EnquiryCardDa
           <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search name, phone, city" className="pl-9" />
         </div>
+        <ScrollRail target={boardRef} className="ml-auto" />
       </div>
 
       <DndContext
@@ -108,7 +112,7 @@ export function EnquiryBoard({ enquiries, planners }: { enquiries: EnquiryCardDa
         onDragEnd={onDragEnd}
         onDragCancel={() => setDragging(null)}
       >
-        <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-4 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
+        <div ref={boardRef} className="no-scrollbar -mx-4 flex gap-4 overflow-x-auto px-4 pb-4 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
           {STATUSES.map((s) => (
             <Column key={s} status={s} items={filtered.filter((e) => e.status === s)} onOpen={setOpenId} />
           ))}
