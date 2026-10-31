@@ -470,3 +470,44 @@ html { scroll-behavior: smooth; }
 }
 }
 @media (prefers-reduced-motion: reduce) { .cave-warm { opacity: 0.85; } }
+
+/* First-time hint beside the diya, arrow pointing at the flame. */
+@keyframes hint-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes hint-float {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: -3px; }
+}
+.diya-hint {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  right: -10px;
+  white-space: nowrap;
+  pointer-events: none;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: oklch(0.95 0.03 80);
+  background: oklch(0.19 0.03 45);
+  border: 1px solid rgb(232 163 61 / 0.45);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.45), 0 0 18px rgb(232 163 61 / 0.15);
+  backdrop-filter: blur(6px);
+  animation: hint-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both, hint-float 2.8s ease-in-out 0.5s infinite;
+}
+.diya-hint::after {
+  content: "";
+  position: absolute;
+  right: 34px;
+  bottom: -6px;
+  width: 10px;
+  height: 10px;
+  transform: rotate(45deg);
+  background: inherit;
+  border-right: 1px solid rgb(232 163 61 / 0.45);
+  border-bottom: 1px solid rgb(232 163 61 / 0.45);
+}
+@media (prefers-reduced-motion: reduce) { .diya-hint { animation: none; } }

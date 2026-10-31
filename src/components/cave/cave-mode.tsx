@@ -88,8 +88,23 @@ export function CaveMode() {
 
 type Mode = "docked" | "gliding" | "dragging" | "carried";
 
+const TRIED_KEY = "knot:diya-tried";
+
 function Cave() {
   const diyaRef = useRef<HTMLDivElement>(null);
+  // First-time hint: "grab" while docked, "drop" while carrying, then never again.
+  const [hint, setHint] = useState<"grab" | "drop" | null>(null);
+  const hintRef = useRef(hint);
+  hintRef.current = hint;
+  useEffect(() => {
+    let tried = false;
+    try {
+      tried = localStorage.getItem(TRIED_KEY) === "1";
+    } catch {}
+    if (tried) return;
+    const t = setTimeout(() => setHint("grab"), 1400);
+    return () => clearTimeout(t);
+  }, []);
   // All live state lives in one ref, read and written only by the loop and event handlers.
   const s = useRef({
     mode: "gliding" as Mode,
@@ -129,6 +144,12 @@ function Cave() {
     // ── pointer: grab, carry, drop ──
     const onDown = (e: PointerEvent) => {
       e.preventDefault();
+      if (hintRef.current === "grab") {
+        setHint("drop");
+        try {
+          localStorage.setItem(TRIED_KEY, "1");
+        } catch {}
+      }
       diya.setPointerCapture(e.pointerId);
       clearTimeout(st.idleTimer);
       st.mode = "dragging";
@@ -146,6 +167,7 @@ function Cave() {
       if (st.mode !== "dragging") return;
       diya.releasePointerCapture?.(e.pointerId);
       const best = nearestSlot(st.x, st.y, true);
+      if (hintRef.current === "drop") setTimeout(() => setHint(null), 1200);
       if (best && best.d < SNAP_DISTANCE) return goToSlot(best.id);
       st.mode = "carried";
       st.tx = st.x;
@@ -309,6 +331,11 @@ function Cave() {
         }}
       >
         <DiyaGraphic />
+        {hint && (
+          <span key={hint} role="status" className="diya-hint">
+            {hint === "grab" ? "Hold & drag to carry the light" : "Drop it into a niche to light the page"}
+          </span>
+        )}
       </div>
     </>
   );

@@ -113,7 +113,7 @@ export function Celebrations() {
   return (
     <section id="celebrations" className="py-24" aria-label="Celebration styles">
       <div className="relative mx-auto max-w-6xl px-6">
-        <DiyaSlot id="celebrations" className="absolute -top-6 right-6" />
+        <DiyaSlot id="celebrations" className="absolute -top-20 right-6" />
         <p className="text-xs tracking-[0.3em] text-eyebrow uppercase">Celebrations</p>
         <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
           <h2 data-cast className="max-w-xl text-4xl leading-tight font-semibold sm:text-5xl">Every wedding has its own light</h2>
