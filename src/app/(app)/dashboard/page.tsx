@@ -30,7 +30,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         subtitle="Which weddings made money, what's still unfinished, and what's due"
         actions={
           <>
-            <div className="flex rounded-lg border bg-card p-0.5">
+            <div className="flex max-w-full flex-wrap rounded-lg border bg-card p-0.5">
               {PERIODS.map((x) => (
                 <Link
                   key={x.key}

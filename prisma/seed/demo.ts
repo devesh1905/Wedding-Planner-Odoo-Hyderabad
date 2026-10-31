@@ -117,7 +117,7 @@ export async function seedDemo(db: PrismaClient) {
 
   // Payment milestones: 20 / 40 / 40 split
   const milestoneRows: Prisma.PaymentMilestoneCreateManyInput[] = [];
-  for (const w of weddings) {
+  weddings.forEach((w, i) => {
     const stage = STAGE_MAP[w.stage];
     const [bookAmt, advAmt, finAmt] = splitByWeight(scaleMoney(w.contractValue), [20, 40, 40]);
     const advDue = addDays(new Date(w.startDate), -30);
@@ -125,10 +125,13 @@ export async function seedDemo(db: PrismaClient) {
       if (stage === "SETTLED") return "PAID";
       if (stage === "SETTLEMENT" || stage === "BIG_DAY") return type === "FINAL" ? "DUE" : "PAID";
       if (stage === "PLANNING") return type === "BOOKING" || (type === "ADVANCE" && advDue < TODAY) ? "PAID" : "DUE";
-      return "DUE";
+      // Booked: the deposit is normally paid on signing; two couples are a little late (overdue reminders).
+      return type === "BOOKING" && i % 5 !== 3 ? "PAID" : "DUE";
     };
+    // Deposit falls due a week after the couple signs (about four months before the wedding).
+    const depositDue = addDays(new Date(w.startDate), i % 5 === 3 ? -75 : -120);
     const items = [
-      { type: "BOOKING" as const, label: "Booking deposit", amount: bookAmt, dueDate: new Date("2026-09-01T00:00:00.000Z") },
+      { type: "BOOKING" as const, label: "Booking deposit", amount: bookAmt, dueDate: depositDue },
       { type: "ADVANCE" as const, label: "Advance (30 days before)", amount: advAmt, dueDate: advDue },
       { type: "FINAL" as const, label: "Final settlement", amount: finAmt, dueDate: addDays(new Date(w.endDate), 7) },
     ];
@@ -139,7 +142,7 @@ export async function seedDemo(db: PrismaClient) {
         reference: st === "PAID" ? `RCPT-${w.code}-${m.type}` : null,
       });
     }
-  }
+  });
   await insertAll(milestoneRows, (data) => db.paymentMilestone.createMany({ data }));
 
   // Bookings: historical ones for settled weddings plus category bookings that sum to the finance vendor cost

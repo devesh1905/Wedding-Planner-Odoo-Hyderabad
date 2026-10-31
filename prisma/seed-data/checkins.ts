@@ -7,7 +7,8 @@ const settled = weddings.filter((wedding) => wedding.stage === "SETTLED");
 const historicalVendors = [vendors.find((vendor) => vendor.name === "Beat Baraat")!, vendors[0]!, vendors[8]!, vendors[24]!];
 export const historicalBookings: HistoricalBookingSeed[] = settled.flatMap((wedding, weddingIndex) => historicalVendors.map((vendor, vendorIndex) => ({
   id: seedId(5, weddingIndex * historicalVendors.length + vendorIndex + 1), weddingId: wedding.id, vendorId: vendor.id,
-  agreedAmount: vendor.category === "CATERER" ? wedding.guestCount * 245000 : 15000000,
+  // Paise. Caterer: ₹2,450 a plate × 4 catered meals over three days; others at market rates.
+  agreedAmount: vendor.category === "CATERER" ? wedding.guestCount * 245000 * 4 : ({ DJ: 250000, PHOTOGRAPHER: 650000, FLORIST: 450000 }[vendor.category as string] ?? 300000) * 100,
   expectedArrival: new Date(new Date(wedding.startDate).getTime() + vendorIndex * 3600000).toISOString(),
   agreedGuests: wedding.guestCount, agreedHours: 4, hourlyRate: 1500000, perPlate: vendor.category === "CATERER" ? 245000 : null,
 })));

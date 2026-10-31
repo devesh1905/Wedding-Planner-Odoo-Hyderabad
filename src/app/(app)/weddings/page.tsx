@@ -96,7 +96,7 @@ export default async function WeddingsPage({ searchParams }: { searchParams: Pro
                   <StagePill status={w.stage} />
                   <span className="text-xs text-muted-foreground tabular">{w.code}</span>
                 </div>
-                <h2 className="mt-3 text-2xl leading-tight font-semibold group-hover:text-maroon">
+                <h2 className="mt-3 text-2xl leading-tight font-semibold break-words group-hover:text-maroon">
                   {w.partner1} & {w.partner2}
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
