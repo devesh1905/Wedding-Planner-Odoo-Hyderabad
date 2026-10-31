@@ -58,9 +58,11 @@ export function EnquiryFields({
   errors: Record<string, string>;
   onChange: (k: keyof EnquiryValues, v: string) => void;
 }) {
-  const input = (k: keyof EnquiryValues, props: React.ComponentProps<typeof Input> = {}) => (
+  const input = (k: keyof EnquiryValues, { className, ...props }: React.ComponentProps<typeof Input> = {}) => (
     <Input
       id={k}
+      // taller fields: comfortable 44px tap targets on phones
+      className={cn("h-11 md:h-10", className)}
       value={values[k]}
       aria-invalid={!!errors[k]}
       onChange={(e) => onChange(k, e.target.value)}
@@ -69,7 +71,7 @@ export function EnquiryFields({
   );
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className="grid gap-x-4 gap-y-5 sm:grid-cols-2">
       <Field label="Partner one" icon="user" htmlFor="partner1" error={errors.partner1}>
         {input("partner1", { placeholder: "Meera", autoComplete: "given-name" })}
       </Field>
@@ -78,7 +80,7 @@ export function EnquiryFields({
       </Field>
       <Field label="Mobile number" icon="phone" htmlFor="phone" error={errors.phone}>
         <div className="flex">
-          <span className="inline-flex items-center rounded-l-md border border-r-0 bg-muted px-3 text-sm text-muted-foreground">+91</span>
+          <span className="inline-flex items-center rounded-l-lg border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground">+91</span>
           {input("phone", { inputMode: "tel", placeholder: "98290 12345", className: "rounded-l-none", autoComplete: "tel-national" })}
         </div>
       </Field>
@@ -108,6 +110,7 @@ export function EnquiryFields({
       <Field label="Anything else?" icon="notes" htmlFor="notes" error={errors.notes} className="sm:col-span-2">
         <Textarea
           id="notes"
+          aria-invalid={!!errors.notes}
           rows={3}
           value={values.notes}
           onChange={(e) => onChange("notes", e.target.value)}
@@ -143,8 +146,8 @@ function Chips({
               onChange(on ? "" : o.value);
             }}
             className={cn(
-              "rounded-full border px-3.5 py-1.5 text-sm transition-[color,background-color,border-color,transform] duration-200 active:scale-95",
-              on ? "border-maroon bg-maroon text-primary-foreground" : "bg-card hover:border-maroon/40 hover:bg-maroon-soft",
+              "inline-flex min-h-11 items-center rounded-full border px-4 text-sm transition-[color,background-color,border-color,transform] duration-200 active:scale-95 motion-reduce:transition-none motion-reduce:active:scale-100 sm:min-h-9 outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+              on ? "border-cta bg-cta text-cta-foreground" : "bg-card hover:border-maroon/40 hover:bg-maroon-soft",
             )}
           >
             {o.label}

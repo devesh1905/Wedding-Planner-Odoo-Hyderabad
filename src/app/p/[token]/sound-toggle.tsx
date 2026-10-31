@@ -15,7 +15,7 @@ export function SoundToggle() {
         setOn(!on);
         if (!on) cue("toggle");
       }}
-      className="rounded-full border bg-card p-2 text-muted-foreground hover:text-foreground"
+      className="grid size-11 place-items-center rounded-full border bg-card text-muted-foreground transition-colors hover:text-foreground sm:size-9 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       aria-label={on ? "Turn sounds off" : "Turn sounds on"}
       aria-pressed={on}
     >
