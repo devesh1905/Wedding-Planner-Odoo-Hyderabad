@@ -50,3 +50,7 @@ CLAUDE.md
 
 # uploads
 /public/uploads
+
+.vercel
+.env*
+!.env.example
