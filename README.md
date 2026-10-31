@@ -1,10 +1,12 @@
-<p align="center"><img src="public/brand/knotos-ivory.png" alt="KnotOS" width="220" /></p>
+<p align="center"><img src="src/app/icon.svg" alt="KnotOS" width="96" /></p>
 
 # KnotOS — The Royal Knot
 
 **One system that carries a wedding from the first enquiry to the final vendor payment, and rolls the whole season up for the founder.**
 
 **Live:** https://knotos.vercel.app
+
+[![CI](https://github.com/devesh1905/Wedding-Planner-Odoo-Hyderabad/actions/workflows/ci.yml/badge.svg)](https://github.com/devesh1905/Wedding-Planner-Odoo-Hyderabad/actions/workflows/ci.yml)
 
 | Demo login | Email | Password | Lands on |
 |---|---|---|---|
@@ -83,6 +85,15 @@ Routes: `/weddings/[id]` (Payments and Settlement tabs)
 Routes: `/dashboard`, `/vendors`, `/vendors/[id]`, `/share/[token]`, `/api/reports/season.csv`
 
 ---
+
+### Across the app
+- **Global search (Ctrl/⌘ K or `/`):** pages, couples (by name, phone, code or city), a wedding's sections ("dhruv pay" → Payments), vendors and quick actions.
+- **Duplicate detection:** an enquiry whose mobile number matches another enquiry or a booked wedding shows "Same phone as …".
+- **Meeting slot picker:** book enquiry meetings on a day rail with the agency's existing meetings shown as busy (`/api/meetings/availability`).
+- **Vendor gate pass:** each booking has a public pass with its check-in QR (`/v/pass/[token]`), opened from *Booked vendors*.
+- **WhatsApp sharing:** couple portal, vendor gate passes and quote invitations open WhatsApp with the link and message pre-typed.
+- **Signed agreement PDF:** the couple and staff can download the signed agreement with signature and seal (`/api/public/agreements/[token]/pdf`).
+- **Dark mode everywhere;** on the couples' home page dark mode becomes "cave mode" — a draggable diya (WebGL flame) that lights the page.
 
 ## Who uses it
 
@@ -204,7 +215,7 @@ Own REST route handlers under `src/app/api`. Staff endpoints check the session; 
 | Layer | Choice |
 |---|---|
 | Framework | Next.js 16 (App Router), React 19, TypeScript |
-| UI | Tailwind CSS 4, shadcn/ui (Radix), Framer Motion, Recharts, dnd-kit, locally bundled fonts (Inter, Cormorant Garamond) |
+| UI | Tailwind CSS 4, shadcn/ui (Radix), Framer Motion, cmdk (search), dnd-kit, WebGL shader flame, locally bundled fonts (Inter + Yeseva One for couples, Geist for staff) |
 | Forms and validation | React Hook Form, Zod 4 |
 | Database | PostgreSQL on Supabase (Mumbai), Prisma 6 |
 | Auth | Signed session cookie (`jose`), `bcryptjs` password hashes, token links for couples and vendors |
@@ -214,12 +225,21 @@ Own REST route handlers under `src/app/api`. Staff endpoints check the session; 
 | PDF | `pdf-lib` |
 | Testing | Node test runner via `tsx`, `fake-indexeddb` |
 | Hosting | Vercel (region `bom1`) |
+| CI | GitHub Actions: typecheck, lint, unit tests, migrate + seed a fresh Postgres, production build |
 
 ---
 
 ## Getting started locally
 
-**Prerequisites:** Node.js 22+, npm, a Postgres database (a free Supabase project works).
+**Prerequisites:** Node.js 22+, npm, and a Postgres database — either **local** (Docker, below) or a free Supabase project.
+
+**Local database (no cloud needed):**
+
+```bash
+docker compose up -d        # Postgres 16 on localhost:5432 (user/password/db: knot/knot/knotos)
+```
+
+Then use the local `DATABASE_URL` / `DIRECT_URL` lines from `.env.example`.
 
 ```bash
 npm install
@@ -258,6 +278,7 @@ It makes the seeded demo wedding "happen today": shifts all of its event and run
 | `npm run db:reset` | Reset the database and reseed (destructive) |
 | `npm run db:studio` | Prisma Studio |
 | `npm run quotes` | Regenerate the three demo caterer quote PDFs in `demo-assets/quotes` |
+| `npx tsx demo-assets/make-vendor-quotes.ts <folder>` | Generate demo florist, decorator, photographer and DJ proposals |
 
 Camera (QR scanning), IndexedDB and the service worker need HTTPS or `localhost`.
 
@@ -270,12 +291,6 @@ Camera (QR scanning), IndexedDB and the service worker need HTTPS or `localhost`
 3. **Plan:** mark the booking payment paid; 25+ tasks with owners and due dates appear.
 4. **Quotes:** upload the three caterer PDFs from `demo-assets/quotes`, review the extracted data, compare side by side, choose the winner and see the others close.
 5. **Control room and money:** with Wi-Fi off, check in a vendor and log an issue; reconnect and watch it sync. Then add extras, block a duplicate payment, and open the founder dashboard for profit, cash due and vendor scorecards.
-
-## Screenshots
-
-<!-- add screenshots -->
-
----
 
 ## Project structure
 
