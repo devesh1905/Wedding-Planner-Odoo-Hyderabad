@@ -11,7 +11,7 @@ export function QrScanner({ onScan, onError }: QrScannerProps) {
   const scanner = useRef<Html5Qrcode | null>(null);
   const delivery = useRef(new ScanDelivery());
   const callbacks = useRef({ onScan, onError });
-  callbacks.current = { onScan, onError };
+  useEffect(() => { callbacks.current = { onScan, onError }; }, [onScan, onError]);
   const [cameras, setCameras] = useState<Camera[]>([]);
   const [cameraId, setCameraId] = useState("");
   const [starting, setStarting] = useState(false);
