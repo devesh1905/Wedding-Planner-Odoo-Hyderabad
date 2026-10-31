@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LoginForm } from "./login-form";
+import { KnotMark } from "@/components/home/knot-mark";
 
 export const metadata: Metadata = { title: "Sign in" };
 
@@ -45,10 +46,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
 function Logo() {
   return (
     <div className="grid size-10 place-items-center rounded-full bg-marigold text-maroon shadow-sm">
-      <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-        <circle cx="9" cy="12" r="5" />
-        <circle cx="15" cy="12" r="5" />
-      </svg>
+      <KnotMark className="h-5 w-8" />
     </div>
   );
 }
