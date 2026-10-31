@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Field } from "@/components/common/field";
 import { api, ApiError } from "@/lib/api-client";
 import { cue } from "@/lib/sound";
+import { petalShower } from "@/components/home/petals";
 
 export function SignForm({ token, defaultName }: { token: string; defaultName: string }) {
   const router = useRouter();
@@ -66,6 +67,7 @@ export function SignForm({ token, defaultName }: { token: string; defaultName: s
         body: { signerName: name, signature: pad.toDataURL("image/png"), agree },
       });
       cue("success", "strong");
+      petalShower("full");
       router.refresh();
     } catch (err) {
       if (err instanceof ApiError && err.fields) setErrors(err.fields);

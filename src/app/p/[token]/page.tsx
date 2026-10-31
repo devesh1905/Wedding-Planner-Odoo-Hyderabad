@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { ApproveAddons } from "./approve-addons";
 import { SoundToggle } from "./sound-toggle";
 
-export const metadata: Metadata = { title: "Your wedding", robots: { index: false } };
+export const metadata: Metadata = { title: { absolute: "Your wedding · The Royal Knot" }, robots: { index: false } };
 
 // Couple portal: private link, no login. Shows progress, payment schedule and add-ons to approve.
 export default async function CouplePortal({ params }: { params: Promise<{ token: string }> }) {
