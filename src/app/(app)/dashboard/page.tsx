@@ -26,7 +26,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   return (
     <>
       <PageHeader
-        title="Season at a glance"
+        title={{ today: "Today", week: "This week", month: "This month", season: "Season" }[period] + " at a glance"}
         subtitle="Which weddings made money, what's still unfinished, and what's due"
         actions={
           <>
@@ -35,7 +35,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                 <Link
                   key={x.key}
                   href={`/dashboard?period=${x.key}`}
-                  className={cn("rounded-md px-3 py-1.5 text-sm", period === x.key ? "bg-maroon text-primary-foreground" : "text-muted-foreground hover:text-foreground")}
+                  className={cn("rounded-md px-3 py-1.5 text-sm", period === x.key ? "bg-cta text-cta-foreground" : "text-muted-foreground hover:text-foreground")}
                 >
                   {x.label}
                 </Link>

@@ -17,20 +17,52 @@ export function DashboardView({ report: r, readOnly }: { report: SeasonReport; r
   const W = ({ id, children }: { id: string; children: React.ReactNode }) =>
     readOnly ? <>{children}</> : <Link href={`/weddings/${id}`} className="hover:text-maroon hover:underline">{children}</Link>;
 
+  const season = r.period === "season";
+  const when = periodLabel(r.period); // "today" | "this week" | "this month" | "this season"
+  const span = r.window ? ` · ${formatDate(r.window.fromDay)}${r.period === "today" ? "" : ` – ${formatDate(new Date(+r.window.toDay - 86_400_000))}`}` : "";
+
   return (
     <div className="space-y-6">
+      <p className="text-sm text-muted-foreground">
+        {season ? "Every wedding this season" : `Weddings with an event ${when}${span}`} · money and check-ins counted {when}
+      </p>
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        <Kpi icon="heart" label="Active weddings" value={r.kpi.activeWeddings} sub={`${r.rows.length} this season`} />
-        <Kpi icon="money" label="Season revenue" value={formatINRCompact(r.kpi.seasonRevenue)} sub={`${formatINRCompact(r.kpi.collectedInPeriod)} collected ${periodLabel(r.period)}`} />
+        {season ? (
+          <Kpi icon="heart" label="Active weddings" value={r.kpi.activeWeddings} sub={`${r.rows.length} this season`} />
+        ) : (
+          <Kpi icon="heart" label={`Weddings ${when}`} value={r.rows.length} sub={`${r.kpi.activeWeddings} still active · ${r.seasonCount} this season`} />
+        )}
+        <Kpi
+          icon="money"
+          label={season ? "Season revenue" : `Revenue · ${when}'s weddings`}
+          value={formatINRCompact(r.kpi.seasonRevenue)}
+          sub={`${formatINRCompact(r.kpi.collectedInPeriod)} collected · ${formatINRCompact(r.kpi.paidOutInPeriod)} paid to vendors ${when}`}
+        />
         <Kpi
           icon="chart"
-          label="Season profit"
+          label={season ? "Season profit" : `Profit · ${when}'s weddings`}
           value={<span className={r.kpi.seasonProfit < 0 ? "text-rose" : "text-teal"}>{formatINRCompact(r.kpi.seasonProfit)}</span>}
           sub={`${pct(r.kpi.avgMargin)} avg margin · ${r.kpi.lossMaking} loss-making · ${r.kpi.costedWeddings} weddings with vendors booked`}
           danger={r.kpi.lossMaking > 0}
         />
-        <Kpi icon="wallet" label="Due in next 4 weeks" value={formatINRCompact(r.kpi.dueIn4Weeks)} sub={`${r.overduePayments.length} payments overdue`} danger={r.overduePayments.length > 0} />
-        <Kpi icon="warning" label="Open issues" value={r.kpi.openIssues} sub={r.kpi.openIssues ? "From day-of control rooms" : "All clear"} danger={r.kpi.openIssues > 0} />
+        <Kpi
+          icon="wallet"
+          label={season ? "Due in next 4 weeks" : `Client payments due ${when}`}
+          value={formatINRCompact(r.kpi.dueInPeriod)}
+          sub={`${r.overduePayments.length} payments overdue`}
+          danger={r.overduePayments.length > 0}
+        />
+        {season ? (
+          <Kpi icon="warning" label="Open issues" value={r.kpi.openIssues} sub={r.kpi.openIssues ? "From day-of control rooms" : "All clear"} danger={r.kpi.openIssues > 0} />
+        ) : (
+          <Kpi
+            icon="warning"
+            label={`Issues raised ${when}`}
+            value={r.kpi.issuesInPeriod}
+            sub={`${r.kpi.openIssues} open across all weddings`}
+            danger={r.kpi.openIssues > 0}
+          />
+        )}
       </div>
 
       <section className="rounded-2xl border bg-card p-5">
@@ -50,7 +82,11 @@ export function DashboardView({ report: r, readOnly }: { report: SeasonReport; r
             </span>
           </div>
         </div>
-        <ProfitChart rows={r.rows.filter((w) => w.costed)} />
+        {r.rows.some((w) => w.costed) ? (
+          <ProfitChart rows={r.rows.filter((w) => w.costed)} />
+        ) : (
+          <p className="py-12 text-center text-sm text-muted-foreground">No weddings with booked vendors {when}.</p>
+        )}
       </section>
 
       <div className="grid gap-6 xl:grid-cols-3">
@@ -81,7 +117,8 @@ export function DashboardView({ report: r, readOnly }: { report: SeasonReport; r
             <Icon name="star" className="size-5" /> Vendor scorecards
           </h2>
           <p className="mb-4 text-sm text-muted-foreground">Punctuality from day-of check-ins · bill accuracy from bill matching</p>
-          <ScoreList title="Most reliable" items={best} />
+          {best.length === 0 && <p className="text-sm text-muted-foreground">No vendor check-ins {when}.</p>}
+          {best.length > 0 && <ScoreList title="Most reliable" items={best} />}
           {worst.length > 0 && <ScoreList title="Often late" items={worst} danger />}
         </section>
 
@@ -115,7 +152,7 @@ export function DashboardView({ report: r, readOnly }: { report: SeasonReport; r
       <section className="overflow-hidden rounded-2xl border bg-card">
         <div className="flex items-center justify-between p-5">
           <h2 className="flex items-center gap-2 text-2xl font-semibold">
-            <Icon name="heart" className="size-5" /> All weddings this season
+            <Icon name="heart" className="size-5" /> {season ? "All weddings this season" : `Weddings ${when}`}
           </h2>
         </div>
         <div className="overflow-x-auto">
@@ -134,6 +171,13 @@ export function DashboardView({ report: r, readOnly }: { report: SeasonReport; r
               </tr>
             </thead>
             <tbody>
+              {r.rows.length === 0 && (
+                <tr>
+                  <td colSpan={9} className="p-8 text-center text-sm text-muted-foreground">
+                    No wedding events {when}.
+                  </td>
+                </tr>
+              )}
               {r.rows.map((w) => (
                 <tr key={w.id} className={cn("border-t", w.costed && w.profit < 0 && "bg-rose-soft/40")}>
                   <td className="p-3">
