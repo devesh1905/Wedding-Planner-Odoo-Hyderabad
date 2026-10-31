@@ -280,6 +280,14 @@ html { scroll-behavior: smooth; }
 
 [data-nosplash] .splash { display: none; }
 
+/* Home page, desktop mouse/trackpad only: each section is gently magnetic. Proximity snapping settles
+   on a section start when you stop near one, and snap-stop keeps a fast flick from skipping a whole
+   section. "How it works" pins its card track; it snaps at its start, two midpoints and its end (.snap-mark). */
+@media (min-width: 1024px) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  html:has([data-snap-page]) { scroll-snap-type: y proximity; scroll-padding-top: 4.5rem; }
+  [data-snap-page] > section:not(#journey), [data-snap-page] .snap-mark { scroll-snap-align: start; scroll-snap-stop: always; }
+}
+
 /* ── Flame: layered fire rising from the knot, with firelight + shadow ─────── */
 /* Each layer sways from the base at its own pace so the fire never looks mechanical. */
 .flame-body, .flame-l1, .flame-l2, .flame-l3, .flame-l4 { transform-box: fill-box; transform-origin: 50% 100%; }

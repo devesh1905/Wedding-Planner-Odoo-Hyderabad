@@ -36,6 +36,11 @@ export function Chapters() {
 
   return (
     <section ref={ref} id="journey" className="relative md:h-[260vh]" aria-label="How it works">
+      {/* Snap stops through the pinned track (desktop only, see globals.css): start, two midpoints, end.
+          The pinned range is 160vh; each mark is offset by the header padding so it lands exactly on it. */}
+      {[0, 1, 2, 3].map((i) => (
+        <span key={i} aria-hidden className="snap-mark pointer-events-none absolute left-0 h-px w-px" style={{ top: `calc(${(i * 160) / 3}vh + 4.5rem)` }} />
+      ))}
       <div className="md:sticky md:top-0 md:flex md:h-svh md:flex-col md:justify-center md:overflow-hidden">
         <div className="relative mx-auto w-full max-w-6xl px-6 pt-24 pb-10 md:pt-0">
           <DiyaSlot id="chapters" className="absolute right-6 bottom-6" />
