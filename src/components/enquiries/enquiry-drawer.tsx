@@ -26,6 +26,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { StagePill } from "@/components/common/stage-pill";
 import { Field } from "@/components/common/field";
+import { SlotPicker, type SlotDay } from "./slot-picker";
 import { api, ApiError } from "@/lib/api-client";
 import { formatDate, formatDateTime, formatINR, relativeDays } from "@/lib/format";
 import { ConvertDialog } from "./convert-dialog";
@@ -234,6 +235,15 @@ function Meetings({ data, onDone }: { data: Detail; onDone: () => Promise<void> 
   const [notes, setNotes] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [pending, setPending] = useState(false);
+  // Free/busy for the next working days, loaded when the booking form opens.
+  const [days, setDays] = useState<SlotDay[] | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    setDays(null);
+    api<{ days: SlotDay[] }>("/api/meetings/availability")
+      .then((r) => setDays(r.days))
+      .catch(() => toast.error("Could not load free times"));
+  }, [open]);
 
   async function book() {
     setPending(true);
@@ -278,9 +288,22 @@ function Meetings({ data, onDone }: { data: Detail; onDone: () => Promise<void> 
       </ul>
       {open && (
         <div className="space-y-3 rounded-xl border bg-muted/40 p-3">
-          <Field label="Date & time" error={errors.scheduledAt}>
-            <Input type="datetime-local" value={at} onChange={(e) => setAt(e.target.value)} />
-          </Field>
+          {days ? (
+            <SlotPicker
+              className="max-w-none"
+              days={days}
+              durations={[60]}
+              host={{ name: data.partner1 + " & " + data.partner2, title: "Planning meeting" }}
+              onBook={({ date, start }) =>
+                setAt(`${date}T${String(Math.floor(start / 60)).padStart(2, "0")}:${String(start % 60).padStart(2, "0")}:00+05:30`)
+              }
+            />
+          ) : (
+            <p className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="size-4 animate-spin" /> Loading free times…
+            </p>
+          )}
+          {errors.scheduledAt && <p className="text-xs text-rose">{errors.scheduledAt}</p>}
           <Field label="Where" error={errors.location}>
             <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Office, video call, venue…" />
           </Field>
@@ -291,7 +314,7 @@ function Meetings({ data, onDone }: { data: Detail; onDone: () => Promise<void> 
             <Button size="sm" variant="ghost" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button size="sm" onClick={book} disabled={pending}>
+            <Button size="sm" onClick={book} disabled={pending || !at}>
               {pending && <Loader2 className="animate-spin" />} Book
             </Button>
           </div>

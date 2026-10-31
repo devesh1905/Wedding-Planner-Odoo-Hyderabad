@@ -54,6 +54,13 @@ const SEEDS: Seed[] = [
 
 const FLOW: EnquiryStatus[] = ["NEW", "CONTACTED", "MEETING_BOOKED", "AGREEMENT_SENT", "SIGNED"];
 
+/** A meeting N days from today in office hours (11:30 or 15:00 India time). */
+function meetingAt(days: number) {
+  const ist = new Date(Date.now() + 5.5 * 3600_000);
+  const minutes = days % 2 === 0 ? 11 * 60 + 30 : 15 * 60;
+  return new Date(Date.UTC(ist.getUTCFullYear(), ist.getUTCMonth(), ist.getUTCDate() + days, 0, minutes) - 5.5 * 3600_000);
+}
+
 export async function seedEnquiries(db: PrismaClient) {
   const planners = await db.user.findMany({ where: { role: "PLANNER" }, orderBy: { email: "asc" } });
   const actorId = planners[0]?.id ?? null;
@@ -111,7 +118,7 @@ export async function seedEnquiries(db: PrismaClient) {
       const at = new Date(createdAt.getTime() + (span * k) / (path.length + 1));
       logs.push({ action: "status", payload: { from: path[k - 1], to: path[k] }, at });
       if (path[k] === "MEETING_BOOKED" && s.meetingInDays != null) {
-        logs.push({ action: "meeting", payload: { at: new Date(now + s.meetingInDays * DAY).toISOString() }, at: new Date(at.getTime() + HOUR) });
+        logs.push({ action: "meeting", payload: { at: meetingAt(s.meetingInDays).toISOString() }, at: new Date(at.getTime() + HOUR) });
       }
     }
     if (s.status === "LOST") {
@@ -122,7 +129,7 @@ export async function seedEnquiries(db: PrismaClient) {
       await db.meeting.create({
         data: {
           enquiryId: enquiry.id,
-          scheduledAt: new Date(now + s.meetingInDays * DAY + 11 * HOUR),
+          scheduledAt: meetingAt(s.meetingInDays),
           location: s.city === "Udaipur" ? "Studio, Fateh Sagar Road" : "The Royal Knot office, C-Scheme",
           notes: "Discuss venue shortlist, budget split and timeline.",
         },
