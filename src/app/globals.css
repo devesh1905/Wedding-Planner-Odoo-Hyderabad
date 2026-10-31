@@ -555,3 +555,9 @@ html { scroll-behavior: smooth; }
   z-index: 1;
   mix-blend-mode: screen;
 }
+/* Logo flame: when the live fire is running, the vector flame layers step aside. */
+.flame-body:has(.knot-flame-gl canvas) .flame-l1,
+.flame-body:has(.knot-flame-gl canvas) .flame-l2,
+.flame-body:has(.knot-flame-gl canvas) .flame-l3,
+.flame-body:has(.knot-flame-gl canvas) .flame-l4 { display: none; }
+.knot-flame-gl { overflow: visible; pointer-events: none; }

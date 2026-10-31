@@ -7,6 +7,7 @@
 // mode="ignite" – the flame catches on mount
 // (no mode)     – already lit
 import { useId } from "react";
+import { ShaderFlame } from "@/components/cave/shader-flame";
 
 const KNOT =
   "M50 34 C 40 22, 26 16, 15 21 C 5 26, 6 42, 17 45 C 29 48, 40 41, 50 34 C 60 27, 71 20, 83 23 C 94 26, 95 42, 85 45 C 74 49, 60 42, 50 34 Z";
@@ -80,6 +81,12 @@ export function KnotMark({
           <path d={MID} fill={u("mid")} className="flame-l2" />
           <path d={INNER} fill={u("inner")} className="flame-l3" />
           <path d={CORE} fill="#fffaf0" filter={u("bloom")} className="flame-l4" />
+          {/* live fire: drawn in-place so the knot strand still covers its base; hides the vector layers when running */}
+          {effects && (
+            <foreignObject x="34" y="0" width="32" height="36" className="knot-flame-gl">
+              <ShaderFlame className="block h-full w-full" fallback={null} />
+            </foreignObject>
+          )}
         </g>
       </g>
 

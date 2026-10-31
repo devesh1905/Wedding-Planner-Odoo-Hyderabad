@@ -66,7 +66,18 @@ void main(){
 }`;
 
 /** Live WebGL flame. Renders nothing (returns false via onFail) if WebGL isn't available. */
-export function ShaderFlame({ className, fallback }: { className?: string; fallback: React.ReactNode }) {
+const STILL = { lean: 0 };
+
+export function ShaderFlame({
+  className,
+  fallback,
+  state = STILL,
+}: {
+  className?: string;
+  fallback: React.ReactNode;
+  /** where to read the lean from; the logo stays upright, the carried diya leans */
+  state?: { lean: number };
+}) {
   const ref = useRef<HTMLCanvasElement>(null);
   const [failed, setFailed] = useState(false);
 
@@ -105,8 +116,9 @@ export function ShaderFlame({ className, fallback }: { className?: string; fallb
 
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     const resize = () => {
-      canvas.width = Math.round(canvas.clientWidth * dpr);
-      canvas.height = Math.round(canvas.clientHeight * dpr);
+      const r = canvas.getBoundingClientRect();
+      canvas.width = Math.max(8, Math.round(r.width * dpr));
+      canvas.height = Math.max(8, Math.round(r.height * dpr));
       gl.viewport(0, 0, canvas.width, canvas.height);
     };
     resize();
@@ -117,7 +129,7 @@ export function ShaderFlame({ className, fallback }: { className?: string; fallb
     let lean = 0;
     const start = performance.now();
     const frame = (now: number) => {
-      lean += (flameState.lean - lean) * 0.15; // smooth so the flame sways rather than snaps
+      lean += (state.lean - lean) * 0.15; // smooth so the flame sways rather than snaps
       gl.uniform2f(uRes, canvas.width, canvas.height);
       gl.uniform1f(uTime, reduce ? 1.0 : (now - start) / 1000);
       gl.uniform1f(uLean, lean);
@@ -129,7 +141,7 @@ export function ShaderFlame({ className, fallback }: { className?: string; fallb
     // No loseContext() here: dev mode re-runs effects on the same canvas, and the context is
     // released with the canvas when the diya unmounts.
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [state]);
 
   if (failed) return <>{fallback}</>;
   return <canvas ref={ref} className={className} aria-hidden />;

@@ -353,6 +353,7 @@ function DiyaGraphic() {
       <span className="diya-flame-glow" aria-hidden />
       <ShaderFlame
         className="diya-flame-gl"
+        state={flameState}
         fallback={
       <svg viewBox="20 4 20 30" className="diya-flame" aria-hidden>
         <defs>
