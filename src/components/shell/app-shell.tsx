@@ -8,6 +8,30 @@ import { AppSidebar } from "./app-sidebar";
 
 export function AppShell({ user, children }: { user: { name: string; role: string }; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  // Thin icon rail by default; expanded state is remembered. Ctrl/⌘+B toggles.
+  const [rail, setRail] = useState(true);
+  useEffect(() => {
+    try {
+      setRail(localStorage.getItem("knot:sidebar") !== "expanded");
+    } catch {}
+  }, []);
+  const toggle = () =>
+    setRail((r) => {
+      try {
+        localStorage.setItem("knot:sidebar", r ? "expanded" : "rail");
+      } catch {}
+      return !r;
+    });
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") {
+        e.preventDefault();
+        toggle();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
   // Dialogs and drawers portal to <body>, outside the shell — scope the staff font on <html> too.
   useEffect(() => {
     document.documentElement.classList.add("app-ui");
@@ -16,19 +40,19 @@ export function AppShell({ user, children }: { user: { name: string; role: strin
   return (
     <TooltipProvider delayDuration={200}>
     <div className="app-ui flex min-h-svh">
-      <aside className="sticky top-0 hidden h-svh w-64 shrink-0 lg:block">
-        <AppSidebar user={user} />
+      <aside className={`sticky top-0 hidden h-svh shrink-0 transition-[width] duration-200 ease-out md:block ${rail ? "w-16" : "w-56"}`}>
+        <AppSidebar user={user} rail={rail} onToggle={toggle} />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/85 px-4 backdrop-blur lg:hidden">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/85 px-4 backdrop-blur md:hidden">
           <button onClick={() => setOpen(true)} className="rounded-md p-2 hover:bg-muted" aria-label="Open menu">
             <Menu className="size-5" />
           </button>
           <span className="font-brand text-lg font-semibold">The Royal Knot</span>
         </header>
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetContent side="left" className="w-64 border-0 p-0">
+          <SheetContent side="left" className="w-60 border-0 p-0">
             <SheetTitle className="sr-only">Navigation</SheetTitle>
             <AppSidebar user={user} onNavigate={() => setOpen(false)} />
           </SheetContent>

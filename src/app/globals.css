@@ -603,3 +603,14 @@ html { scroll-behavior: smooth; }
 .font-brand { font-family: "Yeseva One", ui-serif, Georgia, serif; font-weight: 400; }
 /* Yeseva has a single (heavy) weight: never fake-bold it. */
 .font-serif, .font-brand, h1, h2, h3 { font-synthesis-weight: none; }
+
+/* Dashboard: bars and rings draw in once on load (server-rendered, so no layout shift). */
+@keyframes dash-grow-x { from { transform: scaleX(0); } }
+@keyframes dash-grow-y { from { transform: scaleY(0); } }
+@keyframes dash-ring { from { stroke-dasharray: 0 999; } }
+.dash-grow-x { animation: dash-grow-x 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.dash-grow-y { transform-box: view-box; animation: dash-grow-y 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.dash-ring { animation: dash-ring 0.9s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .dash-grow-x, .dash-grow-y, .dash-ring { animation: none; }
+}
