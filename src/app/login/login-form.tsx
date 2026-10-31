@@ -23,7 +23,8 @@ export function LoginForm({ next }: { next?: string }) {
         method: "POST",
         body: { email: form.get("email"), password: form.get("password") },
       });
-      router.replace(next?.startsWith("/") ? next : res.role === "FOUNDER" ? "/dashboard" : "/weddings");
+      // only same-site paths: "//host" and "/\host" would be read as another site
+      router.replace(next?.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\") ? next : res.role === "FOUNDER" ? "/dashboard" : "/weddings");
       router.refresh();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not sign in");
