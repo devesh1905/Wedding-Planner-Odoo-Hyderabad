@@ -5,7 +5,7 @@ type QuoteLine = z.output<typeof quoteLineSchema> & { id?: string; sortOrder?: n
 type QuoteSummary = {
   id: string; token: string; status: "INVITED" | "SUBMITTED" | "WON" | "NOT_SELECTED";
   perPlate: number | null; extraHourRate: number | null; total: number | null; notes: string | null;
-  aiExtracted: boolean; aiReviewed: boolean; hasFile: boolean; submittedAt?: string | null; lines: QuoteLine[];
+  aiExtracted: boolean; aiReviewed: boolean; hasFile: boolean; submittedAt?: string | null; updatedAt?: string; lines: QuoteLine[];
 };
 export type QuoteRequestView = {
   id: string; weddingId: string; category: VendorCategory; title: string; requirements: string | null;

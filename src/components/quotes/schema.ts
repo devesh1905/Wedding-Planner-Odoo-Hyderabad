@@ -29,8 +29,12 @@ export const quoteSubmissionSchema = z.object({
   notes: optionalText(4000),
   lines: z.array(quoteLineSchema).max(100),
 }).strict();
+export const quoteReviewContentSchema = quoteSubmissionSchema.extend({ lines: z.array(quoteLineSchema).min(1, "Add at least one line to confirm this quote").max(100) });
+export const quoteReviewSchema = quoteReviewContentSchema.extend({ expectedUpdatedAt: z.string().datetime({ offset: true }).optional() });
+export const quoteExtractSchema = z.object({ updatedAt: z.string().datetime({ offset: true }).optional() }).strict();
 export const quoteAwardSchema = z.object({
   quoteId: uuid,
+  expectedUpdatedAt: z.string().datetime({ offset: true }).optional(),
   expectedArrival: z.string().datetime({ offset: true }).nullable().optional(),
   agreedHours: z.number().int().min(1).max(168).nullable().optional(),
 }).strict();

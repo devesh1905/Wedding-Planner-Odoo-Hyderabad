@@ -12,6 +12,6 @@ export default async function ComparisonPage({params}:{params:Promise<{id:string
   const wedding=await db.wedding.findUnique({where:{id},select:{partner1:true,partner2:true,enquiry:{select:{agreement:{select:{status:true}}}}}});if(!wedding)notFound();
   if(wedding.enquiry && wedding.enquiry.agreement?.status!=='SIGNED')return <p className="rounded-xl border p-5">Sign the service agreement before comparing vendor proposals.</p>;
   const data=await db.quoteRequest.findMany({where:{weddingId:id,category:parsed.data},orderBy:{createdAt:'desc'},include:{quotes:{include:{vendor:{select:{id:true,name:true,phone:true}},lines:{orderBy:{sortOrder:'asc'}}},orderBy:{createdAt:'asc'}}}});
-  const requests=data.map(request=>({...request,createdAt:request.createdAt.toISOString(),quotes:request.quotes.map(q=>({...q,submittedAt:q.submittedAt?.toISOString()??null,hasFile:!!q.fileUrl,fileUrl:undefined}))})) as ComparisonRequest[];
+  const requests:ComparisonRequest[]=data.map(request=>({...request,createdAt:request.createdAt.toISOString(),quotes:request.quotes.map(q=>({...q,updatedAt:q.updatedAt.toISOString(),submittedAt:q.submittedAt?.toISOString()??null,hasFile:!!q.fileUrl,fileUrl:undefined}))}));
   return <><PageHeader title="Three proposals, one celebration" subtitle={`${wedding.partner1} & ${wedding.partner2} · ${parsed.data.replaceAll('_',' ')}`} back={{href:`/weddings/${id}/quotes`,label:'All quote requests'}}/><QuoteComparison requests={requests} weddingId={id}/></>;
 }

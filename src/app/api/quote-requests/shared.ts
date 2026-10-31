@@ -34,7 +34,7 @@ export async function requireSignedWedding(tx: Prisma.TransactionClient | typeof
 export const lineSelect = { id: true, item: true, category: true, qty: true, unit: true, unitPrice: true, included: true, sortOrder: true } satisfies Prisma.QuoteLineSelect;
 export const quoteSelect = {
   id: true, token: true, status: true, perPlate: true, extraHourRate: true, total: true, notes: true,
-  aiExtracted: true, aiReviewed: true, submittedAt: true, fileUrl: true,
+  aiExtracted: true, aiReviewed: true, submittedAt: true, updatedAt: true, fileUrl: true,
   vendor: { select: { id: true, name: true, phone: true } },
   lines: { select: lineSelect, orderBy: { sortOrder: "asc" } },
 } satisfies Prisma.VendorQuoteSelect;

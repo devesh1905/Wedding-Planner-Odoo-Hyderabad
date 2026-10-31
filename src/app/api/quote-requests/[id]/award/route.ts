@@ -17,9 +17,11 @@ export const POST = handle(async (request: Request, context: Context) => {
     if (wedding.stage === "CANCELLED" || wedding.stage === "SETTLED") throw new HttpError(409, "This wedding no longer accepts vendor awards");
     const group = await tx.quoteRequest.findUnique({ where: { id } });
     if (!group || group.status !== "OPEN") throw new HttpError(409, "This request has already been awarded or closed");
-    const winner = await tx.vendorQuote.findUnique({ where: { id: input.quoteId }, select: { id: true, requestId: true, vendorId: true, status: true, total: true, perPlate: true, extraHourRate: true, vendor: { select: { category: true } } } });
+    const winner = await tx.vendorQuote.findUnique({ where: { id: input.quoteId }, select: { id: true, requestId: true, vendorId: true, status: true, updatedAt: true, total: true, perPlate: true, extraHourRate: true, aiExtracted: true, aiReviewed: true, vendor: { select: { category: true } } } });
     if (!winner || winner.requestId !== id) throw new HttpError(400, "Choose a quote belonging to this request");
+    if (input.expectedUpdatedAt && winner.updatedAt.getTime() !== new Date(input.expectedUpdatedAt).getTime()) throw new HttpError(409, "The vendor changed this proposal. Reload the comparison before awarding it.");
     if (winner.status !== "SUBMITTED" || winner.total === null || winner.total <= 0) throw new HttpError(400, "Only a submitted quote with a confirmed total can be awarded");
+    if (winner.aiExtracted && !winner.aiReviewed) throw new HttpError(409, "Review and confirm the AI-read line items before awarding this quote");
     if (winner.vendor.category !== group.category) throw new HttpError(409, "The vendor category changed. Please review the request before awarding.");
     if (await tx.booking.findFirst({ where: { weddingId: group.weddingId, category: group.category }, select: { id: true } })) throw new HttpError(409, "A vendor has already been booked in this category");
     const claimed = await tx.quoteRequest.updateMany({ where: { id, status: "OPEN" }, data: { status: "AWARDED" } });

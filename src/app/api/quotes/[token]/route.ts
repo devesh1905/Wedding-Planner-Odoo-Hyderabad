@@ -4,6 +4,9 @@ import { tokenSchema } from "@/components/quotes/schema";
 import { lockWedding, privateJson, quoteTransaction, requireSignedWedding } from "@/app/api/quote-requests/shared";
 import { findPortalQuote, portalSelect, portalView } from "../portal";
 import { parseSubmission } from "../submission";
+import { extractAndPersistQuote, extractionFallbackMessage } from "../extraction";
+
+export const maxDuration = 90;
 
 type Context = { params: Promise<{ token: string }> };
 export const GET = handle(async (_request: Request, context: Context) => {
@@ -15,7 +18,7 @@ export const POST = handle(async (request: Request, context: Context) => {
   const invitation = await db.vendorQuote.findUnique({ where: { token }, select: { id: true, request: { select: { weddingId: true } } } });
   if (!invitation) throw new HttpError(404, "Invitation not found");
   const { data, fileUrl } = await parseSubmission(request);
-  const quote = await quoteTransaction(async (tx) => {
+  let quote = await quoteTransaction(async (tx) => {
     await lockWedding(tx, invitation.request.weddingId);
     const wedding = await requireSignedWedding(tx, invitation.request.weddingId);
     if (wedding.stage === "CANCELLED" || wedding.stage === "SETTLED") throw new HttpError(409, "This wedding no longer accepts quote submissions");
@@ -29,5 +32,10 @@ export const POST = handle(async (request: Request, context: Context) => {
       lines: { create: lines.map((line, sortOrder) => ({ ...line, sortOrder })) },
     }, select: portalSelect });
   });
-  return privateJson({ quote: portalView(quote) });
+  let extractionError: string | undefined;
+  if (fileUrl) {
+    try { quote = await extractAndPersistQuote(quote.id, quote.updatedAt); }
+    catch { extractionError = extractionFallbackMessage; }
+  }
+  return privateJson({ quote: portalView(quote), ...(extractionError ? { extractionError } : {}) });
 });

@@ -5,6 +5,7 @@ import { quoteSelect, requireSignedWedding } from "@/app/api/quote-requests/shar
 
 export const portalSelect = {
   ...quoteSelect,
+  updatedAt: true,
   request: { select: {
     id: true, weddingId: true, title: true, category: true, requirements: true, guestCount: true, status: true,
     wedding: { select: { partner1: true, partner2: true, city: true, startDate: true } },

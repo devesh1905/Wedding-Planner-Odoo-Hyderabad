@@ -31,15 +31,15 @@ export function VendorQuotePortal({token}:{token:string}) {
   </div></main>;
 }
 function ProposalForm({quote,token,onSaved}:{quote:PortalQuote;token:string;onSaved:()=>Promise<void>}) {
-  const [mode,setMode]=useState<'manual'|'pdf'>(quote.hasFile?'pdf':'manual');const [file,setFile]=useState<File>();const [error,setError]=useState('');const [saved,setSaved]=useState(false);
+  const [mode,setMode]=useState<'manual'|'pdf'>(quote.hasFile?'pdf':'manual');const [file,setFile]=useState<File>();const [error,setError]=useState('');const [saved,setSaved]=useState(false);const [readWarning,setReadWarning]=useState('');
   const {register,handleSubmit,control,setError:fieldError,formState:{errors,isSubmitting}}=useForm<Values>({resolver:zodResolver(quoteSubmissionSchema),defaultValues:{perPlate:quote.perPlate,extraHourRate:quote.extraHourRate,total:quote.total ?? undefined,notes:quote.notes ?? '',lines:quote.hasFile?[]:quote.lines.length?quote.lines.map(l=>({item:l.item,category:l.category,qty:l.qty,unit:l.unit,unitPrice:l.unitPrice,included:l.included})):[blankLine()]}});
   const {fields,append,remove,replace}=useFieldArray({control,name:'lines'});
   const submit=handleSubmit(async values=>{
-    setError('');setSaved(false);
+    setError('');setSaved(false);setReadWarning('');
     if(mode==='manual' && values.lines.length===0){setError('Add at least one menu or service line.');return;}
     if(mode==='pdf' && !file){setError('Choose a PDF to submit. You can download the earlier PDF below if needed.');return;}
     const data={...values,lines:mode==='pdf'?[]:values.lines};const body=new FormData();body.set('data',JSON.stringify(data));if(mode==='pdf' && file)body.set('file',file);
-    try{await api(`/api/quotes/${encodeURIComponent(token)}`,{method:'POST',body});setSaved(true);await onSaved();}
+    try{const result=await api<{extractionError?:string}>(`/api/quotes/${encodeURIComponent(token)}`,{method:'POST',body});setSaved(true);setReadWarning(result.extractionError??'');await onSaved();}
     catch(problem){setError(problem instanceof Error?problem.message:'Unable to submit proposal');if(problem instanceof ApiError)for(const [key,message]of Object.entries(problem.fields??{}))fieldError(key as keyof Values,{message});}
   });
   return <Card><CardHeader><CardTitle>{quote.status==='SUBMITTED'?'Update your proposal':'Your catering or service proposal'}</CardTitle></CardHeader><CardContent><form className="space-y-6" noValidate onSubmit={submit}>
@@ -49,7 +49,7 @@ function ProposalForm({quote,token,onSaved}:{quote:PortalQuote;token:string;onSa
     <div className="grid gap-4 sm:grid-cols-2"><div className="space-y-2"><Label htmlFor="quote-per-plate">Per plate (₹, optional)</Label><Input id="quote-per-plate" type="number" min={0} step={1} {...register('perPlate',{setValueAs:optionalNumber})}/>{errors.perPlate && <p className="text-sm text-destructive">{errors.perPlate.message}</p>}</div><div className="space-y-2"><Label htmlFor="quote-extra-hour">Extra hour (₹, optional)</Label><Input id="quote-extra-hour" type="number" min={0} step={1} {...register('extraHourRate',{setValueAs:optionalNumber})}/>{errors.extraHourRate && <p className="text-sm text-destructive">{errors.extraHourRate.message}</p>}</div></div>
     <div className="space-y-2"><Label htmlFor="quote-total">Grand total including taxes and charges (₹) *</Label><Input id="quote-total" type="number" min={1} step={1} {...register('total',{valueAsNumber:true})}/>{errors.total && <p className="text-sm text-destructive">{errors.total.message}</p>}<p className="text-xs text-muted-foreground">For {quote.request.guestCount ?? 'the agreed number of'} guests. Extra hours should be billed separately unless agreed.</p></div>
     <div className="space-y-2"><Label htmlFor="quote-notes">Exclusions and conditions</Label><Textarea id="quote-notes" rows={3} placeholder="Mention taxes, overtime and anything not included." {...register('notes')}/>{errors.notes && <p className="text-sm text-destructive">{errors.notes.message}</p>}</div>
-    {error && <p role="alert" className="text-sm text-destructive">{error}</p>}{saved && <p role="status" className="rounded-lg bg-teal-soft p-3 text-sm text-teal">Your proposal has been saved. Your planner can now review it.</p>}
+    {error && <p role="alert" className="text-sm text-destructive">{error}</p>}{saved && <p role="status" className="rounded-lg bg-teal-soft p-3 text-sm text-teal">Your proposal has been saved. Your planner can now review it.</p>}{readWarning&&<p role="status" className="rounded-lg bg-marigold-soft p-3 text-sm">{readWarning}</p>}
     <Button className="min-h-12 w-full" type="submit" disabled={isSubmitting}>{isSubmitting?'Submitting…':quote.status==='SUBMITTED'?'Save updated proposal':'Submit proposal'}</Button>
   </form></CardContent></Card>;
 }
