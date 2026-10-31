@@ -38,7 +38,7 @@ const responseSchema = z.object({ candidates: z.array(z.object({content:z.object
 async function requestJson(text: string, correction: string): Promise<string> {
   const provider = process.env.AI_PROVIDER || 'gemini';
   const protocol = process.env.AI_PROTOCOL || (provider === 'gemini' ? 'gemini' : 'chat');
-  const model = process.env.AI_MODEL || (protocol === 'gemini' ? 'gemini-3.8-flash' : '');
+  const model = process.env.AI_MODEL || (protocol === 'gemini' ? 'gemini-3.1-flash-lite' : '');
   if (!model) throw new Error('Configure AI_MODEL for the selected provider');
   const endpoint = process.env.AI_ENDPOINT || (protocol === 'gemini' ? `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent` : '');
   if (!endpoint) throw new Error('Configure AI_ENDPOINT and AI_PROTOCOL for the selected provider');
