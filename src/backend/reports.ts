@@ -118,7 +118,7 @@ export async function getSeasonReport(period: Period = "season") {
   });
 
   const overduePayments = allWeddings
-    .flatMap((w) => w.milestones.filter((m) => m.status === "DUE" && m.dueDate < now).map((m) => ({ ...m, couple: `${w.partner1} & ${w.partner2}`, weddingId: w.id })))
+    .flatMap((w) => w.milestones.filter((m) => m.status === "DUE" && m.dueDate < now).map((m) => ({ ...m, couple: `${w.partner1} & ${w.partner2}`, weddingId: w.id, partner1: w.partner1, phone: w.phone, portalToken: w.portalToken })))
     .sort((a, b) => +a.dueDate - +b.dueDate);
 
   // Vendor scorecards from real data: check-ins (punctuality) and bill matching (accuracy).

@@ -153,7 +153,7 @@ export default async function WeddingPage({
       {tab === "overview" && <OverviewTab wedding={plain} openIssues={wedding.issues.length} />}
       {tab === "plan" && <PlanTab weddingId={wedding.id} tasks={plain.tasks} users={users} hasPlan={wedding.tasks.length > 0} />}
       {tab === "vendors" && <VendorsTab weddingId={wedding.id} bookings={plain.bookings} quotePanel={<QuoteRequestPanel weddingId={wedding.id} guestCount={wedding.guestCount} />} />}
-      {tab === "payments" && <PaymentsTab milestones={plain.milestones} contractValue={wedding.contractValue} />}
+      {tab === "payments" && <PaymentsTab milestones={plain.milestones} contractValue={wedding.contractValue} remind={{ phone: wedding.phone, portalToken: wedding.portalToken, name: wedding.partner1 }} />}
       {tab === "hours" && <HoursTab weddingId={wedding.id} logs={plain.timeLogs} users={users} currentUserId={session.sub} />}
       {tab === "settlement" && <SettlementTab weddingId={wedding.id} stage={wedding.stage} bookings={plain.bookings} />}
     </>

@@ -14,6 +14,8 @@ import { SoundToggle } from "./sound-toggle";
 import { Reveal, RevealItem } from "@/frontend/components/home/reveal";
 import { FlipCountdown } from "@/frontend/components/portal/flip-countdown";
 import { CheckDraw } from "@/frontend/components/portal/check-draw";
+import { DayOf, type DayOfItem } from "@/frontend/components/portal/day-of";
+import { CouplePortalMessages } from "@/frontend/components/messages/message-thread";
 
 export const metadata: Metadata = { title: { absolute: "Your wedding · The Royal Knot" }, robots: { index: false } };
 
@@ -37,6 +39,20 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
   const days = Math.ceil((w.startDate.getTime() - Date.now()) / 86_400_000);
   const pendingAddons = w.milestones.filter((m) => m.type === "ADDON" && m.status === "DUE" && m.extras.some((e) => !e.clientApproved));
   const agreement = w.enquiry?.agreement;
+
+  // Big day: today's run sheet (India date) from the control room, so the couple can follow along.
+  const ist = (d: Date) => new Date(d.getTime() + 5.5 * 3600_000).toISOString().slice(0, 10);
+  const now = new Date();
+  const todaysEvents = w.events.filter((e) => ist(e.startsAt) === ist(now)).map((e) => e.id);
+  const dayOf: DayOfItem[] = todaysEvents.length
+    ? (
+        await db.scheduleItem.findMany({
+          where: { eventId: { in: todaysEvents } },
+          orderBy: { startsAt: "asc" },
+          select: { id: true, title: true, startsAt: true, status: true, event: { select: { name: true } } },
+        })
+      ).map((i) => ({ id: i.id, title: i.title, startsAt: i.startsAt, status: i.status, event: i.event.name }))
+    : [];
 
   return (
     <ViewTransition enter="page-rise" exit="page-fade" default="none">
@@ -74,6 +90,8 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
             <p className="font-serif text-3xl font-semibold">Married {relativeDays(w.startDate)}</p>
           )}
         </section></RevealItem>
+
+        {dayOf.length > 0 && <RevealItem><DayOf items={dayOf} now={now} /></RevealItem>}
 
         {pendingAddons.length > 0 && (
           <RevealItem><section className="squircle rounded-2xl border-2 border-marigold bg-card p-5 sm:p-6">
@@ -170,6 +188,8 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
           </ol>
           )}
         </section></RevealItem>
+
+        <RevealItem><CouplePortalMessages token={token} names={[w.partner1, w.partner2]} /></RevealItem>
 
         {w.leadPlanner && (
           <RevealItem><section className="squircle flex items-center gap-3 rounded-2xl border bg-card p-5 sm:p-6">

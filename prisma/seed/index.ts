@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { PACKAGES } from "./templates";
 import { seedDemo } from "./demo";
 import { seedEnquiries } from "./enquiries";
+import { seedMessages } from "./messages";
 
 const db = new PrismaClient();
 
@@ -39,6 +40,7 @@ async function main() {
 
   await seedDemo(db);
   await seedEnquiries(db);
+  await seedMessages(db);
 
   console.log(`Seeded ${users.length} users, ${PACKAGES.length} packages`);
 }
