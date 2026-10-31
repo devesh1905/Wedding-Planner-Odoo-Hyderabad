@@ -7,6 +7,8 @@ import { Splash } from "@/frontend/components/home/splash";
 import { Hero } from "@/frontend/components/home/hero";
 import { Chapters } from "@/frontend/components/home/chapters";
 import { ThreeDays } from "@/frontend/components/home/three-days";
+import { Team, type TeamMember } from "@/frontend/components/home/team";
+import { db } from "@/backend/db";
 import { Celebrations } from "@/frontend/components/home/celebrations";
 import { VenueMarquee } from "@/frontend/components/home/venue-marquee";
 import { NumberTicker } from "@/frontend/components/home/number-ticker";
@@ -30,6 +32,25 @@ const PROMISES = [
 // The couples' front door. Staff who are signed in get a quiet link back into KnotOS.
 export default async function Home() {
   const session = await getSession();
+  // the team section reads live counts from the planning system
+  const staff = await db.user.findMany({
+    orderBy: [{ role: "asc" }, { name: "asc" }],
+    select: { id: true, name: true, role: true, avatarColor: true, leadWeddings: { where: { stage: { not: "CANCELLED" } }, select: { stage: true } } },
+  });
+  const team: TeamMember[] = staff.map((u) => ({
+    id: u.id,
+    name: u.name,
+    role: u.role,
+    color: u.avatarColor,
+    leading: u.leadWeddings.filter((w) => w.stage !== "SETTLED").length,
+    done: u.leadWeddings.filter((w) => w.stage === "SETTLED").length,
+  }));
+  if (team[0]?.role === "FOUNDER") {
+    // the founder oversees every wedding rather than leading one
+    const all = await db.wedding.groupBy({ by: ["stage"], where: { stage: { not: "CANCELLED" } }, _count: true });
+    team[0].leading = all.filter((g) => g.stage !== "SETTLED").reduce((n, g) => n + g._count, 0);
+    team[0].done = all.filter((g) => g.stage === "SETTLED").reduce((n, g) => n + g._count, 0);
+  }
 
   return (
     <div className="bg-background">
@@ -90,6 +111,7 @@ export default async function Home() {
         <Chapters />
         <VenueMarquee />
         <Celebrations />
+        <Team people={team} />
 
         <section className="px-6 pb-24">
           <Reveal className="squircle relative mx-auto max-w-6xl overflow-hidden rounded-[36px] bg-[oklch(0.24_0.07_18)] px-8 py-20 text-center text-[oklch(0.95_0.02_80)] sm:px-16">
