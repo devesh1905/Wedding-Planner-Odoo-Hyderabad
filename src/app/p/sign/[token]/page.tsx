@@ -22,7 +22,6 @@ export default async function SignPage({ params }: { params: Promise<{ token: st
     <main className="min-h-svh bg-paper">
       <div className="mx-auto max-w-2xl px-6 pt-10 pb-16 sm:pt-14">
         <header className="mb-8 space-y-4 text-center">
-          <p className="text-xs tracking-[0.25em] text-eyebrow uppercase">The Royal Knot</p>
           <h1 className="text-4xl font-semibold text-balance break-words sm:text-5xl">
             {partner1} & {partner2}
           </h1>

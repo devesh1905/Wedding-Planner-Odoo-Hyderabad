@@ -33,20 +33,12 @@ export function Hero() {
 
       <DiyaSlot id="hero" className="absolute top-[26%] right-[9%] z-10" />
       <div className="mx-auto w-full max-w-6xl px-6 py-28">
-        <motion.p
-          initial={reduce ? false : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-xs tracking-[0.35em] text-eyebrow uppercase"
-        >
-          Luxury weddings · Jaipur & Udaipur
-        </motion.p>
         <motion.h1
           initial={reduce ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
           data-cast
-          className="mt-6 text-[clamp(2.6rem,7vw,5.75rem)] leading-[0.98] font-semibold"
+          className="text-[clamp(2.6rem,7vw,5.75rem)] leading-[0.98] font-semibold"
         >
           {/* one thought per line: the rhythm is the message */}
           <span className="block sm:whitespace-nowrap">Three days.</span>
@@ -60,8 +52,7 @@ export function Hero() {
           data-cast
           className="mt-8 max-w-xl text-lg leading-relaxed text-foreground/75"
         >
-          We plan around twenty-five weddings a season — each with its own team, its own timeline and a clear view of every rupee.
-          You get the calm. We carry the details.
+          Twenty-five palace weddings a season in Jaipur and Udaipur, each with its own team and a clear view of every rupee.
         </motion.p>
         <motion.div
           initial={reduce ? false : { opacity: 0 }}
