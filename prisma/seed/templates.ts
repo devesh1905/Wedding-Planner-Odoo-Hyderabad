@@ -66,14 +66,14 @@ export const PACKAGES = [
     name: "Full-Service Wedding",
     description:
       "Theme & design, venue booking, vendor sourcing, layout planning, guest tracking, rehearsal and on-the-day crisis handling.",
-    basePrice: 35_00_000_00, // ₹35 L in paise
+    basePrice: 35_00_000, // ₹35 L
     templates: FULL_SERVICE,
   },
   {
     kind: "PARTIAL" as const,
     name: "Partial / Day-of",
     description: "Day schedule management, vendor check-in, family cues and clear-up after the event.",
-    basePrice: 8_00_000_00, // ₹8 L in paise
+    basePrice: 8_00_000, // ₹8 L
     templates: PARTIAL,
   },
 ];

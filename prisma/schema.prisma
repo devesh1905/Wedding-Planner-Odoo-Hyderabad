@@ -1,5 +1,5 @@
 // KnotOS data model
-// Conventions: UUID ids (safe for records created offline), money in paise (Int), timestamps on every table.
+// Conventions: UUID ids (safe for records created offline), money in whole rupees (Int, max ₹214 Cr), timestamps on every table.
 
 generator client {
   provider = "prisma-client-js"
@@ -154,7 +154,7 @@ model User {
   email        String   @unique
   passwordHash String
   role         Role     @default(PLANNER)
-  hourlyCost   Int      @default(0) // paise per hour, used in profit
+  hourlyCost   Int      @default(0) // rupees per hour, used in profit
   avatarColor  String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -180,7 +180,7 @@ model Enquiry {
   roughDate     DateTime?     @db.Date
   guestCount    Int?
   theme         String?
-  maxBudget     Int? // paise
+  maxBudget     Int? // rupees
   city          String?
   notes         String?
   status        EnquiryStatus @default(NEW)
@@ -239,7 +239,7 @@ model Package {
   kind        PackageKind @unique
   name        String
   description String
-  basePrice   Int // paise
+  basePrice   Int // rupees
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
@@ -280,7 +280,7 @@ model Wedding {
   venue         String?
   guestCount    Int
   theme         String?
-  contractValue Int // paise, what the couple pays the agency (excl. add-ons)
+  contractValue Int // rupees, what the couple pays the agency (excl. add-ons)
   stage         WeddingStage @default(BOOKED)
   portalToken   String       @unique
   createdAt     DateTime     @default(now())
@@ -344,7 +344,7 @@ model PaymentMilestone {
   weddingId String          @db.Uuid
   type      MilestoneType
   label     String
-  amount    Int // paise
+  amount    Int // rupees
   dueDate   DateTime        @db.Date
   status    MilestoneStatus @default(DUE)
   paidAt    DateTime?
@@ -406,9 +406,9 @@ model VendorQuote {
   token          String            @unique
   status         VendorQuoteStatus @default(INVITED)
   fileUrl        String?
-  perPlate       Int? // paise
-  extraHourRate  Int? // paise
-  total          Int? // paise
+  perPlate       Int? // rupees
+  extraHourRate  Int? // rupees
+  total          Int? // rupees
   notes          String?
   aiExtracted    Boolean           @default(false)
   aiReviewed     Boolean           @default(false)
@@ -431,7 +431,7 @@ model QuoteLine {
   category  QuoteLineCategory @default(OTHER)
   qty       Float?
   unit      String?
-  unitPrice Int? // paise
+  unitPrice Int? // rupees
   included  Boolean           @default(true)
   sortOrder Int               @default(0)
 
@@ -447,11 +447,11 @@ model Booking {
   vendorId        String         @db.Uuid
   quoteId         String?        @unique @db.Uuid
   category        VendorCategory
-  agreedAmount    Int // paise, base agreed cost
-  perPlate        Int? // paise
+  agreedAmount    Int // rupees, base agreed cost
+  perPlate        Int? // rupees
   agreedGuests    Int?
   agreedHours     Int?
-  hourlyRate      Int? // paise
+  hourlyRate      Int? // rupees
   expectedArrival DateTime?
   checkinToken    String         @unique
   createdAt       DateTime       @default(now())
@@ -533,8 +533,8 @@ model Extra {
   bookingId        String   @db.Uuid
   description      String
   qty              Float
-  unitPrice        Int // paise, vendor's rate
-  clientUnitPrice  Int? // paise, rate billed to client (defaults to unitPrice)
+  unitPrice        Int // rupees, vendor's rate
+  clientUnitPrice  Int? // rupees, rate billed to client (defaults to unitPrice)
   billableToClient Boolean  @default(true)
   clientApproved   Boolean  @default(false)
   milestoneId      String?  @db.Uuid // ADDON milestone it was billed on
@@ -551,7 +551,7 @@ model VendorBill {
   id        String    @id @default(uuid()) @db.Uuid
   bookingId String    @db.Uuid
   billNo    String
-  amount    Int // paise
+  amount    Int // rupees
   fileUrl   String?
   match     BillMatch @default(PENDING)
   createdAt DateTime  @default(now())
@@ -565,7 +565,7 @@ model VendorBill {
 model VendorPayment {
   id        String   @id @default(uuid()) @db.Uuid
   bookingId String   @db.Uuid
-  amount    Int // paise
+  amount    Int // rupees
   paidAt    DateTime @default(now())
   reference String   @unique // UTR / cheque no.; unique blocks paying the same thing twice
   isAdvance Boolean  @default(false)

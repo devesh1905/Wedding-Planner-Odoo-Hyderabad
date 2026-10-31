@@ -1,4 +1,4 @@
-// Money is stored as integer paise everywhere; these helpers are the only place we convert.
+// Money is stored as whole rupees (Int) everywhere.
 
 const inr = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -13,17 +13,15 @@ const inrPrecise = new Intl.NumberFormat("en-IN", {
   maximumFractionDigits: 2,
 });
 
-/** ₹1,50,000 — Indian digit grouping. Pass paise. */
-export function formatINR(paise: number | null | undefined, opts?: { precise?: boolean }) {
-  if (paise == null) return "—";
-  const rupees = paise / 100;
+/** ₹1,50,000 — Indian digit grouping. Pass rupees. */
+export function formatINR(rupees: number | null | undefined, opts?: { precise?: boolean }) {
+  if (rupees == null) return "—";
   return (opts?.precise ? inrPrecise : inr).format(rupees);
 }
 
 /** ₹2.4 Cr / ₹18.5 L / ₹45,000 — for dashboards and tight spaces. */
-export function formatINRCompact(paise: number | null | undefined) {
-  if (paise == null) return "—";
-  const rupees = paise / 100;
+export function formatINRCompact(rupees: number | null | undefined) {
+  if (rupees == null) return "—";
   const abs = Math.abs(rupees);
   const sign = rupees < 0 ? "−" : "";
   if (abs >= 1e7) return `${sign}₹${trim(abs / 1e7)} Cr`;
@@ -35,8 +33,6 @@ function trim(n: number) {
   return n.toFixed(n >= 100 ? 0 : n >= 10 ? 1 : 2).replace(/\.?0+$/, "");
 }
 
-export const toPaise = (rupees: number) => Math.round(rupees * 100);
-export const toRupees = (paise: number) => paise / 100;
 
 const dateFmt = new Intl.DateTimeFormat("en-IN", {
   day: "2-digit",
