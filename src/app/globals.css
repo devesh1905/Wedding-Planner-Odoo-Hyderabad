@@ -187,3 +187,50 @@
     height: 1px;
   }
 }
+
+/* ── Couples' home: splash, aurora, monogram ─────────────────────────── */
+@keyframes knot-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes knot-dot {
+  0%, 70% { opacity: 0; transform: scale(0.4); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.knot-draw {
+  stroke-dasharray: 1;
+  animation: knot-draw 1.2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+.knot-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: knot-dot 1.3s ease-out forwards;
+}
+.splash { transition: opacity 0.6s ease, transform 0.7s cubic-bezier(0.65, 0, 0.35, 1); }
+.splash-leave { opacity: 0; transform: translateY(-2%); pointer-events: none; }
+
+/* Slow aurora: three soft blobs drifting on long, offset loops. */
+@keyframes aurora-drift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(6%, -4%, 0) scale(1.08); }
+  66% { transform: translate3d(-5%, 5%, 0) scale(0.95); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+.aurora > span {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.55;
+  animation: aurora-drift 22s ease-in-out infinite;
+}
+.aurora-a { width: 55vw; height: 55vw; left: -10vw; top: -15vw; background: oklch(0.82 0.13 75); }
+.aurora-b { width: 45vw; height: 45vw; right: -8vw; top: 5vw; background: oklch(0.72 0.12 20); animation-duration: 28s !important; animation-delay: -6s !important; }
+.aurora-c { width: 40vw; height: 40vw; left: 30vw; bottom: -20vw; background: oklch(0.88 0.08 90); animation-duration: 34s !important; animation-delay: -12s !important; }
+.aurora-dim > span { opacity: 0.3; }
+@media (prefers-reduced-motion: reduce) {
+  .aurora > span, .knot-draw, .knot-dot { animation: none; }
+  .knot-draw { stroke-dasharray: none; }
+}
+html { scroll-behavior: smooth; }
+
+[data-nosplash] .splash { display: none; }
