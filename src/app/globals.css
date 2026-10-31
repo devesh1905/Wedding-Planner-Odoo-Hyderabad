@@ -561,3 +561,27 @@ html { scroll-behavior: smooth; }
 .flame-body:has(.knot-flame-gl canvas) .flame-l3,
 .flame-body:has(.knot-flame-gl canvas) .flame-l4 { display: none; }
 .knot-flame-gl { overflow: visible; pointer-events: none; }
+
+/* Squircle corners (continuous curvature, like iOS). Progressive: browsers without
+   corner-shape keep the normal rounded corners. Couple-facing cards and CTAs only. */
+@supports (corner-shape: squircle) {
+  .squircle {
+    corner-shape: squircle;
+  }
+}
+
+/* Celebrations "By night": fairy lights twinkle, firelight breathes. */
+@keyframes fairy-twinkle {
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 3px #ffc65e); }
+  50% { opacity: 0.55; filter: drop-shadow(0 0 1px #ffc65e); }
+}
+@keyframes firelight-breathe {
+  0%, 100% { opacity: 0.85; transform: scaleY(1); }
+  40% { opacity: 1; transform: scaleY(1.04); }
+  70% { opacity: 0.75; transform: scaleY(0.98); }
+}
+.fairy-bulb { animation: fairy-twinkle 2.4s ease-in-out infinite; }
+.firelight { transform-origin: 50% 100%; animation: firelight-breathe 3.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .fairy-bulb, .firelight { animation: none; }
+}

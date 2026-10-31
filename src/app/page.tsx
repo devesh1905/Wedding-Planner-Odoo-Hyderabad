@@ -82,7 +82,7 @@ export default async function Home() {
         <Celebrations />
 
         <section className="px-6 pb-24">
-          <Reveal className="relative mx-auto max-w-6xl overflow-hidden rounded-[36px] bg-[oklch(0.24_0.07_18)] px-8 py-20 text-center text-[oklch(0.95_0.02_80)] sm:px-16">
+          <Reveal className="squircle relative mx-auto max-w-6xl overflow-hidden rounded-[36px] bg-[oklch(0.24_0.07_18)] px-8 py-20 text-center text-[oklch(0.95_0.02_80)] sm:px-16">
             <div className="aurora aurora-dim pointer-events-none absolute inset-0" aria-hidden>
               <span className="aurora-a" />
               <span className="aurora-b" />

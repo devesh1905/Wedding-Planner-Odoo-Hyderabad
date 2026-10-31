@@ -50,7 +50,7 @@ export function Chapters() {
             <li
               key={c.n}
               data-cast
-              className="group relative flex flex-col justify-between rounded-[28px] border border-border bg-surface p-8 text-foreground shadow-[0_1px_0_var(--border)] md:h-[22rem] md:w-[24rem]"
+              className="group squircle relative flex flex-col justify-between rounded-[28px] border border-border bg-surface p-8 text-foreground shadow-[0_1px_0_var(--border)] md:h-[22rem] md:w-[24rem]"
             >
               <div className="flex items-start justify-between">
                 <span className="font-serif text-7xl leading-none font-semibold text-marigold/80 transition-colors group-hover:text-marigold">{c.n}</span>

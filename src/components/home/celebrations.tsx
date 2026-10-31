@@ -58,16 +58,51 @@ function Motif({ kind, color }: { kind: string; color: string }) {
 }
 
 const VIEW_KEY = "knot:celebrations-view";
+const LIGHT_KEY = "knot:celebrations-light";
 type View = "wander" | "scan";
+type Light = "day" | "night";
 
-function Card({ t, className }: { t: (typeof THEMES)[number]; className: string }) {
+// A swag of fairy lights strung across the top of a card at night (sangeet-night mood).
+function FairyLights() {
+  const bulbs = Array.from({ length: 9 }, (_, i) => {
+    const x = 12 + i * 22;
+    return { x, y: 14 + 10 * Math.sin((i / 8) * Math.PI) };
+  });
   return (
-    <div
-      className={`relative overflow-hidden rounded-[28px] ${className}`}
-      style={{ background: `linear-gradient(160deg, ${t.palette[2]} 0%, ${t.palette[1]} 55%, ${t.palette[0]} 100%)` }}
-    >
-      <Motif kind={t.motif} color={t.palette[2]} />
-      <div className="absolute inset-x-0 top-0 flex gap-1.5 p-5">
+    <svg viewBox="0 0 200 40" className="absolute inset-x-0 top-0 w-full" aria-hidden>
+      <path d="M2 10 Q100 40 198 10" fill="none" stroke="#3a2a22" strokeWidth="0.8" />
+      {bulbs.map((b, i) => (
+        <circle key={b.x} cx={b.x} cy={b.y} r="2.2" fill="#ffd27a" className="fairy-bulb" style={{ animationDelay: `${(i % 4) * 0.45}s` }} />
+      ))}
+    </svg>
+  );
+}
+
+/**
+ * One moodboard, lit two ways. Day = the palette in soft daylight; night = the same palette in
+ * darkness, relit from below by firelight (a warm radial falloff) with fairy lights overhead.
+ * Both layers are always rendered and cross-fade, so switching is a relight, not a re-render.
+ */
+function Card({ t, className, night }: { t: (typeof THEMES)[number]; className: string; night: boolean }) {
+  return (
+    <div data-cast className={`squircle relative overflow-hidden rounded-[28px] ${className}`}>
+      <div
+        className="absolute inset-0 transition-opacity duration-700 ease-out"
+        style={{ background: `linear-gradient(160deg, ${t.palette[2]} 0%, ${t.palette[1]} 55%, ${t.palette[0]} 100%)`, opacity: night ? 0 : 1 }}
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 transition-opacity duration-700 ease-out"
+        style={{
+          opacity: night ? 1 : 0,
+          background: `radial-gradient(120% 70% at 50% 108%, rgb(255 168 72 / 0.62) 0%, rgb(232 120 40 / 0.28) 35%, transparent 70%), linear-gradient(180deg, #0c0911 0%, color-mix(in oklab, ${t.palette[0]} 55%, #0c0911) 100%)`,
+        }}
+      >
+        <div className="firelight absolute inset-0" style={{ background: "radial-gradient(90% 55% at 50% 110%, rgb(255 200 110 / 0.35), transparent 70%)" }} />
+        <FairyLights />
+      </div>
+      <Motif kind={t.motif} color={night ? "#ffcf86" : t.palette[2]} />
+      <div className={`absolute inset-x-0 top-0 flex gap-1.5 p-5 transition-opacity duration-500 ${night ? "opacity-0" : "opacity-100"}`}>
         {t.palette.map((c) => (
           <span key={c} className="size-3 rounded-full ring-1 ring-black/10" style={{ background: c }} />
         ))}
@@ -90,6 +125,7 @@ export function Celebrations() {
   const [hover, setHover] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [view, setView] = useState<View>("wander");
+  const [light, setLight] = useState<Light>("day");
   const cx = useSpring(useMotionValue(0), { stiffness: 500, damping: 40 });
   const cy = useSpring(useMotionValue(0), { stiffness: 500, damping: 40 });
 
@@ -97,8 +133,18 @@ export function Celebrations() {
     try {
       const saved = localStorage.getItem(VIEW_KEY);
       if (saved === "scan" || saved === "wander") setView(saved);
+      // First visit: night if the site is in dark mode, so the moodboards match the cave.
+      const lit = localStorage.getItem(LIGHT_KEY);
+      setLight(lit === "day" || lit === "night" ? lit : document.documentElement.classList.contains("dark") ? "night" : "day");
     } catch {}
   }, []);
+
+  const relight = (l: Light) => {
+    setLight(l);
+    try {
+      localStorage.setItem(LIGHT_KEY, l);
+    } catch {}
+  };
 
   const choose = (v: View) => {
     setView(v);
@@ -119,6 +165,23 @@ export function Celebrations() {
         <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
           <h2 data-cast className="max-w-xl text-4xl leading-tight font-semibold sm:text-5xl">Every wedding has its own light</h2>
           <div className="flex flex-col items-start gap-4 sm:items-end">
+            <div className="flex flex-wrap gap-2">
+            <div role="group" aria-label="Lighting" className="inline-flex rounded-full border border-border bg-surface p-1 text-sm">
+              {(["day", "night"] as const).map((l) => (
+                <button
+                  key={l}
+                  type="button"
+                  aria-pressed={light === l}
+                  onClick={() => relight(l)}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none ${
+                    light === l ? "bg-cta text-cta-foreground" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Icon name={l === "day" ? "sun" : "moon"} />
+                  By {l}
+                </button>
+              ))}
+            </div>
             <div role="group" aria-label="Celebrations view" className="inline-flex rounded-full border border-border bg-surface p-1 text-sm">
               {(["wander", "scan"] as const).map((v) => (
                 <button
@@ -135,6 +198,7 @@ export function Celebrations() {
                 </button>
               ))}
             </div>
+            </div>
             <p className="max-w-sm text-muted-foreground sm:text-right">
               Six moods our couples keep coming back to. {view === "wander" ? "Drag to wander through them." : "Scan them all at a glance."}
             </p>
@@ -147,7 +211,7 @@ export function Celebrations() {
         <ul className="mx-auto mt-12 grid max-w-6xl gap-5 px-6 sm:grid-cols-2 lg:grid-cols-3">
           {THEMES.map((t) => (
             <motion.li key={t.name} layoutId={`celebration-${t.name}`} transition={glide} className="select-none">
-              <Card t={t} className="h-[22rem] w-full" />
+              <Card t={t} night={light === "night"} className="h-[22rem] w-full" />
             </motion.li>
           ))}
         </ul>
@@ -174,7 +238,7 @@ export function Celebrations() {
         >
           {THEMES.map((t) => (
             <motion.li key={t.name} layoutId={`celebration-${t.name}`} transition={glide} className="select-none">
-              <Card t={t} className="h-[24rem] w-[17rem] sm:w-[19rem]" />
+              <Card t={t} night={light === "night"} className="h-[24rem] w-[17rem] sm:w-[19rem]" />
             </motion.li>
           ))}
         </motion.ul>
