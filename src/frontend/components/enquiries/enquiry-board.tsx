@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { ScrollRail } from "@/frontend/components/common/scroll-rail";
 import { useRouter } from "next/navigation";
 import { DndContext, DragOverlay, PointerSensor, TouchSensor, useDraggable, useDroppable, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
-import { AlertTriangle, AtSign, Globe, Inbox, MessageCircle, Phone, Search, Users, UserPlus } from "lucide-react";
+import { AlertTriangle, AtSign, ChevronLeft, ChevronRight, Globe, Inbox, MessageCircle, Phone, Search, Users, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/frontend/components/ui/input";
 import { OwnerAvatar } from "@/frontend/components/common/owner-avatar";
@@ -26,6 +26,16 @@ const COLUMN_ACCENT: Record<string, string> = {
   SIGNED: "bg-teal",
   LOST: "bg-muted-foreground/40",
 };
+
+// The steps a planner moves a card through by hand. Signed is set by the couple's signature, and
+// Lost is chosen from the drawer, so neither is an arrow target; a lost card can only be reopened.
+const STEPS = ["NEW", "CONTACTED", "MEETING_BOOKED", "AGREEMENT_SENT"] as const;
+function neighbours(status: string): { back?: string; forward?: string } {
+  if (status === "LOST") return { back: "NEW" };
+  const i = STEPS.indexOf(status as (typeof STEPS)[number]);
+  if (i < 0) return {};
+  return { back: STEPS[i - 1], forward: STEPS[i + 1] };
+}
 
 const SOURCE_ICON: Record<string, React.ElementType> = {
   WEB_FORM: Globe,
@@ -68,8 +78,12 @@ export function EnquiryBoard({ enquiries, planners }: { enquiries: EnquiryCardDa
 
   async function onDragEnd(ev: DragEndEvent) {
     setDragging(null);
-    const id = String(ev.active.id);
     const to = ev.over?.id as string | undefined;
+    if (to) await move(String(ev.active.id), to);
+  }
+
+  // Shared by drag-and-drop (desktop) and the arrow buttons (phones, keyboard).
+  async function move(id: string, to: string) {
     const card = items.find((e) => e.id === id);
     if (!card || !to || card.status === to) return;
     if (to === "SIGNED") return void toast.info("Cards move to Signed when the couple signs the agreement");
@@ -110,7 +124,7 @@ export function EnquiryBoard({ enquiries, planners }: { enquiries: EnquiryCardDa
       >
         <div ref={boardRef} className="no-scrollbar -mx-4 flex gap-4 overflow-x-auto px-4 pb-4 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
           {STATUSES.map((s) => (
-            <Column key={s} status={s} items={filtered.filter((e) => e.status === s)} onOpen={setOpenId} />
+            <Column key={s} status={s} items={filtered.filter((e) => e.status === s)} onOpen={setOpenId} onMove={move} />
           ))}
         </div>
         <DragOverlay>{dragging && <Card e={dragging} overlay />}</DragOverlay>
@@ -121,7 +135,17 @@ export function EnquiryBoard({ enquiries, planners }: { enquiries: EnquiryCardDa
   );
 }
 
-function Column({ status, items, onOpen }: { status: string; items: EnquiryCardData[]; onOpen: (id: string) => void }) {
+function Column({
+  status,
+  items,
+  onOpen,
+  onMove,
+}: {
+  status: string;
+  items: EnquiryCardData[];
+  onOpen: (id: string) => void;
+  onMove: (id: string, to: string) => void;
+}) {
   const { setNodeRef, isOver } = useDroppable({ id: status });
   return (
     <section
@@ -136,23 +160,53 @@ function Column({ status, items, onOpen }: { status: string; items: EnquiryCardD
       <div className="flex min-h-24 flex-col gap-2">
         {items.length === 0 && <p className="rounded-xl border border-dashed px-3 py-6 text-center text-xs text-muted-foreground">Nothing here yet</p>}
         {items.map((e) => (
-          <DraggableCard key={e.id} e={e} onOpen={onOpen} />
+          <DraggableCard key={e.id} e={e} onOpen={onOpen} onMove={onMove} />
         ))}
       </div>
     </section>
   );
 }
 
-function DraggableCard({ e, onOpen }: { e: EnquiryCardData; onOpen: (id: string) => void }) {
+function DraggableCard({ e, onOpen, onMove }: { e: EnquiryCardData; onOpen: (id: string) => void; onMove: (id: string, to: string) => void }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: e.id });
+  const { back, forward } = neighbours(e.status);
+  const hasArrows = Boolean(back || forward);
   return (
-    <div ref={setNodeRef} {...attributes} {...listeners} className={cn(isDragging && "opacity-30")}>
-      <Card e={e} onClick={() => onOpen(e.id)} />
+    <div ref={setNodeRef} {...attributes} {...listeners} className={cn("relative", isDragging && "opacity-30")}>
+      <Card e={e} onClick={() => onOpen(e.id)} roomForArrows={hasArrows} />
+      {/* Arrows sit over the card's bottom edge as siblings (a button can't hold buttons). They stop
+          the pointer/touch from starting a drag, so a tap always moves exactly one column. */}
+      {hasArrows && (
+        <div
+          className="absolute inset-x-2 bottom-2 flex items-center justify-between gap-2"
+          onPointerDown={(ev) => ev.stopPropagation()}
+          onTouchStart={(ev) => ev.stopPropagation()}
+        >
+          {back ? <MoveButton dir="back" to={back} onClick={() => onMove(e.id, back)} /> : <span />}
+          {forward && <MoveButton dir="forward" to={forward} onClick={() => onMove(e.id, forward)} />}
+        </div>
+      )}
     </div>
   );
 }
 
-function Card({ e, onClick, overlay }: { e: EnquiryCardData; onClick?: () => void; overlay?: boolean }) {
+function MoveButton({ dir, to, onClick }: { dir: "back" | "forward"; to: string; onClick: () => void }) {
+  const label = to === "NEW" && dir === "back" ? "New" : statusLabel(to);
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={`Move to ${statusLabel(to)}`}
+      className="hit-44 inline-flex h-7 max-w-[48%] items-center gap-0.5 rounded-lg px-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+    >
+      {dir === "back" && <ChevronLeft className="size-3.5 shrink-0" />}
+      <span className="truncate">{label}</span>
+      {dir === "forward" && <ChevronRight className="size-3.5 shrink-0" />}
+    </button>
+  );
+}
+
+function Card({ e, onClick, overlay, roomForArrows }: { e: EnquiryCardData; onClick?: () => void; overlay?: boolean; roomForArrows?: boolean }) {
   const Icon = SOURCE_ICON[e.source] ?? Globe;
   const warn = needsFollowUp(e);
   return (
@@ -162,6 +216,7 @@ function Card({ e, onClick, overlay }: { e: EnquiryCardData; onClick?: () => voi
       className={cn(
         "w-full rounded-xl border bg-card p-3 text-left shadow-xs transition hover:border-maroon/30 hover:shadow-sm",
         overlay && "rotate-2 shadow-lg",
+        roomForArrows && "pb-11",
       )}
     >
       <div className="flex items-start gap-2">
