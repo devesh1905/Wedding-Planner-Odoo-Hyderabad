@@ -16,4 +16,6 @@ export type MessageRow = {
   authorName: string;
   body: string;
   createdAt: string;
+  /** when the other side opened it; null = unread */
+  readAt?: string | null;
 };

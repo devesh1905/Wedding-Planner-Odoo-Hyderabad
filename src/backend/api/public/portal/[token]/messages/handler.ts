@@ -3,7 +3,7 @@ import { db } from "@/backend/db";
 import { handle, HttpError } from "@/backend/auth";
 import { coupleMessageInput } from "@/shared/schemas/messages";
 
-const MESSAGE_SELECT = { id: true, author: true, authorName: true, body: true, createdAt: true } as const;
+const MESSAGE_SELECT = { id: true, author: true, authorName: true, body: true, createdAt: true, readAt: true } as const;
 const HOURLY_LIMIT = 30;
 
 async function weddingByToken(token: string) {
@@ -15,8 +15,9 @@ async function weddingByToken(token: string) {
 // Couple opens the thread: return it oldest to newest and mark the planners' replies as read.
 export const GET = handle(async (_req: Request, { params }: { params: Promise<{ token: string }> }) => {
   const w = await weddingByToken((await params).token);
-  await db.message.updateMany({ where: { weddingId: w.id, author: "STAFF", readAt: null }, data: { readAt: new Date() } });
   const messages = await db.message.findMany({ where: { weddingId: w.id }, orderBy: { createdAt: "asc" }, select: MESSAGE_SELECT });
+  // read first so this response still shows which messages are new, then mark them read
+  await db.message.updateMany({ where: { weddingId: w.id, author: "STAFF", readAt: null }, data: { readAt: new Date() } });
   return NextResponse.json(messages);
 });
 

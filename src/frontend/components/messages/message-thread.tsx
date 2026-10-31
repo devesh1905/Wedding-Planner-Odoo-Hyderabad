@@ -30,17 +30,22 @@ export function MessageThread({ endpoint, me, names, pollMs = 15000 }: { endpoin
   const [sending, setSending] = useState(false);
   const [sender, setSender] = useState(names?.[0] ?? "");
   const listRef = useRef<HTMLDivElement>(null);
+  // Messages from the other side that were unread when this thread opened keep a "New" tag
+  // until the reader leaves, even though the server marks them read on that first fetch.
+  const [fresh, setFresh] = useState<Set<string>>(() => new Set());
 
   const load = useCallback(async () => {
     try {
       const rows = await api<MessageRow[]>(endpoint);
       // Keep optimistic (not yet saved) bubbles from disappearing during a poll.
       setMessages((prev) => [...rows, ...(prev ?? []).filter((m) => m.id.startsWith("tmp-"))]);
+      const unread = rows.filter((m) => m.author !== me && !m.readAt).map((m) => m.id);
+      if (unread.length) setFresh((prev) => new Set([...prev, ...unread]));
       setFailed(false);
     } catch {
       setFailed(true);
     }
-  }, [endpoint]);
+  }, [endpoint, me]);
 
   useEffect(() => {
     load();
@@ -100,10 +105,18 @@ export function MessageThread({ endpoint, me, names, pollMs = 15000 }: { endpoin
             {me === "COUPLE" ? "No messages yet — ask anything about your wedding." : "No messages from the couple yet."}
           </p>
         ) : (
-          messages.map((m) => {
+          messages.map((m, i) => {
             const mine = m.author === me;
+            const firstNew = fresh.has(m.id) && !messages.slice(0, i).some((p) => fresh.has(p.id));
             return (
               <div key={m.id} className={cn("flex flex-col", mine ? "items-end" : "items-start")}>
+                {firstNew && (
+                  <div className="mb-2 flex w-full items-center gap-2 text-[11px] font-semibold tracking-wider text-rose uppercase">
+                    <span className="h-px flex-1 bg-rose/30" />
+                    New
+                    <span className="h-px flex-1 bg-rose/30" />
+                  </div>
+                )}
                 <div
                   className={cn(
                     "max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-sm",
@@ -116,6 +129,7 @@ export function MessageThread({ endpoint, me, names, pollMs = 15000 }: { endpoin
                 <span className="mt-0.5 px-1 text-[11px] text-muted-foreground">
                   {mine ? "" : `${m.authorName} · `}
                   {timeAgo(m.createdAt)}
+                  {mine && !m.id.startsWith("tmp-") && (m.readAt ? " · Seen" : " · Sent")}
                 </span>
               </div>
             );

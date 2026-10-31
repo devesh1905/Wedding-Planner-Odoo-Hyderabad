@@ -32,6 +32,7 @@ export function DayOf({ items, now }: { items: DayOfItem[]; now: Date }) {
       <p className="mt-1 text-sm text-muted-foreground">
         {done} of {items.length} moments done{late ? " · one item is running a little late — your planner is on it" : ""}
       </p>
+      <p className="mt-0.5 text-xs text-muted-foreground tabular-nums">Updated {time(now)} · refreshes every 30 seconds</p>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <div className="rounded-xl bg-cta p-4 text-cta-foreground">

@@ -3,7 +3,7 @@ import { db } from "@/backend/db";
 import { handle, HttpError, requireUser } from "@/backend/auth";
 import { messageInput } from "@/shared/schemas/messages";
 
-const MESSAGE_SELECT = { id: true, author: true, authorName: true, body: true, createdAt: true } as const;
+const MESSAGE_SELECT = { id: true, author: true, authorName: true, body: true, createdAt: true, readAt: true } as const;
 
 async function assertWedding(id: string) {
   const w = await db.wedding.findUnique({ where: { id }, select: { id: true } });
@@ -15,8 +15,9 @@ export const GET = handle(async (_req: Request, { params }: { params: Promise<{ 
   await requireUser();
   const { id } = await params;
   await assertWedding(id);
-  await db.message.updateMany({ where: { weddingId: id, author: "COUPLE", readAt: null }, data: { readAt: new Date() } });
   const messages = await db.message.findMany({ where: { weddingId: id }, orderBy: { createdAt: "asc" }, select: MESSAGE_SELECT });
+  // read first so this response still shows which messages are new, then mark them read
+  await db.message.updateMany({ where: { weddingId: id, author: "COUPLE", readAt: null }, data: { readAt: new Date() } });
   return NextResponse.json(messages);
 });
 
