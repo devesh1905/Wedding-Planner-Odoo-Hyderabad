@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { ScrollRail } from "@/components/common/scroll-rail";
 import { useRouter } from "next/navigation";
 import {
@@ -49,7 +50,12 @@ export function EnquiryBoard({ enquiries, planners }: { enquiries: EnquiryCardDa
   const router = useRouter();
   const [items, setItems] = useState(enquiries);
   const [query, setQuery] = useState("");
+  // `?open=<id>` (from global search) opens that enquiry straight away
   const [openId, setOpenId] = useState<string | null>(null);
+  const openParam = useSearchParams().get("open");
+  useEffect(() => {
+    if (openParam) setOpenId(openParam);
+  }, [openParam]);
   const [dragging, setDragging] = useState<EnquiryCardData | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),

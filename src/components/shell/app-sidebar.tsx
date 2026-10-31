@@ -24,11 +24,13 @@ export function AppSidebar({
   rail = false,
   onToggle,
   onNavigate,
+  onSearch,
 }: {
   user: { name: string; role: string };
   rail?: boolean;
   onToggle?: () => void;
   onNavigate?: () => void;
+  onSearch?: () => void;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -60,6 +62,32 @@ export function AppSidebar({
         <KnotMark className="h-5 w-10 shrink-0 text-foreground" effects={false} />
         {!rail && <span className="font-brand text-base">The Royal Knot</span>}
       </Link>
+
+      {onSearch && (
+        <Tip label="Search (Ctrl K)">
+          <button
+            type="button"
+            onClick={() => {
+              onNavigate?.();
+              onSearch();
+            }}
+            aria-label="Search"
+            className={cn(
+              item,
+              "mb-3 border bg-card text-muted-foreground hover:text-foreground",
+              rail ? "w-9 justify-center" : "w-full px-2.5",
+            )}
+          >
+            <Icon name="search" className="size-[18px]" />
+            {!rail && (
+              <>
+                <span className="flex-1 text-left">Search</span>
+                <kbd className="rounded border bg-muted px-1.5 font-sans text-[10px]">Ctrl K</kbd>
+              </>
+            )}
+          </button>
+        </Tip>
+      )}
 
       <nav className={cn("flex flex-1 flex-col gap-1", rail ? "items-center" : "")} aria-label="Main">
         {NAV.filter((n) => !n.founderOnly || user.role === "FOUNDER").map((n) => {
