@@ -9,7 +9,7 @@ export type LiveIssue = {
   ownerId: string | null; owner: LiveStaff | null;
 };
 export type LiveBooking = {
-  id: string; expectedArrival: string | null;
+  id: string; expectedArrival: string | null; scanKey: string;
   vendor: { id: string; name: string; phone: string; category: VendorCategory; backupVendor: { id: string; name: string; phone: string } | null };
   checkins: { arrivedAt: string; method: "QR" | "MANUAL" }[];
 };
