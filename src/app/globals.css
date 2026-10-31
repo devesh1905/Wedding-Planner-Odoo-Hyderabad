@@ -634,6 +634,15 @@ html { scroll-behavior: smooth; }
     z-index: 59; /* above the header and page, just under the diya */
     pointer-events: none;
   }
+  /* resting in the niche: pinned by CSS to the same corner (box maths: niche 84×88 at right 12 /
+     bottom 16, flame anchor 36px from the diya's left and 62px from its top, diya box 72×96) */
+  .cave-diya.at-dock {
+    left: auto;
+    top: auto;
+    right: 18px;
+    bottom: calc(17px + env(safe-area-inset-bottom));
+    transform: none !important;
+  }
   /* the drifting, 80px-blurred glow is the costliest thing to scroll over: keep it, but still */
   .aurora > span { animation: none; filter: blur(48px); }
   /* live backdrop blur under a fixed header re-renders on every scroll frame */
