@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // pdf-parse loads pdf.js with a worker file; bundling breaks that path, so load them from node_modules.
+  serverExternalPackages: ["pdf-parse", "pdfjs-dist"],
   turbopack: {
     rules: {
       "*.css": {
