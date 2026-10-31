@@ -190,7 +190,7 @@ export function PlanTab({ weddingId, tasks, users, hasPlan }: { weddingId: strin
         <AddTask weddingId={weddingId} />
       </div>
 
-      <DndContext
+      <DndContext id="plan-board"
         sensors={sensors}
         onDragStart={(e) => setDragging(items.find((t) => t.id === e.active.id) ?? null)}
         onDragEnd={onDragEnd}
