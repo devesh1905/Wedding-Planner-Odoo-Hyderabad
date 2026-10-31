@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CalendarDays, MapPin, Palette, Radio, Users } from "lucide-react";
 import { db } from "@/lib/db";
+import { requirePageUser } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { StagePill } from "@/components/common/stage-pill";
 import { OwnerAvatar } from "@/components/common/owner-avatar";
@@ -15,6 +16,7 @@ import { OverviewTab } from "@/components/weddings/overview-tab";
 import { VendorsTab } from "@/components/weddings/vendors-tab";
 import { SettlementTab } from "@/components/weddings/settlement-tab";
 import { QuoteRequestPanel } from "@/components/quotes/QuoteRequestPanel";
+import { HoursTab } from "@/components/weddings/hours-tab";
 
 const TABS = [
   { key: "overview", label: "Overview" },
@@ -22,6 +24,7 @@ const TABS = [
   { key: "vendors", label: "Vendors & quotes" },
   { key: "payments", label: "Payments" },
   { key: "settlement", label: "Settlement" },
+  { key: "hours", label: "Team hours" },
 ] as const;
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -55,11 +58,13 @@ export default async function WeddingPage({
         orderBy: { category: "asc" },
       },
       issues: { where: { status: "OPEN" }, select: { id: true } },
+      timeLogs: { orderBy: { date: "desc" }, include: { user: { select: { id: true, name: true, avatarColor: true, hourlyCost: true } } } },
     },
   });
   if (!wedding) notFound();
 
-  const users = await db.user.findMany({ select: { id: true, name: true, avatarColor: true }, orderBy: { name: "asc" } });
+  const session = await requirePageUser();
+  const users = await db.user.findMany({ select: { id: true, name: true, avatarColor: true, hourlyCost: true }, orderBy: { name: "asc" } });
   const done = wedding.tasks.filter((t) => t.stage === "DONE").length;
   const pct = wedding.tasks.length ? Math.round((done / wedding.tasks.length) * 100) : 0;
   const plain = JSON.parse(JSON.stringify(wedding)) as typeof wedding;
@@ -141,6 +146,7 @@ export default async function WeddingPage({
       {tab === "plan" && <PlanTab weddingId={wedding.id} tasks={plain.tasks} users={users} hasPlan={wedding.tasks.length > 0} />}
       {tab === "vendors" && <VendorsTab weddingId={wedding.id} bookings={plain.bookings} quotePanel={<QuoteRequestPanel weddingId={wedding.id} guestCount={wedding.guestCount} />} />}
       {tab === "payments" && <PaymentsTab milestones={plain.milestones} contractValue={wedding.contractValue} />}
+      {tab === "hours" && <HoursTab weddingId={wedding.id} logs={plain.timeLogs} users={users} currentUserId={session.sub} />}
       {tab === "settlement" && <SettlementTab weddingId={wedding.id} stage={wedding.stage} bookings={plain.bookings} />}
     </>
   );
