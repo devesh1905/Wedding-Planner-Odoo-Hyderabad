@@ -132,7 +132,7 @@ export function MessageThread({ endpoint, me, names, pollMs = 15000 }: { endpoin
               type="button"
               onClick={() => setSender(n)}
               aria-pressed={sender === n}
-              className={cn("min-h-11 rounded-full border px-4 text-sm transition-colors", sender === n ? "border-maroon bg-maroon text-white" : "bg-card hover:bg-muted")}
+              className={cn("min-h-11 rounded-full border px-4 text-sm transition-colors", sender === n ? "border-cta bg-cta text-cta-foreground" : "bg-card text-foreground hover:bg-muted")}
             >
               {n}
             </button>
