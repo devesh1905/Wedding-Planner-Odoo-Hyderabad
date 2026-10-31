@@ -36,7 +36,7 @@ export function Chapters() {
     <section ref={ref} id="journey" className="relative md:h-[260vh]" aria-label="How it works">
       <div className="md:sticky md:top-0 md:flex md:h-svh md:flex-col md:justify-center md:overflow-hidden">
         <div className="mx-auto w-full max-w-6xl px-6 pt-24 pb-10 md:pt-0">
-          <p className="text-xs tracking-[0.3em] text-maroon uppercase">How it works</p>
+          <p className="text-xs tracking-[0.3em] text-eyebrow uppercase">How it works</p>
           <h2 className="mt-3 max-w-xl text-4xl leading-tight font-semibold sm:text-5xl">Your wedding, chapter by chapter</h2>
         </div>
         <motion.ol
@@ -46,7 +46,7 @@ export function Chapters() {
           {CHAPTERS.map((c) => (
             <li
               key={c.n}
-              className="group relative flex flex-col justify-between rounded-[28px] border border-maroon/10 bg-[oklch(0.995_0.006_85)] p-8 shadow-[0_1px_0_oklch(0.9_0.02_70)] md:h-[22rem] md:w-[24rem]"
+              className="group relative flex flex-col justify-between rounded-[28px] border border-border bg-surface p-8 text-foreground shadow-[0_1px_0_var(--border)] md:h-[22rem] md:w-[24rem]"
             >
               <span className="font-serif text-7xl leading-none font-semibold text-marigold/80 transition-colors group-hover:text-marigold">{c.n}</span>
               <div>

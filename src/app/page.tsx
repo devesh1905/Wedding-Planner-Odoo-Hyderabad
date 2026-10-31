@@ -53,10 +53,10 @@ export default async function Home() {
         <Hero />
 
         <section className="mx-auto max-w-6xl px-6 py-24" aria-label="Our promise">
-          <Reveal className="grid gap-12 border-t border-maroon/15 pt-12 md:grid-cols-3">
+          <Reveal className="grid gap-12 border-t border-border pt-12 md:grid-cols-3">
             {PROMISES.map((p) => (
               <RevealItem key={p.v}>
-                <p className="font-serif text-6xl font-semibold text-maroon">{p.k}</p>
+                <p className="font-serif text-6xl font-semibold text-eyebrow">{p.k}</p>
                 <p className="mt-2 text-lg font-medium">{p.v}</p>
                 <p className="mt-2 leading-relaxed text-muted-foreground">{p.d}</p>
               </RevealItem>
@@ -93,7 +93,7 @@ export default async function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-maroon/10">
+      <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8 text-sm text-muted-foreground">
           <p>© {new Date().getFullYear()} The Royal Knot · Jaipur · Udaipur</p>
           <p>Planned with care, run on KnotOS.</p>

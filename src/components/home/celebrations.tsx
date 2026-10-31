@@ -70,7 +70,7 @@ export function Celebrations() {
   return (
     <section id="celebrations" className="py-24" aria-label="Celebration styles">
       <div className="mx-auto max-w-6xl px-6">
-        <p className="text-xs tracking-[0.3em] text-maroon uppercase">Celebrations</p>
+        <p className="text-xs tracking-[0.3em] text-eyebrow uppercase">Celebrations</p>
         <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
           <h2 className="max-w-xl text-4xl leading-tight font-semibold sm:text-5xl">Every wedding has its own light</h2>
           <p className="max-w-sm text-muted-foreground">Six moods our couples keep coming back to. Drag to wander through them.</p>
@@ -124,7 +124,7 @@ export function Celebrations() {
             className="pointer-events-none absolute top-0 left-0 hidden md:block"
           >
             <span
-              className={`-translate-x-1/2 -translate-y-1/2 grid size-20 place-items-center rounded-full bg-maroon text-xs font-medium tracking-[0.2em] text-primary-foreground uppercase shadow-lg transition-transform duration-200 ${dragging ? "scale-75" : "scale-100"}`}
+              className={`-translate-x-1/2 -translate-y-1/2 grid size-20 place-items-center rounded-full bg-cta text-xs font-medium tracking-[0.2em] text-cta-foreground uppercase shadow-lg transition-transform duration-200 ${dragging ? "scale-75" : "scale-100"}`}
             >
               Drag
             </span>

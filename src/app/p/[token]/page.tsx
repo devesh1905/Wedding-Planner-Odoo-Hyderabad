@@ -39,7 +39,7 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
           <div className="flex justify-end">
             <SoundToggle />
           </div>
-          <p className="text-xs tracking-[0.25em] text-maroon uppercase">The Royal Knot</p>
+          <p className="text-xs tracking-[0.25em] text-eyebrow uppercase">The Royal Knot</p>
           <h1 className="text-5xl leading-tight font-semibold">
             {w.partner1} & {w.partner2}
           </h1>

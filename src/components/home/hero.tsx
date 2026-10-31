@@ -28,7 +28,7 @@ export function Hero() {
       <motion.div
         aria-hidden
         style={reduce ? undefined : { y: drift, opacity: fade }}
-        className="pointer-events-none absolute top-1/2 right-[-6rem] -z-10 hidden -translate-y-1/2 text-maroon/[0.07] lg:block"
+        className="pointer-events-none absolute top-1/2 right-[-6rem] -z-10 hidden -translate-y-1/2 text-foreground/[0.06] lg:block"
       >
         <KnotMark className="h-[34rem] w-[56rem]" flameClassName="opacity-25" effects={false} />
       </motion.div>
@@ -38,7 +38,7 @@ export function Hero() {
           initial={reduce ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-xs tracking-[0.35em] text-maroon uppercase"
+          className="text-xs tracking-[0.35em] text-eyebrow uppercase"
         >
           Luxury weddings · Jaipur & Udaipur
         </motion.p>
@@ -68,7 +68,7 @@ export function Hero() {
           <Magnetic>
             <Link
               href="/enquire"
-              className="group inline-flex items-center gap-3 rounded-full bg-maroon px-8 py-4 text-base font-medium text-primary-foreground shadow-[0_10px_30px_-10px_oklch(0.38_0.12_18/0.6)] transition-colors hover:bg-[oklch(0.33_0.12_18)]"
+              className="group inline-flex items-center gap-3 rounded-full bg-cta px-8 py-4 text-base font-medium text-cta-foreground shadow-[0_10px_30px_-10px_oklch(0.38_0.12_18/0.6)] transition-colors hover:bg-cta/90"
             >
               Plan your wedding
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
