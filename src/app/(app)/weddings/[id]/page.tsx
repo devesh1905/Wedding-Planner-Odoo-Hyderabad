@@ -14,6 +14,7 @@ import { PaymentsTab } from "@/components/weddings/payments-tab";
 import { OverviewTab } from "@/components/weddings/overview-tab";
 import { VendorsTab } from "@/components/weddings/vendors-tab";
 import { SettlementTab } from "@/components/weddings/settlement-tab";
+import { QuoteRequestPanel } from "@/components/quotes/QuoteRequestPanel";
 
 const TABS = [
   { key: "overview", label: "Overview" },
@@ -138,7 +139,7 @@ export default async function WeddingPage({
 
       {tab === "overview" && <OverviewTab wedding={plain} openIssues={wedding.issues.length} />}
       {tab === "plan" && <PlanTab weddingId={wedding.id} tasks={plain.tasks} users={users} hasPlan={wedding.tasks.length > 0} />}
-      {tab === "vendors" && <VendorsTab weddingId={wedding.id} bookings={plain.bookings} />}
+      {tab === "vendors" && <VendorsTab weddingId={wedding.id} bookings={plain.bookings} quotePanel={<QuoteRequestPanel weddingId={wedding.id} guestCount={wedding.guestCount} />} />}
       {tab === "payments" && <PaymentsTab milestones={plain.milestones} contractValue={wedding.contractValue} />}
       {tab === "settlement" && <SettlementTab weddingId={wedding.id} stage={wedding.stage} bookings={plain.bookings} />}
     </>
