@@ -16,7 +16,7 @@ export function Hero() {
   const reduce = useReducedMotion();
 
   return (
-    <section className="relative isolate flex min-h-[92svh] items-center overflow-hidden">
+    <section className="relative isolate flex min-h-[80svh] items-center overflow-hidden">
       <div className="aurora pointer-events-none absolute inset-0 -z-10" aria-hidden>
         <span className="aurora-a" />
         <span className="aurora-b" />
@@ -32,25 +32,28 @@ export function Hero() {
       </div>
 
       <DiyaSlot id="hero" className="absolute top-[26%] right-[9%] z-10" />
-      <div className="mx-auto w-full max-w-6xl px-6 py-28">
+      <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-14">
         <motion.h1
           initial={reduce ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
           data-cast
-          className="text-[clamp(2.6rem,7vw,5.75rem)] leading-[0.98] font-semibold"
+          className="text-[clamp(2.5rem,6vw,4.75rem)] leading-[0.98] font-semibold"
         >
           {/* one thought per line: the rhythm is the message */}
           <span className="block sm:whitespace-nowrap">Three days.</span>
           <span className="block sm:whitespace-nowrap">Four hundred guests.</span>
           <span className="block sm:whitespace-nowrap">Not one thing forgotten.</span>
         </motion.h1>
+        {/* sentence + actions on the left, a real venue on the right (stacked on phones) */}
+        <div className="mt-8 grid items-end gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)]">
+        <div>
         <motion.p
           initial={reduce ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.5 }}
           data-cast
-          className="mt-8 max-w-xl text-lg leading-relaxed text-foreground/75"
+          className="max-w-xl text-lg leading-relaxed text-foreground/75"
         >
           Twenty-five palace weddings a season in Jaipur and Udaipur, each with its own team and a clear view of every rupee.
         </motion.p>
@@ -76,6 +79,35 @@ export function Hero() {
             <Icon name="route" />See how it works
           </a>
         </motion.div>
+        </div>
+
+        <motion.figure
+          initial={reduce ? false : { opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.1, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="squircle overflow-hidden rounded-3xl shadow-[0_30px_60px_-30px_rgb(60_20_10/0.55)] ring-1 ring-marigold/25">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/city-palace-udaipur-night-1600.jpg"
+              srcSet="/brand/city-palace-udaipur-night-960.jpg 960w, /brand/city-palace-udaipur-night-1600.jpg 1600w"
+              sizes="(min-width: 1024px) 30rem, 100vw"
+              width={1600}
+              height={1000}
+              alt="City Palace, Udaipur, lit gold at night and reflected in Lake Pichola"
+              className="aspect-[16/10] w-full object-cover object-[50%_48%]"
+              fetchPriority="high"
+            />
+          </div>
+          {/* the photographer's licence (CC BY-SA 4.0) requires credit */}
+          <figcaption className="mt-2 text-[11px] text-muted-foreground">
+            City Palace, Udaipur · Photo: Ashwin Geet D&apos;Sa,{" "}
+            <a href="https://commons.wikimedia.org/wiki/File:Udaipur_City_Palace_at_Night.jpg" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">
+              CC BY-SA 4.0
+            </a>
+          </figcaption>
+        </motion.figure>
+        </div>
       </div>
     </section>
   );
