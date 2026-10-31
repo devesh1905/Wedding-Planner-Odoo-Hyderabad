@@ -22,7 +22,7 @@ export function MonogramButton() {
 
   return (
     <Link href="/" onClick={onClick} className="flex items-center gap-3" aria-label="The Royal Knot — home">
-      <KnotMark className="h-7 w-12 text-maroon" />
+      <KnotMark mode="ignite" className="h-7 w-14 text-maroon" />
       <span className="font-serif text-2xl font-semibold tracking-tight">The Royal Knot</span>
     </Link>
   );
