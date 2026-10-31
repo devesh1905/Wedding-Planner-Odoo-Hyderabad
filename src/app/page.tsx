@@ -21,9 +21,9 @@ export const metadata: Metadata = {
 };
 
 const PROMISES = [
-  { k: "25", from: 0, v: "weddings a season, never more", d: "So every couple has a lead planner who knows every detail." },
-  { k: "1 day", from: 0, v: "to hear back from us", d: "Every enquiry has an owner the moment it arrives." },
-  { k: "0", from: 9, v: "surprises on the final bill", d: "Every addition is shown to you, priced fairly, before it's billed." },
+  { k: "25", from: 0, v: "weddings a season, never more" },
+  { k: "1 day", from: 0, v: "to hear back from us" },
+  { k: "0", from: 9, v: "surprises on the final bill" },
 ];
 
 // The couples' front door. Staff who are signed in get a quiet link back into KnotOS.
@@ -72,7 +72,6 @@ export default async function Home() {
                 <p className="font-serif text-6xl font-semibold text-eyebrow"><NumberTicker value={p.k} from={p.from} />
                 </p>
                 <p className="mt-2 text-lg font-medium">{p.v}</p>
-                <p className="mt-2 leading-relaxed text-muted-foreground">{p.d}</p>
                 </div>
               </RevealItem>
             ))}

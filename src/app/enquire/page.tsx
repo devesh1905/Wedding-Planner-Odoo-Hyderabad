@@ -17,7 +17,6 @@ export default function EnquirePage() {
               <KnotMark mode="ignite" className="h-10 w-20" />
             </ViewTransition>
           </Link>
-          <p className="text-xs tracking-[0.25em] text-eyebrow uppercase">The Royal Knot · Jaipur & Udaipur</p>
           <h1 className="text-4xl font-semibold text-balance sm:text-5xl">Tell us about your wedding</h1>
           <div className="ornament mx-auto w-32" />
           <p className="text-pretty text-muted-foreground">Share a few details and a planner will call you within 24 hours.</p>

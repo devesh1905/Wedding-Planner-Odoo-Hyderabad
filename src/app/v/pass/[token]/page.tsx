@@ -34,11 +34,12 @@ export default async function VendorPass({ params }: { params: Promise<{ token: 
     <main className="min-h-svh bg-paper">
       <div className="mx-auto flex max-w-md flex-col items-center px-6 py-10 text-center">
         <KnotMark mode="ignite" className="h-12 w-24 text-maroon" />
-        <p className="mt-3 text-xs tracking-[0.25em] text-eyebrow uppercase">The Royal Knot · Gate pass</p>
 
         <section className="squircle mt-6 w-full rounded-3xl border bg-card p-6 shadow-sm">
-          <p className="text-sm text-muted-foreground capitalize">{booking.category.toLowerCase().replace("_", " ")}</p>
-          <h1 className="text-3xl leading-tight font-semibold">{booking.vendor.name}</h1>
+          <h1 className="text-3xl leading-tight font-semibold">
+            {booking.vendor.name}
+            <span className="ml-2 align-middle text-base font-normal text-muted-foreground capitalize">· {booking.category.toLowerCase().replace("_", " ")}</span>
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {w.partner1} & {w.partner2} · {w.venue ? `${w.venue}, ` : ""}
             {w.city}
