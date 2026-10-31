@@ -21,6 +21,7 @@ export function WhatsAppLink({
   message,
   label = "WhatsApp",
   compact,
+  bare,
   className,
 }: {
   phone: string;
@@ -29,6 +30,8 @@ export function WhatsAppLink({
   message: string;
   label?: string;
   compact?: boolean;
+  /** send the message as written, without appending a link */
+  bare?: boolean;
   className?: string;
 }) {
   const digits = phone.replace(/\D/g, "").slice(-10);
@@ -36,7 +39,7 @@ export function WhatsAppLink({
     <button
       type="button"
       onClick={() => {
-        const text = `${message} ${window.location.origin}${path}`;
+        const text = bare ? message : `${message} ${window.location.origin}${path}`;
         window.open(`https://wa.me/91${digits}?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
       }}
       aria-label={compact ? `${label} to +91 ${digits}` : undefined}
