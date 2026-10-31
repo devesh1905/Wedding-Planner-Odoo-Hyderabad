@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { Icon } from "@/components/icons/icon";
 import { getSession } from "@/lib/auth";
 import { ViewTransition } from "react";
 import { Splash } from "@/components/home/splash";
@@ -21,10 +21,10 @@ export const metadata: Metadata = {
 };
 
 const PROMISES = [
-  { k: "25", from: 0, v: "weddings a season, never more", d: "So every couple has a lead planner who knows every detail." },
-  { k: "1 day", from: 0, v: "to hear back from us", d: "Every enquiry has an owner the moment it arrives." },
-  { k: "0", from: 9, v: "surprises on the final bill", d: "Every addition is shown to you, priced fairly, before it's billed." },
-];
+  { icon: "guests", k: "25", from: 0, v: "weddings a season, never more", d: "So every couple has a lead planner who knows every detail." },
+  { icon: "phone", k: "1 day", from: 0, v: "to hear back from us", d: "Every enquiry has an owner the moment it arrives." },
+  { icon: "billCheck", k: "0", from: 9, v: "surprises on the final bill", d: "Every addition is shown to you, priced fairly, before it's billed." },
+] as const;
 
 // The couples' front door. Staff who are signed in get a quiet link back into KnotOS.
 export default async function Home() {
@@ -39,17 +39,18 @@ export default async function Home() {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-5">
           <MonogramButton />
           <nav className="flex items-center gap-6 text-sm">
-            <a href="#journey" className="hidden text-foreground/70 hover:text-foreground sm:inline">
-              How it works
+            <a href="#journey" className="hidden items-center gap-1.5 text-foreground/70 hover:text-foreground sm:inline-flex">
+              <Icon name="route" />How it works
             </a>
-            <a href="#celebrations" className="hidden text-foreground/70 hover:text-foreground sm:inline">
-              Celebrations
+            <a href="#celebrations" className="hidden items-center gap-1.5 text-foreground/70 hover:text-foreground sm:inline-flex">
+              <Icon name="confetti" />Celebrations
             </a>
             <ThemeToggle className="-my-2" />
             <Link
               href={session ? (session.role === "FOUNDER" ? "/dashboard" : "/weddings") : "/login"}
-              className="text-foreground/50 hover:text-foreground"
+              className="inline-flex items-center gap-1.5 text-foreground/50 hover:text-foreground"
             >
+              <Icon name={session ? "grid" : "login"} />
               {session ? "Open KnotOS" : "Team sign in"}
             </Link>
           </nav>
@@ -68,7 +69,7 @@ export default async function Home() {
                 <div data-cast>
                 <p className="font-serif text-6xl font-semibold text-eyebrow"><NumberTicker value={p.k} from={p.from} />
                 </p>
-                <p className="mt-2 text-lg font-medium">{p.v}</p>
+                <p className="mt-2 flex items-center gap-2 text-lg font-medium"><Icon name={p.icon} className="size-5 text-eyebrow" />{p.v}</p>
                 <p className="mt-2 leading-relaxed text-muted-foreground">{p.d}</p>
                 </div>
               </RevealItem>
@@ -99,7 +100,7 @@ export default async function Home() {
                   className="group inline-flex items-center gap-3 rounded-full bg-marigold px-8 py-4 text-base font-medium text-[oklch(0.22_0.05_30)] transition-colors hover:bg-[oklch(0.8_0.15_75)]"
                 >
                   Start your enquiry
-                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                  <Icon name="arrow" className="size-5 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Magnetic>
             </RevealItem>

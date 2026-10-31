@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { LayoutGroup, motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 import { DiyaSlot } from "@/components/cave/cave-mode";
+import { Icon } from "@/components/icons/icon";
 
 // Theme "moodboards" rendered from gradients and pattern — no stock photos.
 const THEMES = [
@@ -125,10 +126,11 @@ export function Celebrations() {
                   type="button"
                   aria-pressed={view === v}
                   onClick={() => choose(v)}
-                  className={`rounded-full px-4 py-1.5 capitalize transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none ${
+                  className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 capitalize transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none ${
                     view === v ? "bg-cta text-cta-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
+                  <Icon name={v === "wander" ? "wander" : "grid"} />
                   {v}
                 </button>
               ))}

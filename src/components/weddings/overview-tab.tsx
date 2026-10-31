@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { AlertTriangle, ArrowRight, ListChecks, Store, Wallet } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { Icon, type IconName } from "@/components/icons/icon";
 import { StagePill } from "@/components/common/stage-pill";
 import { OwnerAvatar } from "@/components/common/owner-avatar";
 import { Amount } from "@/components/common/amount";
@@ -25,14 +26,14 @@ export function OverviewTab({ wedding: w, openIssues }: { wedding: W; openIssues
   return (
     <div className="space-y-6">
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Stat icon={ListChecks} label="Tasks open" value={w.tasks.filter((t) => t.stage !== "DONE").length} sub={overdue ? `${overdue} overdue` : "On track"} danger={overdue > 0} />
-        <Stat icon={Wallet} label="Received from couple" value={<Amount rupees={received} compact />} sub={nextDue ? `Next: ${formatDate(nextDue.dueDate)}` : "All paid"} />
-        <Stat icon={Store} label="Vendors booked" value={w.bookings.length} sub={<Amount rupees={vendorCost} compact className="font-normal" />} />
-        <Stat icon={AlertTriangle} label="Open issues" value={openIssues} sub={openIssues ? "Needs attention" : "None"} danger={openIssues > 0} />
+        <Stat icon="checklist" label="Tasks open" value={w.tasks.filter((t) => t.stage !== "DONE").length} sub={overdue ? `${overdue} overdue` : "On track"} danger={overdue > 0} />
+        <Stat icon="wallet" label="Received from couple" value={<Amount rupees={received} compact />} sub={nextDue ? `Next: ${formatDate(nextDue.dueDate)}` : "All paid"} />
+        <Stat icon="shop" label="Vendors booked" value={w.bookings.length} sub={<Amount rupees={vendorCost} compact className="font-normal" />} />
+        <Stat icon="warning" label="Open issues" value={openIssues} sub={openIssues ? "Needs attention" : "None"} danger={openIssues > 0} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card title="Coming up" href={`/weddings/${w.id}?tab=plan`}>
+        <Card icon="checklist" title="Coming up" href={`/weddings/${w.id}?tab=plan`}>
           {upcoming.length === 0 ? (
             <p className="text-sm text-muted-foreground">No open tasks{w.tasks.length === 0 ? " — the plan is generated when the booking payment is recorded." : "."}</p>
           ) : (
@@ -51,7 +52,7 @@ export function OverviewTab({ wedding: w, openIssues }: { wedding: W; openIssues
           )}
         </Card>
 
-        <Card title="Payments" href={`/weddings/${w.id}?tab=payments`}>
+        <Card icon="card" title="Payments" href={`/weddings/${w.id}?tab=payments`}>
           <ul className="divide-y">
             {w.milestones.map((m) => (
               <li key={m.id} className="flex items-center gap-3 py-2.5 text-sm">
@@ -63,7 +64,7 @@ export function OverviewTab({ wedding: w, openIssues }: { wedding: W; openIssues
           </ul>
         </Card>
 
-        <Card title="Booked vendors" href={`/weddings/${w.id}?tab=vendors`} className="lg:col-span-2">
+        <Card icon="shop" title="Booked vendors" href={`/weddings/${w.id}?tab=vendors`} className="lg:col-span-2">
           {w.bookings.length === 0 ? (
             <p className="text-sm text-muted-foreground">No vendors booked yet.</p>
           ) : (
@@ -85,11 +86,11 @@ export function OverviewTab({ wedding: w, openIssues }: { wedding: W; openIssues
   );
 }
 
-function Stat({ icon: Icon, label, value, sub, danger }: { icon: React.ElementType; label: string; value: React.ReactNode; sub: React.ReactNode; danger?: boolean }) {
+function Stat({ icon, label, value, sub, danger }: { icon: IconName; label: string; value: React.ReactNode; sub: React.ReactNode; danger?: boolean }) {
   return (
     <div className="rounded-2xl border bg-card p-4">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Icon className="size-4" /> {label}
+        <Icon name={icon} className="size-4" /> {label}
       </div>
       <p className="mt-2 font-serif text-3xl font-semibold tabular">{value}</p>
       <p className={cn("text-xs", danger ? "text-rose" : "text-muted-foreground")}>{sub}</p>
@@ -97,11 +98,13 @@ function Stat({ icon: Icon, label, value, sub, danger }: { icon: React.ElementTy
   );
 }
 
-function Card({ title, href, className, children }: { title: string; href: string; className?: string; children: React.ReactNode }) {
+function Card({ icon, title, href, className, children }: { icon: IconName; title: string; href: string; className?: string; children: React.ReactNode }) {
   return (
     <section className={cn("rounded-2xl border bg-card p-5", className)}>
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-xl font-semibold">{title}</h3>
+        <h3 className="flex items-center gap-2 text-xl font-semibold">
+          <Icon name={icon} className="size-4" /> {title}
+        </h3>
         <Link href={href} className="flex items-center gap-1 text-sm text-maroon hover:underline">
           Open <ArrowRight className="size-3.5" />
         </Link>

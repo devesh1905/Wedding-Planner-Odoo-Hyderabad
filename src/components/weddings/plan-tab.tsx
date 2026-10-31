@@ -13,6 +13,7 @@ import {
   useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
+import { Icon, type IconName } from "@/components/icons/icon";
 import { ListChecks, Loader2, Plus, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ type Task = {
   owner: User | null;
 };
 
+const STAGE_ICON: Record<string, IconName> = { TO_PLAN: "planner", IN_PROGRESS: "route", WAITING: "clock", DONE: "check" };
 const STAGES = ["TO_PLAN", "IN_PROGRESS", "WAITING", "DONE"] as const;
 const EVENT_LABEL: Record<string, string> = {
   VENUE: "Venue & guests",
@@ -146,12 +148,15 @@ export function PlanTab({ weddingId, tasks, users, hasPlan }: { weddingId: strin
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <p className="mr-auto text-sm text-muted-foreground">
+        <p className="mr-auto flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Icon name="checklist" className="size-4" />
+          <span>
           <b className="text-foreground tabular">
             {done}/{items.length}
           </b>{" "}
           tasks done
           {overdueCount > 0 && <span className="ml-2 font-medium text-rose">· {overdueCount} overdue</span>}
+          </span>
         </p>
         <Select value={event} onValueChange={setEvent}>
           <SelectTrigger className="w-40">
@@ -207,7 +212,9 @@ function Column({ stage, tasks, users, onReassign }: { stage: string; tasks: Tas
   return (
     <section ref={setNodeRef} className={cn("rounded-2xl bg-muted/60 p-2 transition-colors", isOver && "bg-marigold-soft ring-2 ring-marigold/50")}>
       <header className="flex items-center justify-between px-2 py-2">
-        <h3 className="font-sans text-sm font-semibold">{statusLabel(stage)}</h3>
+        <h3 className="flex items-center gap-1.5 font-sans text-sm font-semibold">
+          <Icon name={STAGE_ICON[stage] ?? "checklist"} className="size-3.5" /> {statusLabel(stage)}
+        </h3>
         <span className="rounded-full bg-background px-2 text-xs text-muted-foreground tabular">{tasks.length}</span>
       </header>
       <div className="flex min-h-20 flex-col gap-2">

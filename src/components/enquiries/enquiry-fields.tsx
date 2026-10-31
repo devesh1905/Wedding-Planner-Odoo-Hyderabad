@@ -70,42 +70,42 @@ export function EnquiryFields({
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <Field label="Partner one" htmlFor="partner1" error={errors.partner1}>
+      <Field label="Partner one" icon="user" htmlFor="partner1" error={errors.partner1}>
         {input("partner1", { placeholder: "Meera", autoComplete: "given-name" })}
       </Field>
-      <Field label="Partner two" htmlFor="partner2" error={errors.partner2}>
+      <Field label="Partner two" icon="heart" htmlFor="partner2" error={errors.partner2}>
         {input("partner2", { placeholder: "Aarav" })}
       </Field>
-      <Field label="Mobile number" htmlFor="phone" error={errors.phone}>
+      <Field label="Mobile number" icon="phone" htmlFor="phone" error={errors.phone}>
         <div className="flex">
           <span className="inline-flex items-center rounded-l-md border border-r-0 bg-muted px-3 text-sm text-muted-foreground">+91</span>
           {input("phone", { inputMode: "tel", placeholder: "98290 12345", className: "rounded-l-none", autoComplete: "tel-national" })}
         </div>
       </Field>
-      <Field label="Email (optional)" htmlFor="email" error={errors.email}>
+      <Field label="Email (optional)" icon="mail" htmlFor="email" error={errors.email}>
         {input("email", { type: "email", placeholder: "meera@example.com", autoComplete: "email" })}
       </Field>
 
-      <Field label="City" error={errors.city} className="sm:col-span-2">
+      <Field label="City" icon="pin" error={errors.city} className="sm:col-span-2">
         <Chips options={CITIES.map((c) => ({ label: c, value: c }))} value={values.city} onChange={(v) => onChange("city", v)} sound={sound} />
       </Field>
 
-      <Field label="Rough wedding date" htmlFor="roughDate" error={errors.roughDate}>
+      <Field label="Rough wedding date" icon="calendar" htmlFor="roughDate" error={errors.roughDate}>
         {input("roughDate", { type: "date", min: new Date().toISOString().slice(0, 10) })}
       </Field>
-      <Field label="Expected guests" htmlFor="guestCount" error={errors.guestCount}>
+      <Field label="Expected guests" icon="guests" htmlFor="guestCount" error={errors.guestCount}>
         {input("guestCount", { type: "number", inputMode: "numeric", min: 1, max: 5000, placeholder: "400" })}
       </Field>
 
-      <Field label="Theme in mind" error={errors.theme} className="sm:col-span-2">
+      <Field label="Theme in mind" icon="palette" error={errors.theme} className="sm:col-span-2">
         <Chips options={THEMES.map((t) => ({ label: t, value: t }))} value={values.theme} onChange={(v) => onChange("theme", v)} sound={sound} />
       </Field>
 
-      <Field label="Maximum budget" error={errors.maxBudget} className="sm:col-span-2">
+      <Field label="Maximum budget" icon="wallet" error={errors.maxBudget} className="sm:col-span-2">
         <Chips options={BUDGETS} value={values.maxBudget} onChange={(v) => onChange("maxBudget", v)} sound={sound} />
       </Field>
 
-      <Field label="Anything else?" htmlFor="notes" error={errors.notes} className="sm:col-span-2">
+      <Field label="Anything else?" icon="notes" htmlFor="notes" error={errors.notes} className="sm:col-span-2">
         <Textarea
           id="notes"
           rows={3}

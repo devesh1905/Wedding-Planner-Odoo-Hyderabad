@@ -3,15 +3,16 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { DiyaSlot } from "@/components/cave/cave-mode";
+import { Icon, type IconName } from "@/components/icons/icon";
 
 const CHAPTERS = [
-  { n: "01", title: "Tell us your dream", body: "A date, a guest count, a feeling. Share it once — your planner calls within a day, and nothing you said gets lost." },
-  { n: "02", title: "Sign from your phone", body: "Your service agreement arrives as a private link. Read it, sign with a finger, done. No printers, no couriers." },
-  { n: "03", title: "A plan in a moment", body: "The day your booking is confirmed, every task from venue to vidaai appears — each with an owner and a date." },
-  { n: "04", title: "Vendors, compared honestly", body: "Three caterers, three different quotes, one clear table. Price per plate, what's included, what isn't." },
-  { n: "05", title: "The big day, held", body: "Minute by minute, every vendor checked in at the gate. If someone runs late, we know before you do." },
-  { n: "06", title: "Every rupee, clear", body: "Extra guests, longer music — added fairly, shown to you for approval. Nothing paid twice, nothing forgotten." },
-];
+  { n: "01", icon: "chat", title: "Tell us your dream", body: "A date, a guest count, a feeling. Share it once — your planner calls within a day, and nothing you said gets lost." },
+  { n: "02", icon: "sign", title: "Sign from your phone", body: "Your service agreement arrives as a private link. Read it, sign with a finger, done. No printers, no couriers." },
+  { n: "03", icon: "checklist", title: "A plan in a moment", body: "The day your booking is confirmed, every task from venue to vidaai appears — each with an owner and a date." },
+  { n: "04", icon: "compare", title: "Vendors, compared honestly", body: "Three caterers, three different quotes, one clear table. Price per plate, what's included, what isn't." },
+  { n: "05", icon: "clock", title: "The big day, held", body: "Minute by minute, every vendor checked in at the gate. If someone runs late, we know before you do." },
+  { n: "06", icon: "wallet", title: "Every rupee, clear", body: "Extra guests, longer music — added fairly, shown to you for approval. Nothing paid twice, nothing forgotten." },
+] satisfies { n: string; icon: IconName; title: string; body: string }[];
 
 /**
  * "Your wedding, chapter by chapter": vertical scrolling drives a horizontal track while the
@@ -51,7 +52,10 @@ export function Chapters() {
               data-cast
               className="group relative flex flex-col justify-between rounded-[28px] border border-border bg-surface p-8 text-foreground shadow-[0_1px_0_var(--border)] md:h-[22rem] md:w-[24rem]"
             >
-              <span className="font-serif text-7xl leading-none font-semibold text-marigold/80 transition-colors group-hover:text-marigold">{c.n}</span>
+              <div className="flex items-start justify-between">
+                <span className="font-serif text-7xl leading-none font-semibold text-marigold/80 transition-colors group-hover:text-marigold">{c.n}</span>
+                <Icon name={c.icon} className="size-10 text-eyebrow/80 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110" />
+              </div>
               <div>
                 <h3 className="text-3xl font-semibold">{c.title}</h3>
                 <p className="mt-3 leading-relaxed text-muted-foreground">{c.body}</p>

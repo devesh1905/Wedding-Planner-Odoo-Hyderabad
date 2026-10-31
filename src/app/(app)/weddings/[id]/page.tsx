@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CalendarDays, MapPin, Palette, Radio, Users } from "lucide-react";
+import { Icon, type IconName } from "@/components/icons/icon";
 import { db } from "@/lib/db";
 import { requirePageUser } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -18,14 +18,14 @@ import { SettlementTab } from "@/components/weddings/settlement-tab";
 import { QuoteRequestPanel } from "@/components/quotes/QuoteRequestPanel";
 import { HoursTab } from "@/components/weddings/hours-tab";
 
-const TABS = [
-  { key: "overview", label: "Overview" },
-  { key: "plan", label: "Plan" },
-  { key: "vendors", label: "Vendors & quotes" },
-  { key: "payments", label: "Payments" },
-  { key: "settlement", label: "Settlement" },
-  { key: "hours", label: "Team hours" },
-] as const;
+const TABS: readonly { key: string; label: string; icon: IconName }[] = [
+  { key: "overview", label: "Overview", icon: "grid" },
+  { key: "plan", label: "Plan", icon: "checklist" },
+  { key: "vendors", label: "Vendors & quotes", icon: "shop" },
+  { key: "payments", label: "Payments", icon: "card" },
+  { key: "settlement", label: "Settlement", icon: "wallet" },
+  { key: "hours", label: "Team hours", icon: "clock" },
+];
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -87,18 +87,18 @@ export default async function WeddingPage({
             </h1>
             <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted-foreground">
               <span className="flex items-center gap-1.5">
-                <CalendarDays className="size-4" /> {formatDate(wedding.startDate)} – {formatDate(wedding.endDate)} · {relativeDays(wedding.startDate)}
+                <Icon name="calendar" className="size-4" /> {formatDate(wedding.startDate)} – {formatDate(wedding.endDate)} · {relativeDays(wedding.startDate)}
               </span>
               <span className="flex items-center gap-1.5">
-                <MapPin className="size-4" /> {wedding.venue ? `${wedding.venue}, ` : ""}
+                <Icon name="pin" className="size-4" /> {wedding.venue ? `${wedding.venue}, ` : ""}
                 {wedding.city}
               </span>
               <span className="flex items-center gap-1.5">
-                <Users className="size-4" /> {wedding.guestCount} guests
+                <Icon name="guests" className="size-4" /> {wedding.guestCount} guests
               </span>
               {wedding.theme && (
                 <span className="flex items-center gap-1.5">
-                  <Palette className="size-4" /> {wedding.theme}
+                  <Icon name="palette" className="size-4" /> {wedding.theme}
                 </span>
               )}
             </div>
@@ -115,7 +115,7 @@ export default async function WeddingPage({
               <CopyLinkButton path={`/p/${wedding.portalToken}`} label="Couple portal link" />
               <Button asChild size="sm">
                 <Link href={`/weddings/${wedding.id}/live`}>
-                  <Radio /> Control room
+                  <Icon name="radar" className="size-4" /> Control room
                 </Link>
               </Button>
             </div>
@@ -129,10 +129,11 @@ export default async function WeddingPage({
               href={`/weddings/${wedding.id}?tab=${t.key}`}
               scroll={false}
               className={cn(
-                "border-b-2 px-3 py-2.5 text-sm font-medium whitespace-nowrap transition-colors",
+                "inline-flex items-center gap-1.5 border-b-2 px-3 py-2.5 text-sm font-medium whitespace-nowrap transition-colors",
                 tab === t.key ? "border-maroon text-maroon" : "border-transparent text-muted-foreground hover:text-foreground",
               )}
             >
+              <Icon name={t.icon} className="size-4" />
               {t.label}
             </Link>
           ))}

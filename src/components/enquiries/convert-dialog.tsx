@@ -81,22 +81,22 @@ export function ConvertDialog({ enquiry, trigger, onDone }: Props) {
             ))}
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="First event day" error={errors.startDate}>
+            <Field label="First event day" icon="calendar" error={errors.startDate}>
               <Input type="date" value={v.startDate} onChange={set("startDate")} />
             </Field>
-            <Field label="Last event day" error={errors.endDate}>
+            <Field label="Last event day" icon="calendar" error={errors.endDate}>
               <Input type="date" value={v.endDate} onChange={set("endDate")} min={v.startDate} />
             </Field>
-            <Field label="City" error={errors.city}>
+            <Field label="City" icon="pin" error={errors.city}>
               <Input value={v.city} onChange={set("city")} placeholder="Udaipur" />
             </Field>
-            <Field label="Venue" error={errors.venue}>
+            <Field label="Venue" icon="event" error={errors.venue}>
               <Input value={v.venue} onChange={set("venue")} placeholder="City Palace" />
             </Field>
-            <Field label="Guests" error={errors.guestCount}>
+            <Field label="Guests" icon="guests" error={errors.guestCount}>
               <Input type="number" inputMode="numeric" value={v.guestCount} onChange={set("guestCount")} />
             </Field>
-            <Field label="Contract value (₹)" error={errors.contractValue} hint={enquiry.maxBudget ? `Budget up to ${formatINR(enquiry.maxBudget)}` : undefined}>
+            <Field label="Contract value (₹)" icon="money" error={errors.contractValue} hint={enquiry.maxBudget ? `Budget up to ${formatINR(enquiry.maxBudget)}` : undefined}>
               <Input type="number" inputMode="numeric" value={v.contractValue} onChange={set("contractValue")} placeholder="4500000" />
             </Field>
           </div>

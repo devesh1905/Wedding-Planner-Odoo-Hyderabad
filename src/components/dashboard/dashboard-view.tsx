@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertTriangle, CalendarHeart, IndianRupee, TrendingUp, Wallet } from "lucide-react";
+import { Icon, type IconName } from "@/components/icons/icon";
 import type { SeasonReport } from "@/lib/reports";
 import { Amount } from "@/components/common/amount";
 import { StagePill } from "@/components/common/stage-pill";
@@ -20,23 +20,25 @@ export function DashboardView({ report: r, readOnly }: { report: SeasonReport; r
   return (
     <div className="space-y-6">
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        <Kpi icon={CalendarHeart} label="Active weddings" value={r.kpi.activeWeddings} sub={`${r.rows.length} this season`} />
-        <Kpi icon={IndianRupee} label="Season revenue" value={formatINRCompact(r.kpi.seasonRevenue)} sub={`${formatINRCompact(r.kpi.collectedInPeriod)} collected ${periodLabel(r.period)}`} />
+        <Kpi icon="heart" label="Active weddings" value={r.kpi.activeWeddings} sub={`${r.rows.length} this season`} />
+        <Kpi icon="money" label="Season revenue" value={formatINRCompact(r.kpi.seasonRevenue)} sub={`${formatINRCompact(r.kpi.collectedInPeriod)} collected ${periodLabel(r.period)}`} />
         <Kpi
-          icon={TrendingUp}
+          icon="chart"
           label="Season profit"
           value={<span className={r.kpi.seasonProfit < 0 ? "text-rose" : "text-teal"}>{formatINRCompact(r.kpi.seasonProfit)}</span>}
           sub={`${pct(r.kpi.avgMargin)} avg margin · ${r.kpi.lossMaking} loss-making · ${r.kpi.costedWeddings} weddings with vendors booked`}
           danger={r.kpi.lossMaking > 0}
         />
-        <Kpi icon={Wallet} label="Due in next 4 weeks" value={formatINRCompact(r.kpi.dueIn4Weeks)} sub={`${r.overduePayments.length} payments overdue`} danger={r.overduePayments.length > 0} />
-        <Kpi icon={AlertTriangle} label="Open issues" value={r.kpi.openIssues} sub={r.kpi.openIssues ? "From day-of control rooms" : "All clear"} danger={r.kpi.openIssues > 0} />
+        <Kpi icon="wallet" label="Due in next 4 weeks" value={formatINRCompact(r.kpi.dueIn4Weeks)} sub={`${r.overduePayments.length} payments overdue`} danger={r.overduePayments.length > 0} />
+        <Kpi icon="warning" label="Open issues" value={r.kpi.openIssues} sub={r.kpi.openIssues ? "From day-of control rooms" : "All clear"} danger={r.kpi.openIssues > 0} />
       </div>
 
       <section className="rounded-2xl border bg-card p-5">
         <div className="mb-2 flex flex-wrap items-end justify-between gap-2">
           <div>
-            <h2 className="text-2xl font-semibold">Profit by wedding</h2>
+            <h2 className="flex items-center gap-2 text-2xl font-semibold">
+            <Icon name="chart" className="size-5" /> Profit by wedding
+          </h2>
             <p className="text-sm text-muted-foreground">Revenue (contract + add-ons) − vendor costs (agreed + extras) − team hours × hourly cost</p>
           </div>
           <div className="flex gap-3 text-xs text-muted-foreground">
@@ -53,7 +55,9 @@ export function DashboardView({ report: r, readOnly }: { report: SeasonReport; r
 
       <div className="grid gap-6 xl:grid-cols-3">
         <section className="rounded-2xl border bg-card p-5">
-          <h2 className="text-2xl font-semibold">Cash flow ahead</h2>
+          <h2 className="flex items-center gap-2 text-2xl font-semibold">
+            <Icon name="wallet" className="size-5" /> Cash flow ahead
+          </h2>
           <p className="mb-4 text-sm text-muted-foreground">Client payments due in vs vendor balances due out</p>
           <div className="space-y-4">
             {r.horizon.map((h) => {
@@ -73,14 +77,18 @@ export function DashboardView({ report: r, readOnly }: { report: SeasonReport; r
         </section>
 
         <section className="rounded-2xl border bg-card p-5">
-          <h2 className="text-2xl font-semibold">Vendor scorecards</h2>
+          <h2 className="flex items-center gap-2 text-2xl font-semibold">
+            <Icon name="star" className="size-5" /> Vendor scorecards
+          </h2>
           <p className="mb-4 text-sm text-muted-foreground">Punctuality from day-of check-ins · bill accuracy from bill matching</p>
           <ScoreList title="Most reliable" items={best} />
           {worst.length > 0 && <ScoreList title="Often late" items={worst} danger />}
         </section>
 
         <section className="rounded-2xl border bg-card p-5">
-          <h2 className="text-2xl font-semibold">Needs attention</h2>
+          <h2 className="flex items-center gap-2 text-2xl font-semibold">
+            <Icon name="warning" className="size-5" /> Needs attention
+          </h2>
           <p className="mb-4 text-sm text-muted-foreground">Overdue client payments</p>
           {r.overduePayments.length === 0 ? (
             <p className="text-sm text-teal">Nothing overdue.</p>
@@ -106,7 +114,9 @@ export function DashboardView({ report: r, readOnly }: { report: SeasonReport; r
 
       <section className="overflow-hidden rounded-2xl border bg-card">
         <div className="flex items-center justify-between p-5">
-          <h2 className="text-2xl font-semibold">All weddings this season</h2>
+          <h2 className="flex items-center gap-2 text-2xl font-semibold">
+            <Icon name="heart" className="size-5" /> All weddings this season
+          </h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[900px] text-sm">
@@ -165,11 +175,11 @@ function periodLabel(p: string) {
   return p === "today" ? "today" : p === "week" ? "this week" : p === "month" ? "this month" : "this season";
 }
 
-function Kpi({ icon: Icon, label, value, sub, danger }: { icon: React.ElementType; label: string; value: React.ReactNode; sub: string; danger?: boolean }) {
+function Kpi({ icon, label, value, sub, danger }: { icon: IconName; label: string; value: React.ReactNode; sub: string; danger?: boolean }) {
   return (
     <div className="rounded-2xl border bg-card p-4">
       <p className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Icon className="size-4" /> {label}
+        <Icon name={icon} className="size-4" /> {label}
       </p>
       <p className="mt-2 font-serif text-3xl font-semibold tabular">{value}</p>
       <p className={cn("text-xs", danger ? "text-rose" : "text-muted-foreground")}>{sub}</p>

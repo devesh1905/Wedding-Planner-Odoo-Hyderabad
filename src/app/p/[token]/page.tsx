@@ -2,6 +2,7 @@ import { ViewTransition } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CalendarHeart, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Icon } from "@/components/icons/icon";
 import { db } from "@/lib/db";
 import { formatDate, formatINR, relativeDays } from "@/lib/format";
 import { extraClientCharge } from "@/lib/settlement";
@@ -70,7 +71,7 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
 
         {pendingAddons.length > 0 && (
           <RevealItem><section className="rounded-2xl border-2 border-marigold bg-card p-5">
-            <h2 className="text-2xl font-semibold">Please review add-ons</h2>
+            <h2 className="flex items-center gap-2 text-2xl font-semibold"><Icon name="billCheck" className="size-6 text-eyebrow" />Please review add-ons</h2>
             <p className="mb-3 text-sm text-muted-foreground">Things added on the day beyond the agreed plan.</p>
             {pendingAddons.map((m) => (
               <div key={m.id} className="space-y-2">
@@ -100,7 +101,7 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
 
         <RevealItem><section className="rounded-2xl border bg-card p-5">
           <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-2xl font-semibold">Planning progress</h2>
+            <h2 className="flex items-center gap-2 text-2xl font-semibold"><Icon name="checklist" className="size-6 text-eyebrow" />Planning progress</h2>
             <span className="font-semibold tabular">{pct}%</span>
           </div>
           <Progress value={pct} className="h-2" />
@@ -111,7 +112,7 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
 
         {w.events.length > 0 && (
           <RevealItem><section className="rounded-2xl border bg-card p-5">
-            <h2 className="mb-3 text-2xl font-semibold">Your celebrations</h2>
+            <h2 className="mb-3 flex items-center gap-2 text-2xl font-semibold"><Icon name="event" className="size-6 text-eyebrow" />Your celebrations</h2>
             <ul className="space-y-3">
               {w.events.map((e) => (
                 <li key={e.id} className="flex items-center gap-3">
@@ -132,7 +133,7 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
         )}
 
         <RevealItem><section className="rounded-2xl border bg-card p-5">
-          <h2 className="mb-3 text-2xl font-semibold">Payment schedule</h2>
+          <h2 className="mb-3 flex items-center gap-2 text-2xl font-semibold"><Icon name="wallet" className="size-6 text-eyebrow" />Payment schedule</h2>
           <ol className="space-y-3">
             {w.milestones.map((m) => {
               const overdue = m.status === "DUE" && m.dueDate < new Date();

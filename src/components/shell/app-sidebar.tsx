@@ -2,17 +2,17 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarHeart, Inbox, LayoutDashboard, LogOut, Store } from "lucide-react";
+import { Icon, type IconName } from "@/components/icons/icon";
 import { cn } from "@/lib/utils";
 import { initials } from "@/lib/format";
 import { KnotMark } from "@/components/home/knot-mark";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 
-const NAV = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, founderOnly: true },
-  { href: "/enquiries", label: "Enquiries", icon: Inbox },
-  { href: "/weddings", label: "Weddings", icon: CalendarHeart },
-  { href: "/vendors", label: "Vendors", icon: Store },
+const NAV: { href: string; label: string; icon: IconName; founderOnly?: boolean }[] = [
+  { href: "/dashboard", label: "Dashboard", icon: "chart", founderOnly: true },
+  { href: "/enquiries", label: "Enquiries", icon: "inbox" },
+  { href: "/weddings", label: "Weddings", icon: "heart" },
+  { href: "/vendors", label: "Vendors", icon: "shop" },
 ];
 
 export function AppSidebar({ user, onNavigate }: { user: { name: string; role: string }; onNavigate?: () => void }) {
@@ -50,7 +50,7 @@ export function AppSidebar({ user, onNavigate }: { user: { name: string; role: s
                   : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
               )}
             >
-              <n.icon className="size-4" />
+              <Icon name={n.icon} className="size-4" />
               {n.label}
             </Link>
           );
@@ -67,7 +67,7 @@ export function AppSidebar({ user, onNavigate }: { user: { name: string; role: s
         </div>
         <ThemeToggle className="size-8 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" />
         <button onClick={logout} className="rounded-md p-1.5 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" aria-label="Sign out">
-          <LogOut className="size-4" />
+          <Icon name="logout" className="size-4" />
         </button>
       </div>
     </div>

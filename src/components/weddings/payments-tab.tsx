@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { StagePill } from "@/components/common/stage-pill";
 import { Amount } from "@/components/common/amount";
+import { Icon, type IconName } from "@/components/icons/icon";
 import { Field } from "@/components/common/field";
 import { api, ApiError } from "@/lib/api-client";
 import { formatDate, formatINR, relativeDays } from "@/lib/format";
@@ -70,13 +71,15 @@ export function PaymentsTab({ milestones, contractValue }: { milestones: Milesto
       </ol>
 
       <aside className="h-fit space-y-3 rounded-2xl border bg-card p-5">
-        <h3 className="text-xl font-semibold">Client account</h3>
-        <Row label="Contract" value={contractValue} />
-        <Row label="Add-ons billed" value={addons} />
-        <Row label="Total billable" value={total} strong />
-        <Row label="Received" value={received} tone="text-teal" />
+        <h3 className="flex items-center gap-2 text-xl font-semibold">
+          <Icon name="wallet" className="size-4" /> Client account
+        </h3>
+        <Row icon="doc" label="Contract" value={contractValue} />
+        <Row icon="add" label="Add-ons billed" value={addons} />
+        <Row icon="bill" label="Total billable" value={total} strong />
+        <Row icon="check" label="Received" value={received} tone="text-teal" />
         <div className="border-t pt-3">
-          <Row label="Outstanding" value={total - received} strong tone={total - received > 0 ? "text-rose" : "text-teal"} />
+          <Row icon="warning" label="Outstanding" value={total - received} strong tone={total - received > 0 ? "text-rose" : "text-teal"} />
         </div>
       </aside>
 
@@ -85,10 +88,12 @@ export function PaymentsTab({ milestones, contractValue }: { milestones: Milesto
   );
 }
 
-function Row({ label, value, strong, tone }: { label: string; value: number; strong?: boolean; tone?: string }) {
+function Row({ icon, label, value, strong, tone }: { icon: IconName; label: string; value: number; strong?: boolean; tone?: string }) {
   return (
     <div className="flex items-center justify-between text-sm">
-      <span className="text-muted-foreground">{label}</span>
+      <span className="flex items-center gap-1.5 text-muted-foreground">
+        <Icon name={icon} className="size-3.5" /> {label}
+      </span>
       <Amount rupees={value} className={cn(strong && "text-base font-semibold", tone)} />
     </div>
   );

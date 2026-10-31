@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Icon, type IconName } from "@/components/icons/icon";
 import { CheckCircle2, FileText, Loader2, PartyPopper, Plus, Receipt, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -74,10 +75,10 @@ export function SettlementTab({ weddingId, stage, bookings }: { weddingId: strin
   return (
     <div className="space-y-6">
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Kpi label="Agreed with vendors" value={sum((t) => t.expected - t.extras)} />
-        <Kpi label="Extras" value={sum((t) => t.extras)} />
-        <Kpi label="Paid to vendors" value={sum((t) => t.paid)} tone="text-teal" />
-        <Kpi label="Still to pay" value={sum((t) => Math.max(t.balance, 0))} tone={allPaid ? "text-teal" : "text-rose"} />
+        <Kpi icon="doc" label="Agreed with vendors" value={sum((t) => t.expected - t.extras)} />
+        <Kpi icon="add" label="Extras" value={sum((t) => t.extras)} />
+        <Kpi icon="check" label="Paid to vendors" value={sum((t) => t.paid)} tone="text-teal" />
+        <Kpi icon="warning" label="Still to pay" value={sum((t) => Math.max(t.balance, 0))} tone={allPaid ? "text-teal" : "text-rose"} />
       </div>
 
       {(unbilled.length > 0 || unbilledTotal > 0) && (
@@ -103,12 +104,12 @@ export function SettlementTab({ weddingId, stage, bookings }: { weddingId: strin
           <table className="w-full min-w-[860px] text-sm">
             <thead className="bg-muted/50 text-left text-xs text-muted-foreground">
               <tr>
-                <th className="p-3 font-medium">Vendor</th>
-                <th className="p-3 text-right font-medium">Agreed</th>
-                <th className="p-3 text-right font-medium">Extras</th>
-                <th className="p-3 font-medium">Vendor bill</th>
-                <th className="p-3 text-right font-medium">Paid</th>
-                <th className="p-3 text-right font-medium">Balance</th>
+                <th className="p-3 font-medium"><Th icon="shop">Vendor</Th></th>
+                <th className="p-3 text-right font-medium"><Th icon="doc" right>Agreed</Th></th>
+                <th className="p-3 text-right font-medium"><Th icon="add" right>Extras</Th></th>
+                <th className="p-3 font-medium"><Th icon="bill">Vendor bill</Th></th>
+                <th className="p-3 text-right font-medium"><Th icon="check" right>Paid</Th></th>
+                <th className="p-3 text-right font-medium"><Th icon="wallet" right>Balance</Th></th>
                 <th className="p-3" />
               </tr>
             </thead>
@@ -204,10 +205,20 @@ export function SettlementTab({ weddingId, stage, bookings }: { weddingId: strin
   );
 }
 
-function Kpi({ label, value, tone }: { label: string; value: number; tone?: string }) {
+function Th({ icon, right, children }: { icon: IconName; right?: boolean; children: React.ReactNode }) {
+  return (
+    <span className={cn("inline-flex items-center gap-1.5", right && "justify-end")}>
+      <Icon name={icon} className="size-3.5" /> {children}
+    </span>
+  );
+}
+
+function Kpi({ icon, label, value, tone }: { icon: IconName; label: string; value: number; tone?: string }) {
   return (
     <div className="rounded-2xl border bg-card p-4">
-      <p className="text-sm text-muted-foreground">{label}</p>
+      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Icon name={icon} className="size-4" /> {label}
+      </p>
       <Amount rupees={value} className={cn("mt-1 block font-serif text-3xl font-semibold", tone)} />
     </div>
   );

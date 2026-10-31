@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Icon } from "@/components/icons/icon";
 import { Clock, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -71,11 +72,15 @@ export function HoursTab({ weddingId, logs, users, currentUserId }: { weddingId:
       <section className="space-y-4">
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-2xl border bg-card p-4">
-            <p className="text-sm text-muted-foreground">Planning hours</p>
+            <p className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Icon name="clock" className="size-4" /> Planning hours
+            </p>
             <p className="mt-1 font-serif text-3xl font-semibold tabular">{totalHours.toLocaleString("en-IN", { maximumFractionDigits: 1 })} h</p>
           </div>
           <div className="rounded-2xl border bg-card p-4">
-            <p className="text-sm text-muted-foreground">Team cost (used in profit)</p>
+            <p className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Icon name="money" className="size-4" /> Team cost (used in profit)
+            </p>
             <Amount rupees={totalCost} className="mt-1 block font-serif text-3xl font-semibold" />
           </div>
         </div>
@@ -126,7 +131,9 @@ export function HoursTab({ weddingId, logs, users, currentUserId }: { weddingId:
 
       <aside className="space-y-4">
         <form onSubmit={add} noValidate className="space-y-4 rounded-2xl border bg-card p-5">
-          <h3 className="text-xl font-semibold">Log hours</h3>
+          <h3 className="flex items-center gap-2 text-xl font-semibold">
+            <Icon name="add" className="size-4" /> Log hours
+          </h3>
           <Field label="Team member" error={errors.userId}>
             <Select value={v.userId} onValueChange={(userId) => setV({ ...v, userId })}>
               <SelectTrigger className="w-full">
@@ -160,7 +167,9 @@ export function HoursTab({ weddingId, logs, users, currentUserId }: { weddingId:
 
         {byPerson.length > 0 && (
           <div className="rounded-2xl border bg-card p-5">
-            <h3 className="mb-3 text-xl font-semibold">By person</h3>
+            <h3 className="mb-3 flex items-center gap-2 text-xl font-semibold">
+              <Icon name="user" className="size-4" /> By person
+            </h3>
             <ul className="space-y-2 text-sm">
               {byPerson.map((u) => (
                 <li key={u.id} className="flex items-center gap-2">

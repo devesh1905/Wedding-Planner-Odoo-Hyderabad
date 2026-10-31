@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ViewTransition } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { Icon } from "@/components/icons/icon";
 import { Magnetic } from "./magnetic";
 import { KnotMark } from "./knot-mark";
 import { DiyaSlot } from "@/components/cave/cave-mode";
@@ -74,12 +74,12 @@ export function Hero() {
               className="group inline-flex items-center gap-3 rounded-full bg-cta px-8 py-4 text-base font-medium text-cta-foreground shadow-[0_10px_30px_-10px_oklch(0.38_0.12_18/0.6)] transition-colors hover:bg-cta/90"
             >
               Plan your wedding
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+              <Icon name="arrow" className="size-5 transition-transform group-hover:translate-x-1" />
             </Link>
             </ViewTransition>
           </Magnetic>
-          <a href="#journey" className="text-sm font-medium text-foreground/70 underline-offset-4 hover:text-foreground hover:underline">
-            See how it works
+          <a href="#journey" className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground/70 underline-offset-4 hover:text-foreground hover:underline">
+            <Icon name="route" />See how it works
           </a>
         </motion.div>
       </div>
