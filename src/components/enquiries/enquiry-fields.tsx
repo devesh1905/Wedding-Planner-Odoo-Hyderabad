@@ -143,7 +143,7 @@ function Chips({
               onChange(on ? "" : o.value);
             }}
             className={cn(
-              "rounded-full border px-3.5 py-1.5 text-sm transition-colors",
+              "rounded-full border px-3.5 py-1.5 text-sm transition-[color,background-color,border-color,transform] duration-200 active:scale-95",
               on ? "border-maroon bg-maroon text-primary-foreground" : "bg-card hover:border-maroon/40 hover:bg-maroon-soft",
             )}
           >

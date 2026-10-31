@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { formatDateTime } from "@/lib/format";
 import { SignForm } from "./sign-form";
+import { WaxSeal } from "@/components/portal/wax-seal";
 
 export const metadata: Metadata = { title: { absolute: "Your service agreement · The Royal Knot" }, robots: { index: false } };
 
@@ -33,9 +34,10 @@ export default async function SignPage({ params }: { params: Promise<{ token: st
           {agreement.body}
         </article>
 
-        <div className="mt-6">
+        <div className={agreement.status === "SIGNED" ? "mt-14" : "mt-6"}>
           {agreement.status === "SIGNED" ? (
-            <div className="rounded-2xl border bg-teal-soft/60 p-6 text-center">
+            <div className="relative rounded-2xl border bg-teal-soft/60 p-6 pt-14 text-center">
+              <WaxSeal className="absolute -top-10 left-1/2 size-20 -translate-x-1/2" />
               <p className="font-serif text-2xl font-semibold text-teal">Signed — thank you!</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 Signed by {agreement.signerName} on {agreement.signedAt && formatDateTime(agreement.signedAt)}

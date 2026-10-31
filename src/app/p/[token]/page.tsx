@@ -1,7 +1,7 @@
 import { ViewTransition } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { CalendarHeart, Check, MapPin, MessageCircle, Phone } from "lucide-react";
+import { CalendarHeart, MapPin, MessageCircle, Phone } from "lucide-react";
 import { db } from "@/lib/db";
 import { formatDate, formatINR, relativeDays } from "@/lib/format";
 import { extraClientCharge } from "@/lib/settlement";
@@ -9,6 +9,9 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { ApproveAddons } from "./approve-addons";
 import { SoundToggle } from "./sound-toggle";
+import { Reveal, RevealItem } from "@/components/home/reveal";
+import { FlipCountdown } from "@/components/portal/flip-countdown";
+import { CheckDraw } from "@/components/portal/check-draw";
 
 export const metadata: Metadata = { title: { absolute: "Your wedding · The Royal Knot" }, robots: { index: false } };
 
@@ -36,7 +39,7 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
   return (
     <ViewTransition enter="page-rise" exit="page-fade" default="none">
     <main className="min-h-svh bg-paper">
-      <div className="mx-auto max-w-xl space-y-5 px-4 py-8">
+      <Reveal className="mx-auto max-w-xl space-y-5 px-4 py-8">
         <header className="space-y-3 text-center">
           <div className="flex justify-end">
             <SoundToggle />
@@ -52,10 +55,10 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
           </p>
         </header>
 
-        <section className="rounded-3xl bg-maroon p-6 text-center text-primary-foreground shadow-lg">
+        <RevealItem><section className="rounded-3xl bg-maroon p-6 text-center text-primary-foreground shadow-lg">
           {days > 0 ? (
             <>
-              <p className="font-serif text-6xl font-semibold tabular">{days}</p>
+              <p><FlipCountdown days={days} /></p>
               <p className="text-sm opacity-80">days to go · {formatDate(w.startDate)}</p>
             </>
           ) : days > -3 ? (
@@ -63,10 +66,10 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
           ) : (
             <p className="font-serif text-3xl font-semibold">Married {relativeDays(w.startDate)} 💛</p>
           )}
-        </section>
+        </section></RevealItem>
 
         {pendingAddons.length > 0 && (
-          <section className="rounded-2xl border-2 border-marigold bg-card p-5">
+          <RevealItem><section className="rounded-2xl border-2 border-marigold bg-card p-5">
             <h2 className="text-2xl font-semibold">Please review add-ons</h2>
             <p className="mb-3 text-sm text-muted-foreground">Things added on the day beyond the agreed plan.</p>
             {pendingAddons.map((m) => (
@@ -86,7 +89,7 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
                 <ApproveAddons token={token} milestoneId={m.id} />
               </div>
             ))}
-          </section>
+          </section></RevealItem>
         )}
 
         {agreement && agreement.status !== "SIGNED" && (
@@ -95,7 +98,7 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
           </a>
         )}
 
-        <section className="rounded-2xl border bg-card p-5">
+        <RevealItem><section className="rounded-2xl border bg-card p-5">
           <div className="mb-2 flex items-center justify-between">
             <h2 className="text-2xl font-semibold">Planning progress</h2>
             <span className="font-semibold tabular">{pct}%</span>
@@ -104,10 +107,10 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
           <p className="mt-2 text-sm text-muted-foreground">
             {w.tasks.length ? `${done} of ${w.tasks.length} planning tasks done by your team` : "Your plan starts as soon as the booking payment is received."}
           </p>
-        </section>
+        </section></RevealItem>
 
         {w.events.length > 0 && (
-          <section className="rounded-2xl border bg-card p-5">
+          <RevealItem><section className="rounded-2xl border bg-card p-5">
             <h2 className="mb-3 text-2xl font-semibold">Your celebrations</h2>
             <ul className="space-y-3">
               {w.events.map((e) => (
@@ -125,10 +128,10 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
                 </li>
               ))}
             </ul>
-          </section>
+          </section></RevealItem>
         )}
 
-        <section className="rounded-2xl border bg-card p-5">
+        <RevealItem><section className="rounded-2xl border bg-card p-5">
           <h2 className="mb-3 text-2xl font-semibold">Payment schedule</h2>
           <ol className="space-y-3">
             {w.milestones.map((m) => {
@@ -141,7 +144,7 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
                       m.status === "PAID" ? "border-teal bg-teal text-white" : overdue ? "border-rose" : "border-marigold",
                     )}
                   >
-                    {m.status === "PAID" && <Check className="size-4" />}
+                    {m.status === "PAID" && <CheckDraw delay={0.15} />}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-medium">{m.label}</span>
@@ -154,10 +157,10 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
               );
             })}
           </ol>
-        </section>
+        </section></RevealItem>
 
         {w.leadPlanner && (
-          <section className="flex items-center gap-3 rounded-2xl border bg-card p-5">
+          <RevealItem><section className="flex items-center gap-3 rounded-2xl border bg-card p-5">
             <div className="min-w-0 flex-1">
               <p className="text-xs text-muted-foreground">Your planner</p>
               <p className="font-serif text-xl font-semibold">{w.leadPlanner.name}</p>
@@ -168,9 +171,9 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
             <a href="tel:+911412345678" className="rounded-full bg-maroon p-2.5 text-primary-foreground" aria-label="Call The Royal Knot">
               <Phone className="size-5" />
             </a>
-          </section>
+          </section></RevealItem>
         )}
-      </div>
+      </Reveal>
     </main>
     </ViewTransition>
   );
