@@ -4,20 +4,24 @@ import { startTransition, useState, ViewTransition } from "react";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/frontend/components/ui/button";
 import { EnquiryFields, emptyEnquiry, toPayload, type EnquiryValues } from "@/frontend/components/enquiries/enquiry-fields";
+import { PackageBuilder, type PackageSelection } from "@/frontend/components/enquiries/package-builder";
+import { DEFAULT_PACKAGE } from "@/shared/package-builder";
 import { enquiryInput } from "@/shared/validation/enquiry";
 import { api, ApiError } from "@/frontend/lib/api-client";
 import { cue } from "@/frontend/lib/sound";
 import { petalShower } from "@/frontend/components/home/petals";
 
-export function EnquireForm() {
-  const [values, setValues] = useState<EnquiryValues>(emptyEnquiry);
+export function EnquireForm({ initialTheme }: { initialTheme?: string }) {
+  const [values, setValues] = useState<EnquiryValues>({ ...emptyEnquiry, theme: initialTheme ?? "" });
+  const [pkg, setPkg] = useState<PackageSelection>(DEFAULT_PACKAGE);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [pending, setPending] = useState(false);
   const [reference, setReference] = useState<string>();
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const payload = toPayload(values);
+    // the server recomputes the estimate from this selection
+    const payload = { ...toPayload(values), planning: pkg.planning, events: pkg.events, services: pkg.services };
     // Same schema as the server, so users see errors before the round trip.
     const check = enquiryInput.safeParse(payload);
     if (!check.success) {
@@ -60,6 +64,7 @@ export function EnquireForm() {
     <ViewTransition name="enquiry-card" share="morph" default="none">
     <form onSubmit={submit} noValidate className="squircle space-y-8 rounded-2xl border bg-card p-5 shadow-sm sm:p-8">
       <EnquiryFields sound values={values} errors={errors} onChange={(k, v) => setValues((s) => ({ ...s, [k]: v }))} />
+      <PackageBuilder sound value={pkg} onChange={setPkg} guests={Number(values.guestCount) || null} />
       {errors.form && <p role="alert" className="rounded-lg bg-rose-soft px-3 py-2.5 text-sm text-rose">{errors.form}</p>}
       <Button type="submit" size="lg" className="squircle h-12 w-full rounded-xl text-base" disabled={pending} aria-busy={pending}>
         {pending && <Loader2 className="animate-spin" />} {pending ? "Sending…" : "Send enquiry"}

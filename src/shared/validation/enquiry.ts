@@ -1,9 +1,18 @@
 import { z } from "zod";
+import { EVENTS, PLANNING_KEYS, SERVICE_KEYS } from "../package-builder";
 import { email, guestCount, name, optionalEmail, phone, rupees } from "./common";
 
 export const SOURCES = ["WEB_FORM", "PHONE", "INSTAGRAM", "WHATSAPP", "REFERRAL", "WALK_IN"] as const;
 export const STATUSES = ["NEW", "CONTACTED", "MEETING_BOOKED", "AGREEMENT_SENT", "SIGNED", "LOST"] as const;
-export const THEMES = ["Royal Heritage", "Beach Chic", "Pastel Garden", "Modern Minimal", "Desert Boho"] as const;
+export const THEMES = [
+  "Royal Heritage",
+  "Beach Chic",
+  "Pastel Garden",
+  "Modern Minimal",
+  "Desert Boho",
+  "Lakeside Ivory",
+  "Mehendi Marigold",
+] as const;
 export const CITIES = ["Jaipur", "Udaipur", "Jodhpur", "Other"] as const;
 
 const optionalText = (max: number) =>
@@ -24,6 +33,11 @@ export const enquiryInput = z.object({
   maxBudget: rupees.optional(),
   city: optionalText(40),
   notes: optionalText(1000),
+  // "Build your package" selection. The estimate is NOT accepted from the client: the server
+  // recomputes it from these fields (see shared/package-builder.ts).
+  services: z.array(z.enum(SERVICE_KEYS)).max(10).optional().transform((v) => (v ? [...new Set(v)] : undefined)),
+  events: z.array(z.enum(EVENTS)).max(EVENTS.length).optional().transform((v) => (v ? [...new Set(v)] : undefined)),
+  planning: z.enum(PLANNING_KEYS).optional(),
 });
 
 export const staffEnquiryInput = enquiryInput.extend({

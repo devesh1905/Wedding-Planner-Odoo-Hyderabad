@@ -29,7 +29,8 @@ import { StagePill } from "@/frontend/components/common/stage-pill";
 import { Field } from "@/frontend/components/common/field";
 import { SlotPicker, type SlotDay } from "./slot-picker";
 import { api, ApiError } from "@/frontend/lib/api-client";
-import { formatDate, formatDateTime, formatINR, relativeDays } from "@/shared/format";
+import { formatDate, formatDateTime, formatINR, formatINRCompact, relativeDays } from "@/shared/format";
+import { EVENT_LABELS, PLANNING, serviceByKey, type EventKey } from "@/shared/package-builder";
 import { ConvertDialog } from "./convert-dialog";
 import type { Planner } from "./types";
 
@@ -47,6 +48,11 @@ type Detail = {
   maxBudget: number | null;
   city: string | null;
   notes: string | null;
+  services: string[];
+  events: string[];
+  planning: string | null;
+  estimateLow: number | null;
+  estimateHigh: number | null;
   nextFollowUp: string | null;
   assignedToId: string | null;
   createdAt: string;
@@ -155,6 +161,8 @@ export function EnquiryDrawer({ id, planners, onClose }: { id: string | null; pl
                 {data.notes && <Fact icon="notes" label="Notes" value={data.notes} wide />}
               </section>
 
+              {data.services.length > 0 && <RequestedPackage data={data} />}
+
               <section className="grid gap-4 sm:grid-cols-2">
                 <Field label="Assigned planner">
                   <Select value={data.assignedToId ?? ""} onValueChange={(v) => patch({ assignedToId: v }, "Reassigned")}>
@@ -214,6 +222,53 @@ export function EnquiryDrawer({ id, planners, onClose }: { id: string | null; pl
         )}
       </SheetContent>
     </Sheet>
+  );
+}
+
+function RequestedPackage({ data }: { data: Detail }) {
+  const plan = PLANNING.find((p) => p.key === data.planning);
+  return (
+    <section className="space-y-3 rounded-xl border bg-muted/40 p-4">
+      <h3 className="flex items-center gap-2 text-lg font-semibold">
+        <Icon name="gift" className="size-4" /> Requested package
+      </h3>
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+        <div>
+          <dt className="text-xs text-muted-foreground">Planning</dt>
+          <dd className="font-medium">{plan?.label ?? "—"}</dd>
+        </div>
+        <div>
+          <dt className="text-xs text-muted-foreground">Indicative estimate</dt>
+          <dd className="font-medium tabular">
+            {data.estimateLow != null && data.estimateHigh != null
+              ? `${formatINRCompact(data.estimateLow)} – ${formatINRCompact(data.estimateHigh)}`
+              : "—"}
+          </dd>
+        </div>
+        {data.events.length > 0 && (
+          <div className="col-span-2">
+            <dt className="text-xs text-muted-foreground">Events</dt>
+            <dd className="mt-1 flex flex-wrap gap-1.5">
+              {data.events.map((ev) => (
+                <span key={ev} className="rounded-full border bg-card px-2.5 py-0.5 text-xs">
+                  {EVENT_LABELS[ev as EventKey] ?? ev}
+                </span>
+              ))}
+            </dd>
+          </div>
+        )}
+      </dl>
+      <ul className="grid gap-1.5 text-sm sm:grid-cols-2">
+        {data.services.map((k) => {
+          const s = serviceByKey(k);
+          return (
+            <li key={k} className="flex items-center gap-2 rounded-lg border bg-card px-2.5 py-1.5">
+              <Icon name={s?.icon ?? "check"} className="size-4 text-maroon" /> {s?.label ?? k}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }
 
