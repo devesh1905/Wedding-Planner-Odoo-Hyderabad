@@ -46,9 +46,12 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
           data-cast
-          className="mt-6 max-w-4xl text-6xl leading-[0.95] font-semibold sm:text-7xl lg:text-8xl"
+          className="mt-6 text-[clamp(2.6rem,7vw,5.75rem)] leading-[0.98] font-semibold"
         >
-          Three days. Four hundred guests. Not one thing forgotten.
+          {/* one thought per line: the rhythm is the message */}
+          <span className="block sm:whitespace-nowrap">Three days.</span>
+          <span className="block sm:whitespace-nowrap">Four hundred guests.</span>
+          <span className="block sm:whitespace-nowrap">Not one thing forgotten.</span>
         </motion.h1>
         <motion.p
           initial={reduce ? false : { opacity: 0, y: 16 }}
