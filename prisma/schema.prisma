@@ -167,6 +167,7 @@ model User {
   scheduleItems  ScheduleItem[]
   issues         Issue[]
   timeLogs       TimeLog[]
+  messages       Message[]
   activity       ActivityLog[]
 }
 
@@ -298,6 +299,7 @@ model Wedding {
   bookings      Booking[]
   issues        Issue[]
   timeLogs      TimeLog[]
+  messages      Message[]
 
   @@index([stage])
   @@index([startDate])
@@ -615,4 +617,27 @@ model ActivityLog {
   actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
 
   @@index([entity, entityId])
+}
+
+// ─── Couple <-> planning team thread ─────────────────────────────────────
+
+enum MessageAuthor {
+  COUPLE
+  STAFF
+}
+
+model Message {
+  id         String        @id @default(uuid()) @db.Uuid
+  weddingId  String        @db.Uuid
+  author     MessageAuthor
+  authorName String
+  userId     String?       @db.Uuid // staff sender
+  body       String
+  readAt     DateTime? // when the other side first saw it
+  createdAt  DateTime      @default(now())
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([weddingId, createdAt])
 }

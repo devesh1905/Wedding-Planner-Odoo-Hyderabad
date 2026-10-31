@@ -1,5 +1,7 @@
 "use client";
 
+import { WhatsAppLink } from "@/frontend/components/common/whatsapp-link";
+import { reminderText } from "@/shared/reminders";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Loader2 } from "lucide-react";
@@ -26,7 +28,16 @@ type Milestone = {
   reference: string | null;
 };
 
-export function PaymentsTab({ milestones, contractValue }: { milestones: Milestone[]; contractValue: number }) {
+export function PaymentsTab({
+  milestones,
+  contractValue,
+  remind,
+}: {
+  milestones: Milestone[];
+  contractValue: number;
+  /** couple contact for WhatsApp payment reminders */
+  remind?: { phone: string; portalToken: string; name: string };
+}) {
   const [paying, setPaying] = useState<Milestone | null>(null);
   const received = milestones.filter((m) => m.status === "PAID").reduce((s, m) => s + m.amount, 0);
   const addons = milestones.filter((m) => m.type === "ADDON" && m.status !== "CANCELLED").reduce((s, m) => s + m.amount, 0);
@@ -59,6 +70,14 @@ export function PaymentsTab({ milestones, contractValue }: { milestones: Milesto
                 </div>
                 <Amount rupees={m.amount} className="font-serif text-xl" />
                 <StagePill status={overdue ? "OVERDUE" : m.status} />
+                {overdue && remind && (
+                  <WhatsAppLink
+                    phone={remind.phone}
+                    path={`/p/${remind.portalToken}`}
+                    message={reminderText(remind.name, m.label, m.amount, m.dueDate)}
+                    label="Remind"
+                  />
+                )}
                 {m.status === "DUE" && (
                   <Button size="sm" onClick={() => setPaying(m)}>
                     Record payment

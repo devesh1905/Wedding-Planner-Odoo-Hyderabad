@@ -4,6 +4,7 @@ import { Icon, type IconName } from "@/frontend/components/icons/icon";
 import { StagePill } from "@/frontend/components/common/stage-pill";
 import { OwnerAvatar } from "@/frontend/components/common/owner-avatar";
 import { Amount } from "@/frontend/components/common/amount";
+import { WeddingMessages } from "@/frontend/components/messages/message-thread";
 import { formatDate, relativeDays } from "@/shared/format";
 import { cn } from "@/shared/utils";
 
@@ -82,6 +83,8 @@ export function OverviewTab({ wedding: w, openIssues }: { wedding: W; openIssues
           )}
         </Card>
       </div>
+
+      <WeddingMessages weddingId={w.id} />
     </div>
   );
 }

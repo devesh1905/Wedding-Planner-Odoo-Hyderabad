@@ -5,6 +5,8 @@ import { Amount } from "@/frontend/components/common/amount";
 import { StagePill, statusLabel } from "@/frontend/components/common/stage-pill";
 import { formatDate, formatINRCompact } from "@/shared/format";
 import { cn } from "@/shared/utils";
+import { WhatsAppLink } from "@/frontend/components/common/whatsapp-link";
+import { reminderText } from "@/shared/reminders";
 
 const pct = (x: number | null) => (x == null ? "—" : `${Math.round(x * 100)}%`);
 const JOURNEY = ["BOOKED", "PLANNING", "VENDORS", "BIG_DAY", "SETTLEMENT", "SETTLED"] as const;
@@ -138,6 +140,15 @@ export function DashboardView({ report: r, readOnly }: { report: SeasonReport; r
                       </span>
                     </span>
                     <Amount rupees={m.amount} compact className="text-rose" />
+                    {!readOnly && (
+                      <WhatsAppLink
+                        compact
+                        phone={m.phone}
+                        path={`/p/${m.portalToken}`}
+                        message={reminderText(m.partner1, m.label, m.amount, m.dueDate)}
+                        label={`Remind ${m.couple}`}
+                      />
+                    )}
                   </li>
                 );
               })}
