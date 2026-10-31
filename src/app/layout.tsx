@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Toaster } from "@/components/ui/sonner";
 // Fonts are bundled locally so the app looks right offline (venue Wi-Fi is unreliable).
 import "@fontsource-variable/inter";
+import "@fontsource-variable/geist";
 import "@fontsource/cormorant-garamond/500.css";
 import "@fontsource/cormorant-garamond/600.css";
 import "@fontsource/cormorant-garamond/700.css";

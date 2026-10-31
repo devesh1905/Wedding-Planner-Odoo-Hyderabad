@@ -30,7 +30,7 @@ export function AppSidebar({ user, onNavigate }: { user: { name: string; role: s
       <div className="flex items-center gap-3 px-5 py-6">
         <KnotMark className="h-6 w-12 shrink-0 text-[oklch(0.93_0.03_80)]" />
         <div className="leading-tight">
-          <p className="font-serif text-xl font-semibold">The Royal Knot</p>
+          <p className="font-brand text-xl font-semibold">The Royal Knot</p>
           <p className="text-[11px] tracking-widest text-sidebar-foreground/60 uppercase">KnotOS</p>
         </div>
       </div>
