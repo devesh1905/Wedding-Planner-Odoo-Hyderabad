@@ -105,7 +105,7 @@
   --accent-foreground: oklch(0.3 0.06 40);
   --destructive: var(--rose);
   --border: oklch(0.9 0.015 70);
-  --input: oklch(0.88 0.018 70);
+  --input: oklch(0.64 0.03 60); /* 3:1+ against the page and cards: field edges must be visible */
   --ring: oklch(0.6 0.12 40);
   --chart-1: var(--maroon);
   --chart-2: var(--marigold);
@@ -155,7 +155,7 @@
   --accent-foreground: oklch(0.95 0.01 80);
   --destructive: var(--rose);
   --border: oklch(0.85 0.03 70 / 12%);
-  --input: oklch(0.85 0.03 70 / 16%);
+  --input: oklch(0.52 0.03 60); /* 3:1+ against dark page and cards */
   --ring: oklch(0.7 0.12 60);
   --sidebar: oklch(0.15 0.03 18);
   --sidebar-foreground: oklch(0.9 0.02 80);
@@ -534,6 +534,11 @@ html { scroll-behavior: smooth; }
   pointer-events: none;
   z-index: 1;
 }
+.cave-diya:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+  border-radius: 14px;
+}
 .diya-flame-glow {
   position: absolute;
   left: -42px;
@@ -636,6 +641,8 @@ html { scroll-behavior: smooth; }
   }
   /* resting in the niche: pinned by CSS to the same corner (box maths: niche 84×88 at right 12 /
      bottom 16, flame anchor 36px from the diya's left and 62px from its top, diya box 72×96) */
+  /* keep the halo inside the diya's own box so it can't poke past a narrow screen edge */
+  .diya-flame-glow { left: -6px; top: -4px; width: 76px; height: 76px; }
   .cave-diya.at-dock {
     left: auto;
     top: auto;

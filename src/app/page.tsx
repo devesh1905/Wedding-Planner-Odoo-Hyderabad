@@ -99,7 +99,7 @@ export default async function Home() {
               <Magnetic>
                 <Link
                   href="/enquire"
-                  className="group inline-flex items-center gap-3 rounded-full bg-marigold px-8 py-4 text-base font-medium text-[oklch(0.22_0.05_30)] transition-colors hover:bg-[oklch(0.8_0.15_75)]"
+                  className="group inline-flex items-center gap-3 rounded-full bg-marigold px-6 py-4 text-base font-medium whitespace-nowrap sm:px-8 text-[oklch(0.22_0.05_30)] transition-colors hover:bg-[oklch(0.8_0.15_75)]"
                 >
                   Start your enquiry
                   <Icon name="arrow" className="size-5 transition-transform group-hover:translate-x-1" />

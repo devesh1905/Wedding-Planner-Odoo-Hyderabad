@@ -30,9 +30,17 @@ export default async function SignPage({ params }: { params: Promise<{ token: st
           <p className="text-muted-foreground">Please read your service agreement and sign below.</p>
         </header>
 
-        <article tabIndex={0} aria-label="Service agreement" className="squircle max-h-[50svh] overflow-y-auto rounded-2xl border bg-card p-5 font-sans text-sm leading-relaxed text-pretty whitespace-pre-wrap shadow-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:p-8 sm:text-[0.9375rem]">
-          {agreement.body}
-        </article>
+        {/* The full text opens in place (no scroll box inside the page): easier to read on a phone,
+            and nothing hides behind the signature card. The "I have read and agree" box confirms it. */}
+        <details className="squircle group rounded-2xl border bg-card shadow-sm">
+          <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-5 font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:px-8">
+            <span className="flex flex-col"><span>Read the full agreement</span><span className="text-sm font-normal text-muted-foreground">About 2 minutes · please read before signing</span></span>
+            <span aria-hidden className="text-muted-foreground transition-transform group-open:rotate-180">⌄</span>
+          </summary>
+          <article aria-label="Service agreement" className="border-t px-5 pt-4 pb-6 font-sans text-sm leading-relaxed text-pretty whitespace-pre-wrap sm:px-8 sm:text-[0.9375rem]">
+            {agreement.body}
+          </article>
+        </details>
 
         <div className={agreement.status === "SIGNED" ? "mt-16" : "mt-8"}>
           {agreement.status === "SIGNED" ? (
