@@ -45,8 +45,13 @@ export function AppShell({ user, children }: { user: { name: string; role: strin
         setSearchOpen((o) => !o);
       }
     };
+    const openSearch = () => setSearchOpen(true);
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("knot:search", openSearch);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("knot:search", openSearch);
+    };
   }, []);
   // Dialogs and drawers portal to <body>, outside the shell — scope the staff font on <html> too.
   useEffect(() => {
