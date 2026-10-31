@@ -30,7 +30,7 @@ export function MonogramButton() {
           <KnotMark mode="ignite" className="relative h-7 w-14 text-maroon dark:text-[oklch(0.93_0.03_80)]" />
         </ViewTransition>
       </span>
-      <span className="font-serif text-2xl font-semibold tracking-tight">The Royal Knot</span>
+      <span className="font-serif text-xl font-semibold tracking-tight whitespace-nowrap sm:text-2xl">The Royal Knot</span>
     </Link>
   );
 }

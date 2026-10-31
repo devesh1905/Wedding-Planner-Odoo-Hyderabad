@@ -618,3 +618,13 @@ html { scroll-behavior: smooth; }
 /* Hide a native scrollbar where a custom scroller (ScrollRail) is shown instead. */
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* ── Phones & touch tablets: same look, far less work per frame ─────────────────────────────── */
+@media (max-width: 767px), (pointer: coarse) {
+  /* the diya rests in a corner dock instead of niches (see cave-mode.tsx) */
+  .diya-slot { display: none !important; }
+  /* the drifting, 80px-blurred glow is the costliest thing to scroll over: keep it, but still */
+  .aurora > span { animation: none; filter: blur(48px); }
+  /* live backdrop blur under a fixed header re-renders on every scroll frame */
+  .home-header { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: color-mix(in oklab, var(--background) 94%, transparent) !important; }
+}
