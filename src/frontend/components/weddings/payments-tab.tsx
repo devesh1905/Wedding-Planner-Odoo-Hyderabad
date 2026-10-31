@@ -131,9 +131,7 @@ function PayDialog({ milestone, onClose }: { milestone: Milestone | null; onClos
     setPending(true);
     try {
       const r = await api<{ planCreated: number }>(`/api/milestones/${milestone.id}/pay`, { method: "POST", body: { reference, paidAt } });
-      toast.success(
-        r.planCreated ? `Payment recorded — ${r.planCreated} planning tasks created automatically` : `${formatINR(milestone.amount)} recorded`,
-      );
+      toast.success(r.planCreated ? `Payment recorded — ${r.planCreated} planning tasks created automatically` : `${formatINR(milestone.amount)} recorded`);
       setReference("");
       setErrors({});
       onClose();

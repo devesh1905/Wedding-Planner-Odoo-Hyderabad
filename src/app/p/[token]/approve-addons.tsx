@@ -31,7 +31,11 @@ export function ApproveAddons({ token, milestoneId }: { token: string; milestone
       <Button className="squircle h-12 w-full rounded-xl text-base" size="lg" onClick={approve} disabled={pending} aria-busy={pending}>
         {pending && <Loader2 className="animate-spin" />} {pending ? "Approving…" : "Approve add-ons"}
       </Button>
-      {error && <p role="alert" className="text-center text-sm text-rose">{error}</p>}
+      {error && (
+        <p role="alert" className="text-center text-sm text-rose">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

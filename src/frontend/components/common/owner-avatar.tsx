@@ -10,21 +10,15 @@ const COLORS: Record<string, string> = {
   sky: "bg-sky text-white",
 };
 
-export function OwnerAvatar({
-  name,
-  color,
-  size = "sm",
-}: {
-  name?: string | null;
-  color?: string | null;
-  size?: "xs" | "sm" | "md";
-}) {
+export function OwnerAvatar({ name, color, size = "sm" }: { name?: string | null; color?: string | null; size?: "xs" | "sm" | "md" }) {
   const dim = { xs: "size-6 text-[10px]", sm: "size-7 text-xs", md: "size-9 text-sm" }[size];
   if (!name) return <span className={cn("grid place-items-center rounded-full border border-dashed text-muted-foreground", dim)}>?</span>;
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span className={cn("grid shrink-0 place-items-center rounded-full font-semibold ring-2 ring-background", dim, COLORS[color ?? "maroon"] ?? COLORS.maroon)}>
+        <span
+          className={cn("grid shrink-0 place-items-center rounded-full font-semibold ring-2 ring-background", dim, COLORS[color ?? "maroon"] ?? COLORS.maroon)}
+        >
           {initials(name)}
         </span>
       </TooltipTrigger>

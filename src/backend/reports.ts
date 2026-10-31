@@ -17,7 +17,9 @@ const IST = 5.5 * 60 * 60_000;
 export function periodWindow(period: Period, now = new Date()) {
   if (period === "season") return null;
   const ist = new Date(now.getTime() + IST);
-  const y = ist.getUTCFullYear(), m = ist.getUTCMonth(), d = ist.getUTCDate();
+  const y = ist.getUTCFullYear(),
+    m = ist.getUTCMonth(),
+    d = ist.getUTCDate();
   let fromDay: Date, toDay: Date;
   if (period === "today") {
     fromDay = new Date(Date.UTC(y, m, d));
@@ -118,7 +120,11 @@ export async function getSeasonReport(period: Period = "season") {
   });
 
   const overduePayments = allWeddings
-    .flatMap((w) => w.milestones.filter((m) => m.status === "DUE" && m.dueDate < now).map((m) => ({ ...m, couple: `${w.partner1} & ${w.partner2}`, weddingId: w.id, partner1: w.partner1, phone: w.phone, portalToken: w.portalToken })))
+    .flatMap((w) =>
+      w.milestones
+        .filter((m) => m.status === "DUE" && m.dueDate < now)
+        .map((m) => ({ ...m, couple: `${w.partner1} & ${w.partner2}`, weddingId: w.id, partner1: w.partner1, phone: w.phone, portalToken: w.portalToken })),
+    )
     .sort((a, b) => +a.dueDate - +b.dueDate);
 
   // Vendor scorecards from real data: check-ins (punctuality) and bill matching (accuracy).
@@ -163,7 +169,10 @@ export async function getSeasonReport(period: Period = "season") {
       dueIn4Weeks: horizon[2]!.moneyIn,
       // client payments falling due inside the window (season: next 4 weeks)
       dueInPeriod: win
-        ? allWeddings.flatMap((w) => w.milestones).filter((m) => m.status === "DUE" && m.dueDate >= win.fromDay && m.dueDate < win.toDay).reduce((s, m) => s + m.amount, 0)
+        ? allWeddings
+            .flatMap((w) => w.milestones)
+            .filter((m) => m.status === "DUE" && m.dueDate >= win.fromDay && m.dueDate < win.toDay)
+            .reduce((s, m) => s + m.amount, 0)
         : horizon[2]!.moneyIn,
       openIssues: issues.filter((i) => i.status === "OPEN").length,
       issuesInPeriod: issues.filter((i) => inPeriod(i.createdAt)).length,
@@ -183,7 +192,7 @@ export const REPORT_TAG = "report";
 
 const ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
 // The data cache stores JSON, so dates come back as strings — turn them back into Dates.
-const revive = <T,>(v: T): T => JSON.parse(JSON.stringify(v), (_k, x) => (typeof x === "string" && ISO.test(x) ? new Date(x) : x));
+const revive = <T>(v: T): T => JSON.parse(JSON.stringify(v), (_k, x) => (typeof x === "string" && ISO.test(x) ? new Date(x) : x));
 
 const cachedReport = unstable_cache((period: Period) => getSeasonReport(period), ["season-report"], { tags: [REPORT_TAG], revalidate: 60 });
 

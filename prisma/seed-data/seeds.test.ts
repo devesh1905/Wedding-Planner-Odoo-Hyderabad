@@ -6,14 +6,18 @@ import { checkins, historicalBookings } from "./checkins";
 import { vendorCategories } from "./types";
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
-assert.equal(vendors.length, 40); assert.equal(weddings.length, 25);
+assert.equal(vendors.length, 40);
+assert.equal(weddings.length, 25);
 const ids = [...vendors, ...weddings, ...weddingEvents, ...schedule, ...historicalBookings, ...checkins].map((item) => item.id);
-assert.equal(new Set(ids).size, ids.length); ids.forEach((id) => assert.match(id, uuid));
+assert.equal(new Set(ids).size, ids.length);
+ids.forEach((id) => assert.match(id, uuid));
 for (const category of vendorCategories) assert.equal(vendors.filter((vendor) => vendor.category === category).length, 4);
 for (const vendor of vendors) {
   assert.match(vendor.phone, /^[6-9]\d{9}$/);
   const backup = vendors.find((item) => item.id === vendor.backupVendorId);
-  assert.ok(backup); assert.notEqual(backup.id, vendor.id); assert.equal(backup.category, vendor.category);
+  assert.ok(backup);
+  assert.notEqual(backup.id, vendor.id);
+  assert.equal(backup.category, vendor.category);
 }
 for (const wedding of weddings) {
   assert.ok(wedding.guestCount >= 250 && wedding.guestCount <= 600);
@@ -36,5 +40,6 @@ const dj = vendors.find((vendor) => vendor.name === "Beat Baraat")!;
 const djBookings = new Set(historicalBookings.filter((booking) => booking.vendorId === dj.id).map((booking) => booking.id));
 assert.equal(checkins.filter((item) => djBookings.has(item.bookingId) && item.arrivedAt > item.expectedAt).length, 3);
 const profits = weddingFinance.map((item) => item.clientRevenue - item.vendorCosts - item.teamHours * item.hourlyCost);
-assert.ok(profits.some((profit) => profit > 0)); assert.ok(profits.some((profit) => profit < 0));
+assert.ok(profits.some((profit) => profit > 0));
+assert.ok(profits.some((profit) => profit < 0));
 console.log("Seed integrity: 40 vendors, 25 weddings, 120 schedule items, historical relations and finance passed");

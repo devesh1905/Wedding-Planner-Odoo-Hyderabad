@@ -37,7 +37,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           </div>
           <LoginForm next={typeof next === "string" ? next : undefined} />
           <p className="squircle rounded-xl border bg-card px-4 py-3 text-xs leading-relaxed text-muted-foreground">
-            Demo: <b className="font-semibold text-foreground">founder@royalknot.in</b> or <b className="font-semibold text-foreground">ananya@royalknot.in</b> · password <b className="font-semibold text-foreground">knot@2026</b>
+            Demo: <b className="font-semibold text-foreground">founder@royalknot.in</b> or <b className="font-semibold text-foreground">ananya@royalknot.in</b>{" "}
+            · password <b className="font-semibold text-foreground">knot@2026</b>
           </p>
         </div>
       </section>

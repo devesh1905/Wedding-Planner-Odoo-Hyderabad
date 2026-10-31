@@ -7,7 +7,10 @@ import { generatePlan } from "@/backend/plan";
 
 const Body = z.object({
   reference: z.string().trim().min(3, "Enter the payment reference (UTR / cheque no.)").max(60),
-  paidAt: z.coerce.date().max(new Date(Date.now() + 86_400_000), "Payment date can't be in the future").optional(),
+  paidAt: z.coerce
+    .date()
+    .max(new Date(Date.now() + 86_400_000), "Payment date can't be in the future")
+    .optional(),
 });
 
 // Record a client payment. The reference is unique across all milestones, so the same receipt can't be used twice.
@@ -26,7 +29,13 @@ export const POST = handle(async (req: Request, { params }: { params: Promise<{ 
     if (dupe) throw new HttpError(409, "This payment reference was already used");
 
     await tx.paymentMilestone.update({ where: { id }, data: { status: "PAID", reference, paidAt: paidAt ?? new Date() } });
-    await logActivity(tx, { actorId: user.sub, entity: "wedding", entityId: m.weddingId, action: "payment_received", payload: { label: m.label, amount: m.amount } });
+    await logActivity(tx, {
+      actorId: user.sub,
+      entity: "wedding",
+      entityId: m.weddingId,
+      action: "payment_received",
+      payload: { label: m.label, amount: m.amount },
+    });
 
     let plan = { created: 0 };
     if (m.type === "BOOKING") {

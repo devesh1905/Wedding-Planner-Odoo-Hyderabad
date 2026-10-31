@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { checkinSchema, issueCreateSchema, issuePatchSchema, liveQuerySchema, schedulePatchSchema } from "@/shared/schemas/live";
 
-const id = randomUUID(); const clientId = randomUUID();
+const id = randomUUID();
+const clientId = randomUUID();
 assert.equal(checkinSchema.parse({ bookingId: id.toUpperCase(), clientId, method: "MANUAL" }).bookingId, id);
 assert.equal(checkinSchema.safeParse({ clientId, method: "MANUAL" }).success, false);
 assert.equal(checkinSchema.safeParse({ bookingId: id, clientId, method: "UNKNOWN" }).success, false);
@@ -11,7 +12,10 @@ assert.equal(checkinSchema.safeParse({ bookingId: id, clientId, method: "MANUAL"
 assert.equal(schedulePatchSchema.parse({ status: "DONE", clientId }).status, "DONE");
 assert.equal(schedulePatchSchema.safeParse({ status: "INVALID" }).success, false);
 assert.equal(schedulePatchSchema.safeParse({ status: "DONE", actualAt: "bad" }).success, false);
-assert.equal(issueCreateSchema.parse({ weddingId: id, clientId, description: "  Generator needed  ", severity: "HIGH", ownerId: null }).description, "Generator needed");
+assert.equal(
+  issueCreateSchema.parse({ weddingId: id, clientId, description: "  Generator needed  ", severity: "HIGH", ownerId: null }).description,
+  "Generator needed",
+);
 assert.equal(issueCreateSchema.safeParse({ weddingId: id, clientId, description: " ", severity: "HIGH", ownerId: null }).success, false);
 assert.equal(issueCreateSchema.safeParse({ weddingId: id, clientId, description: "Issue", severity: "HIGH", ownerId: "invalid" }).success, false);
 assert.equal(issuePatchSchema.safeParse({ status: "RESOLVED", weddingId: id }).success, false);

@@ -37,7 +37,12 @@ async function run() {
   const events = await db.weddingEvent.findMany({
     where: { weddingId: WEDDING_ID },
     orderBy: [{ sortOrder: "asc" }, { startsAt: "asc" }],
-    select: { id: true, name: true, startsAt: true, scheduleItems: { orderBy: [{ startsAt: "asc" }, { id: "asc" }], select: { id: true, startsAt: true, durationMin: true } } },
+    select: {
+      id: true,
+      name: true,
+      startsAt: true,
+      scheduleItems: { orderBy: [{ startsAt: "asc" }, { id: "asc" }], select: { id: true, startsAt: true, durationMin: true } },
+    },
   });
   const starts = events.map((e) => e.startsAt.getTime());
   await db.wedding.update({
@@ -53,8 +58,14 @@ async function run() {
   for (const ev of events) {
     const items = ev.scheduleItems;
     const endOf = (i: { startsAt: Date; durationMin: number }) => i.startsAt.getTime() + i.durationMin * MIN;
-    if (items.every((i) => endOf(i) <= nowMs)) { done.push(...items.map((i) => i.id)); continue; }
-    if (items.every((i) => i.startsAt.getTime() > nowMs)) { upcoming.push(...items.map((i) => i.id)); continue; }
+    if (items.every((i) => endOf(i) <= nowMs)) {
+      done.push(...items.map((i) => i.id));
+      continue;
+    }
+    if (items.every((i) => i.startsAt.getTime() > nowMs)) {
+      upcoming.push(...items.map((i) => i.id));
+      continue;
+    }
     let pastIdx = 0;
     for (const i of items) {
       if (endOf(i) <= nowMs) {
@@ -113,8 +124,25 @@ async function run() {
     (await db.user.findFirst({ where: { role: "PLANNER" }, orderBy: { name: "asc" } }));
   const resolvedText = "Photographer asked for a second power point near the stage";
   await db.issue.deleteMany({ where: { weddingId: WEDDING_ID, OR: [{ status: "OPEN" }, { description: resolvedText }] } });
-  await db.issue.create({ data: { weddingId: WEDDING_ID, ownerId: planner?.id, description: "Florist needs an extra generator for the mandap lights", severity: "HIGH", status: "OPEN" } });
-  await db.issue.create({ data: { weddingId: WEDDING_ID, ownerId: planner?.id, description: resolvedText, severity: "MEDIUM", status: "RESOLVED", resolvedAt: new Date(nowMs - 40 * MIN) } });
+  await db.issue.create({
+    data: {
+      weddingId: WEDDING_ID,
+      ownerId: planner?.id,
+      description: "Florist needs an extra generator for the mandap lights",
+      severity: "HIGH",
+      status: "OPEN",
+    },
+  });
+  await db.issue.create({
+    data: {
+      weddingId: WEDDING_ID,
+      ownerId: planner?.id,
+      description: resolvedText,
+      severity: "MEDIUM",
+      status: "RESOLVED",
+      resolvedAt: new Date(nowMs - 40 * MIN),
+    },
+  });
 
   // Summary.
   const lateCount = bookings.filter((b) => !checkins.some((c) => c.bookingId === b.id) && expected.get(b.id)!.getTime() < nowMs).length;
@@ -130,5 +158,8 @@ async function run() {
 }
 
 run()
-  .catch((e) => { console.error(e); process.exitCode = 1; })
+  .catch((e) => {
+    console.error(e);
+    process.exitCode = 1;
+  })
   .finally(() => db.$disconnect());

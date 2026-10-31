@@ -30,7 +30,13 @@ export function DashboardView({ report: r, readOnly }: { report: SeasonReport; r
   const when = periodLabel(r.period);
   const span = r.window ? ` · ${formatDate(r.window.fromDay)}${r.period === "today" ? "" : ` – ${formatDate(new Date(+r.window.toDay - 86_400_000))}`}` : "";
   const W = ({ id, children, className }: { id: string; children: React.ReactNode; className?: string }) =>
-    readOnly ? <span className={className}>{children}</span> : <Link href={`/weddings/${id}`} className={cn("hover:text-cta hover:underline", className)}>{children}</Link>;
+    readOnly ? (
+      <span className={className}>{children}</span>
+    ) : (
+      <Link href={`/weddings/${id}`} className={cn("hover:text-cta hover:underline", className)}>
+        {children}
+      </Link>
+    );
 
   const costed = r.rows.filter((w) => w.costed);
   const revenue = costed.reduce((s, w) => s + w.revenue, 0);
@@ -38,13 +44,13 @@ export function DashboardView({ report: r, readOnly }: { report: SeasonReport; r
   const team = costed.reduce((s, w) => s + w.teamCost, 0);
   const profit = r.kpi.seasonProfit;
   const byProfit = [...costed].sort((a, b) => b.profit - a.profit);
-  const ranked = [...r.scorecards].filter((v) => v.punctuality != null).sort((a, b) => (b.punctuality ?? 0) - (a.punctuality ?? 0) || a.avgLateMin - b.avgLateMin);
+  const ranked = [...r.scorecards]
+    .filter((v) => v.punctuality != null)
+    .sort((a, b) => (b.punctuality ?? 0) - (a.punctuality ?? 0) || a.avgLateMin - b.avgLateMin);
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        {season ? "Every wedding this season" : `Weddings with an event ${when}${span}`}
-      </p>
+      <p className="text-sm text-muted-foreground">{season ? "Every wedding this season" : `Weddings with an event ${when}${span}`}</p>
 
       <div className="grid gap-4 lg:grid-cols-12">
         {/* ── Profit: the headline number ─────────────────────────────── */}
@@ -95,11 +101,7 @@ export function DashboardView({ report: r, readOnly }: { report: SeasonReport; r
 
         {/* ── Profit by wedding: diverging bars ───────────────────────── */}
         <Card className="lg:col-span-8" title="Profit by wedding" icon="chart" note="Revenue − vendor costs − team hours. Best first; losses in rose.">
-          {byProfit.length === 0 ? (
-            <Empty>No weddings with booked vendors {when}.</Empty>
-          ) : (
-            <ProfitBars rows={byProfit} W={W} />
-          )}
+          {byProfit.length === 0 ? <Empty>No weddings with booked vendors {when}.</Empty> : <ProfitBars rows={byProfit} W={W} />}
         </Card>
 
         {/* ── Cash flow ahead ─────────────────────────────────────────── */}
@@ -134,7 +136,9 @@ export function DashboardView({ report: r, readOnly }: { report: SeasonReport; r
                   <li key={m.id} className="flex items-center gap-3 py-2.5">
                     <span className="grid size-9 shrink-0 place-items-center rounded-full bg-rose-soft text-xs font-semibold text-rose tabular">{late}d</span>
                     <span className="min-w-0 flex-1">
-                      <W id={m.weddingId} className="block truncate font-medium">{m.couple}</W>
+                      <W id={m.weddingId} className="block truncate font-medium">
+                        {m.couple}
+                      </W>
                       <span className="text-xs text-muted-foreground">
                         {m.label} · due {formatDate(m.dueDate)}
                       </span>
@@ -213,7 +217,9 @@ export function DashboardView({ report: r, readOnly }: { report: SeasonReport; r
               {r.rows.map((w) => (
                 <tr key={w.id} className={cn("transition-colors hover:bg-muted/40", w.costed && w.profit < 0 && "bg-rose-soft/30")}>
                   <td className="px-5 py-3">
-                    <W id={w.id} className="font-medium">{w.couple}</W>
+                    <W id={w.id} className="font-medium">
+                      {w.couple}
+                    </W>
                     <p className="text-xs text-muted-foreground">
                       {w.code} · {w.city}
                     </p>
@@ -232,7 +238,9 @@ export function DashboardView({ report: r, readOnly }: { report: SeasonReport; r
                     <Amount rupees={w.teamCost} compact />
                     <p className="text-xs text-muted-foreground tabular">{Math.round(w.hours)} h</p>
                   </td>
-                  <td className="px-3 py-3 text-right">{w.costed ? <Amount rupees={w.profit} compact signed /> : <span className="text-xs text-muted-foreground">No vendors yet</span>}</td>
+                  <td className="px-3 py-3 text-right">
+                    {w.costed ? <Amount rupees={w.profit} compact signed /> : <span className="text-xs text-muted-foreground">No vendors yet</span>}
+                  </td>
                   <td className={cn("px-3 py-3 text-right tabular", w.margin < 0 ? "text-rose" : "")}>{w.costed ? pct(w.margin) : "—"}</td>
                   <td className="px-5 py-3 text-right tabular">{w.openTasks}</td>
                 </tr>
@@ -277,7 +285,11 @@ function Card({
 }
 
 function Chip({ tone, children }: { tone: "teal" | "rose"; children: React.ReactNode }) {
-  return <span className={cn("rounded-full px-2 py-0.5 text-xs font-semibold tabular", tone === "teal" ? "bg-teal-soft text-teal" : "bg-rose-soft text-rose")}>{children}</span>;
+  return (
+    <span className={cn("rounded-full px-2 py-0.5 text-xs font-semibold tabular", tone === "teal" ? "bg-teal-soft text-teal" : "bg-rose-soft text-rose")}>
+      {children}
+    </span>
+  );
 }
 
 function Stat({ label, value, tone, big }: { label: string; value: string; tone?: string; big?: boolean }) {
@@ -338,7 +350,12 @@ function RupeeRing({ revenue, vendor, team, profit }: { revenue: number; vendor:
   const parts = [
     { label: "Vendors", value: vendor, cls: "stroke-marigold", dot: "bg-marigold" },
     { label: "Team", value: team, cls: "stroke-muted-foreground/50", dot: "bg-muted-foreground/50" },
-    { label: profit >= 0 ? "Profit" : "Loss", value: Math.abs(profit), cls: profit >= 0 ? "stroke-teal" : "stroke-rose", dot: profit >= 0 ? "bg-teal" : "bg-rose" },
+    {
+      label: profit >= 0 ? "Profit" : "Loss",
+      value: Math.abs(profit),
+      cls: profit >= 0 ? "stroke-teal" : "stroke-rose",
+      dot: profit >= 0 ? "bg-teal" : "bg-rose",
+    },
   ];
   const C = 2 * Math.PI * 40;
   let offset = 0;
@@ -390,7 +407,12 @@ function StageBar({ rows }: { rows: SeasonReport["rows"] }) {
     <div className="mt-4">
       <div className="flex h-2.5 overflow-hidden rounded-full bg-muted">
         {counts.map(({ s, n }) => (
-          <span key={s} className={cn("h-full border-r border-card last:border-0", STAGE_TONE[s])} style={{ width: `${(n / total) * 100}%` }} title={`${statusLabel(s)}: ${n}`} />
+          <span
+            key={s}
+            className={cn("h-full border-r border-card last:border-0", STAGE_TONE[s])}
+            style={{ width: `${(n / total) * 100}%` }}
+            title={`${statusLabel(s)}: ${n}`}
+          />
         ))}
       </div>
       <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
@@ -406,13 +428,7 @@ function StageBar({ rows }: { rows: SeasonReport["rows"] }) {
 }
 
 /** Diverging bars around a zero line: profit to the right in teal, losses to the left in rose. */
-function ProfitBars({
-  rows,
-  W,
-}: {
-  rows: SeasonReport["rows"];
-  W: (p: { id: string; children: React.ReactNode; className?: string }) => React.ReactNode;
-}) {
+function ProfitBars({ rows, W }: { rows: SeasonReport["rows"]; W: (p: { id: string; children: React.ReactNode; className?: string }) => React.ReactNode }) {
   const max = Math.max(...rows.map((w) => Math.abs(w.profit)), 1);
   const hasLoss = rows.some((w) => w.profit < 0);
   const zero = hasLoss ? 30 : 0; // % of the track left of zero
@@ -422,7 +438,9 @@ function ProfitBars({
         const len = (Math.abs(w.profit) / max) * (w.profit >= 0 ? 100 - zero : zero);
         return (
           <li key={w.id} className="grid grid-cols-[9rem_1fr_5rem_3rem] items-center gap-3 text-sm">
-            <W id={w.id} className="truncate font-medium">{w.couple}</W>
+            <W id={w.id} className="truncate font-medium">
+              {w.couple}
+            </W>
             <div className="relative h-5 rounded-md bg-muted/50">
               {hasLoss && <span className="absolute inset-y-0 w-px bg-border" style={{ left: `${zero}%` }} />}
               <span
@@ -449,7 +467,10 @@ function Meter({ label, value, max, className }: { label: string; value: number;
     <div className="mt-1 flex items-center gap-2 text-xs">
       <span className="w-7 text-muted-foreground">{label}</span>
       <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
-        <div className={cn("dash-grow-x h-full rounded-full", className)} style={{ width: `${Math.max(1.5, (value / max) * 100)}%`, transformOrigin: "left" }} />
+        <div
+          className={cn("dash-grow-x h-full rounded-full", className)}
+          style={{ width: `${Math.max(1.5, (value / max) * 100)}%`, transformOrigin: "left" }}
+        />
       </div>
       <span className="w-16 text-right font-medium tabular">{formatINRCompact(value)}</span>
     </div>
@@ -464,7 +485,16 @@ function Ring({ value }: { value: number }) {
     <span className="relative grid size-10 shrink-0 place-items-center">
       <svg viewBox="0 0 36 36" className="absolute inset-0 -rotate-90" aria-hidden>
         <circle cx="18" cy="18" r="15" fill="none" className="stroke-muted" strokeWidth="3.5" />
-        <circle cx="18" cy="18" r="15" fill="none" strokeWidth="3.5" strokeLinecap="round" className={cn("dash-ring", tone)} strokeDasharray={`${value * C} ${C}`} />
+        <circle
+          cx="18"
+          cy="18"
+          r="15"
+          fill="none"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          className={cn("dash-ring", tone)}
+          strokeDasharray={`${value * C} ${C}`}
+        />
       </svg>
       <span className={cn("text-[10px] font-semibold tabular", tone.split(" ")[1])}>{Math.round(value * 100)}</span>
     </span>

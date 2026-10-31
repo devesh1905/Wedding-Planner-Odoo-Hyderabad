@@ -281,7 +281,7 @@ function Cave() {
 
       // first frame: start already sitting in the top-most niche
       if (!st.placed) {
-        const first = phone ? { id: HOME } : nearestSlot(innerWidth / 2, 0, true) ?? nearestSlot(innerWidth / 2, 0, false);
+        const first = phone ? { id: HOME } : (nearestSlot(innerWidth / 2, 0, true) ?? nearestSlot(innerWidth / 2, 0, false));
         if (first) {
           const c = target(first.id);
           st.x = st.tx = c.x;
@@ -299,9 +299,7 @@ function Cave() {
         st.tx = st.pointer.x + st.pointer.ox;
         st.ty = st.pointer.y + st.pointer.oy;
         // magnetic: near a niche (or the phone dock), the diya is drawn into it
-        const best = phone
-          ? { id: HOME, d: Math.hypot(homePos().x - st.tx, homePos().y - st.ty) }
-          : nearestSlot(st.tx, st.ty, true);
+        const best = phone ? { id: HOME, d: Math.hypot(homePos().x - st.tx, homePos().y - st.ty) } : nearestSlot(st.tx, st.ty, true);
         if (best && best.d < SNAP_DISTANCE) {
           const c = target(best.id);
           const pull = Math.pow(1 - best.d / SNAP_DISTANCE, 2) * 0.6;
@@ -443,25 +441,37 @@ function DiyaGraphic() {
         className="diya-flame-gl"
         state={flameState}
         fallback={
-      <svg viewBox="20 4 20 30" className="diya-flame" aria-hidden>
-        <defs>
-          <linearGradient id="diya-outer" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#f0a03a" />
-            <stop offset="1" stopColor="#c2501d" />
-          </linearGradient>
-          <linearGradient id="diya-mid" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#ffc457" />
-            <stop offset="1" stopColor="#ea8a2c" />
-          </linearGradient>
-        </defs>
-        <g className="diya-lean">
-          <g className="flame-body">
-            <path d="M30 6 C 36 13, 37.5 20, 34 26 C 32.8 28, 31.4 29.6, 30 32 C 28.6 29.6, 27.2 28, 26 26 C 22.5 20, 24 13, 30 6 Z" fill="url(#diya-outer)" className="flame-l1" />
-            <path d="M30 11 C 34.4 16, 35 21, 32.6 25.4 C 31.7 27, 30.8 28.4, 30 30.6 C 29.2 28.4, 28.3 27, 27.4 25.4 C 25 21, 25.6 16, 30 11 Z" fill="url(#diya-mid)" className="flame-l2" />
-            <path d="M30 17 C 32.4 20, 32.7 23, 31.3 26 C 30.8 27, 30.4 28, 30 29.3 C 29.6 28, 29.2 27, 28.7 26 C 27.3 23, 27.6 20, 30 17 Z" fill="#fff2bf" className="flame-l3" />
-          </g>
-        </g>
-      </svg>
+          <svg viewBox="20 4 20 30" className="diya-flame" aria-hidden>
+            <defs>
+              <linearGradient id="diya-outer" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stopColor="#f0a03a" />
+                <stop offset="1" stopColor="#c2501d" />
+              </linearGradient>
+              <linearGradient id="diya-mid" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stopColor="#ffc457" />
+                <stop offset="1" stopColor="#ea8a2c" />
+              </linearGradient>
+            </defs>
+            <g className="diya-lean">
+              <g className="flame-body">
+                <path
+                  d="M30 6 C 36 13, 37.5 20, 34 26 C 32.8 28, 31.4 29.6, 30 32 C 28.6 29.6, 27.2 28, 26 26 C 22.5 20, 24 13, 30 6 Z"
+                  fill="url(#diya-outer)"
+                  className="flame-l1"
+                />
+                <path
+                  d="M30 11 C 34.4 16, 35 21, 32.6 25.4 C 31.7 27, 30.8 28.4, 30 30.6 C 29.2 28.4, 28.3 27, 27.4 25.4 C 25 21, 25.6 16, 30 11 Z"
+                  fill="url(#diya-mid)"
+                  className="flame-l2"
+                />
+                <path
+                  d="M30 17 C 32.4 20, 32.7 23, 31.3 26 C 30.8 27, 30.4 28, 30 29.3 C 29.6 28, 29.2 27, 28.7 26 C 27.3 23, 27.6 20, 30 17 Z"
+                  fill="#fff2bf"
+                  className="flame-l3"
+                />
+              </g>
+            </g>
+          </svg>
         }
       />
       {/* eslint-disable-next-line @next/next/no-img-element */}

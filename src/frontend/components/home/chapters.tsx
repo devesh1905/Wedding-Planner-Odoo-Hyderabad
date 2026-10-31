@@ -6,12 +6,42 @@ import { DiyaSlot } from "@/frontend/components/cave/cave-mode";
 import { Icon, type IconName } from "@/frontend/components/icons/icon";
 
 const CHAPTERS = [
-  { n: "01", icon: "chat", title: "Tell us your dream", body: "A date, a guest count, a feeling. Share it once — your planner calls within a day, and nothing you said gets lost." },
-  { n: "02", icon: "sign", title: "Sign from your phone", body: "Your service agreement arrives as a private link. Read it, sign with a finger, done. No printers, no couriers." },
-  { n: "03", icon: "checklist", title: "A plan in a moment", body: "The day your booking is confirmed, every task from venue to vidaai appears — each with an owner and a date." },
-  { n: "04", icon: "compare", title: "Vendors, compared honestly", body: "Three caterers, three different quotes, one clear table. Price per plate, what's included, what isn't." },
-  { n: "05", icon: "clock", title: "The big day, held", body: "Minute by minute, every vendor checked in at the gate. If someone runs late, we know before you do." },
-  { n: "06", icon: "wallet", title: "Every rupee, clear", body: "Extra guests, longer music — added fairly, shown to you for approval. Nothing paid twice, nothing forgotten." },
+  {
+    n: "01",
+    icon: "chat",
+    title: "Tell us your dream",
+    body: "A date, a guest count, a feeling. Share it once — your planner calls within a day, and nothing you said gets lost.",
+  },
+  {
+    n: "02",
+    icon: "sign",
+    title: "Sign from your phone",
+    body: "Your service agreement arrives as a private link. Read it, sign with a finger, done. No printers, no couriers.",
+  },
+  {
+    n: "03",
+    icon: "checklist",
+    title: "A plan in a moment",
+    body: "The day your booking is confirmed, every task from venue to vidaai appears — each with an owner and a date.",
+  },
+  {
+    n: "04",
+    icon: "compare",
+    title: "Vendors, compared honestly",
+    body: "Three caterers, three different quotes, one clear table. Price per plate, what's included, what isn't.",
+  },
+  {
+    n: "05",
+    icon: "clock",
+    title: "The big day, held",
+    body: "Minute by minute, every vendor checked in at the gate. If someone runs late, we know before you do.",
+  },
+  {
+    n: "06",
+    icon: "wallet",
+    title: "Every rupee, clear",
+    body: "Extra guests, longer music — added fairly, shown to you for approval. Nothing paid twice, nothing forgotten.",
+  },
 ] satisfies { n: string; icon: IconName; title: string; body: string }[];
 
 /**
@@ -45,7 +75,9 @@ export function Chapters() {
         <div className="relative mx-auto w-full max-w-6xl px-6 pt-24 pb-10 md:pt-0">
           <DiyaSlot id="chapters" className="absolute right-6 bottom-6" />
           <p className="text-xs tracking-[0.3em] text-eyebrow uppercase">How it works</p>
-          <h2 data-cast className="mt-3 max-w-xl text-4xl leading-tight font-semibold sm:text-5xl">Your wedding, chapter by chapter</h2>
+          <h2 data-cast className="mt-3 max-w-xl text-4xl leading-tight font-semibold sm:text-5xl">
+            Your wedding, chapter by chapter
+          </h2>
         </div>
         <motion.ol
           style={reduce || !wide ? undefined : { x }}

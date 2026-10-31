@@ -16,7 +16,7 @@ import { PaymentsTab } from "@/frontend/components/weddings/payments-tab";
 import { OverviewTab } from "@/frontend/components/weddings/overview-tab";
 import { VendorsTab } from "@/frontend/components/weddings/vendors-tab";
 import { SettlementTab } from "@/frontend/components/weddings/settlement-tab";
-import { QuoteRequestPanel } from "@/frontend/components/quotes/QuoteRequestPanel";
+import { QuoteRequestPanel } from "@/frontend/components/quotes/quote-request-panel";
 import { HoursTab } from "@/frontend/components/weddings/hours-tab";
 
 const TABS: readonly { key: string; label: string; icon: IconName }[] = [
@@ -34,13 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return { title: w ? `${w.partner1} & ${w.partner2}` : "Wedding" };
 }
 
-export default async function WeddingPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<{ tab?: string }>;
-}) {
+export default async function WeddingPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ tab?: string }> }) {
   const [{ id }, { tab: rawTab }] = await Promise.all([params, searchParams]);
   const tab = TABS.some((t) => t.key === rawTab) ? rawTab! : "overview";
 
@@ -152,8 +146,20 @@ export default async function WeddingPage({
 
       {tab === "overview" && <OverviewTab wedding={plain} openIssues={wedding.issues.length} />}
       {tab === "plan" && <PlanTab weddingId={wedding.id} tasks={plain.tasks} users={users} hasPlan={wedding.tasks.length > 0} />}
-      {tab === "vendors" && <VendorsTab weddingId={wedding.id} bookings={plain.bookings} quotePanel={<QuoteRequestPanel weddingId={wedding.id} guestCount={wedding.guestCount} />} />}
-      {tab === "payments" && <PaymentsTab milestones={plain.milestones} contractValue={wedding.contractValue} remind={{ phone: wedding.phone, portalToken: wedding.portalToken, name: wedding.partner1 }} />}
+      {tab === "vendors" && (
+        <VendorsTab
+          weddingId={wedding.id}
+          bookings={plain.bookings}
+          quotePanel={<QuoteRequestPanel weddingId={wedding.id} guestCount={wedding.guestCount} />}
+        />
+      )}
+      {tab === "payments" && (
+        <PaymentsTab
+          milestones={plain.milestones}
+          contractValue={wedding.contractValue}
+          remind={{ phone: wedding.phone, portalToken: wedding.portalToken, name: wedding.partner1 }}
+        />
+      )}
       {tab === "hours" && <HoursTab weddingId={wedding.id} logs={plain.timeLogs} users={users} currentUserId={session.sub} />}
       {tab === "settlement" && <SettlementTab weddingId={wedding.id} stage={wedding.stage} bookings={plain.bookings} />}
     </>
@@ -167,7 +173,17 @@ function ProgressRing({ pct }: { pct: number }) {
     <div className="relative grid size-14 place-items-center" title={`${pct}% of tasks done`}>
       <svg viewBox="0 0 56 56" className="absolute inset-0 -rotate-90">
         <circle cx="28" cy="28" r={r} fill="none" stroke="var(--border)" strokeWidth="5" />
-        <circle cx="28" cy="28" r={r} fill="none" stroke="var(--teal)" strokeWidth="5" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - pct / 100)} />
+        <circle
+          cx="28"
+          cy="28"
+          r={r}
+          fill="none"
+          stroke="var(--teal)"
+          strokeWidth="5"
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={c * (1 - pct / 100)}
+        />
       </svg>
       <span className="text-xs font-semibold tabular">{pct}%</span>
     </div>

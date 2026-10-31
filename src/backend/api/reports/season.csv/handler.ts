@@ -9,9 +9,35 @@ const esc = (v: unknown) => {
 export const GET = handle(async () => {
   await requireUser("FOUNDER");
   const r = await getReport();
-  const header = ["Code", "Couple", "Date", "City", "Stage", "Revenue (INR)", "Received (INR)", "Vendor cost (INR)", "Team cost (INR)", "Profit (INR)", "Margin %", "Open tasks"];
+  const header = [
+    "Code",
+    "Couple",
+    "Date",
+    "City",
+    "Stage",
+    "Revenue (INR)",
+    "Received (INR)",
+    "Vendor cost (INR)",
+    "Team cost (INR)",
+    "Profit (INR)",
+    "Margin %",
+    "Open tasks",
+  ];
   const lines = r.rows.map((w) =>
-    [w.code, w.couple, w.startDate.toISOString().slice(0, 10), w.city, w.stage, w.revenue, w.received, w.vendorCost, w.teamCost, w.profit, Math.round(w.margin * 100), w.openTasks]
+    [
+      w.code,
+      w.couple,
+      w.startDate.toISOString().slice(0, 10),
+      w.city,
+      w.stage,
+      w.revenue,
+      w.received,
+      w.vendorCost,
+      w.teamCost,
+      w.profit,
+      Math.round(w.margin * 100),
+      w.openTasks,
+    ]
       .map(esc)
       .join(","),
   );

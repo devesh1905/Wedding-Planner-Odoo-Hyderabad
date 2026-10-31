@@ -37,7 +37,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                 <Link
                   key={x.key}
                   href={`/dashboard?period=${x.key}`}
-                  className={cn("rounded-md px-3 py-1.5 text-sm", period === x.key ? "bg-cta text-cta-foreground" : "text-muted-foreground hover:text-foreground")}
+                  className={cn(
+                    "rounded-md px-3 py-1.5 text-sm",
+                    period === x.key ? "bg-cta text-cta-foreground" : "text-muted-foreground hover:text-foreground",
+                  )}
                 >
                   {x.label}
                 </Link>

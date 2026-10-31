@@ -35,11 +35,28 @@ export function LoginForm({ next }: { next?: string }) {
     <form onSubmit={onSubmit} className="space-y-5" noValidate>
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
-        <Input id="email" name="email" type="email" autoComplete="email" required placeholder="you@royalknot.in" aria-invalid={!!error || undefined} className="h-11 md:h-10" />
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          placeholder="you@royalknot.in"
+          aria-invalid={!!error || undefined}
+          className="h-11 md:h-10"
+        />
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
-        <Input id="password" name="password" type="password" autoComplete="current-password" required aria-invalid={!!error || undefined} className="h-11 md:h-10" />
+        <Input
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          required
+          aria-invalid={!!error || undefined}
+          className="h-11 md:h-10"
+        />
       </div>
       {error && (
         <p role="alert" className="rounded-lg bg-rose-soft px-3 py-2.5 text-sm text-rose">

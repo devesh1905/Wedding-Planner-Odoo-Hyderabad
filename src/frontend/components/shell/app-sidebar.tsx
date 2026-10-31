@@ -72,11 +72,7 @@ export function AppSidebar({
               onSearch();
             }}
             aria-label="Search"
-            className={cn(
-              item,
-              "mb-3 border bg-card text-muted-foreground hover:text-foreground",
-              rail ? "w-9 justify-center" : "w-full px-2.5",
-            )}
+            className={cn(item, "mb-3 border bg-card text-muted-foreground hover:text-foreground", rail ? "w-9 justify-center" : "w-full px-2.5")}
           >
             <Icon name="search" className="size-[18px]" />
             {!rail && (

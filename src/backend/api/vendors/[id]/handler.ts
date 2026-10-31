@@ -21,7 +21,8 @@ export const PATCH = handle(async (request: Request, context: Context) => {
     const existing = await tx.vendor.findUnique({ where: { id } });
     if (!existing) throw new HttpError(404, "Vendor not found");
     await validateBackup(tx, {
-      id, category: data.category ?? existing.category,
+      id,
+      category: data.category ?? existing.category,
       backupVendorId: data.backupVendorId === undefined ? existing.backupVendorId : data.backupVendorId,
       previousBackupId: existing.backupVendorId,
     });

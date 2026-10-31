@@ -1,0 +1,9 @@
+.next
+node_modules
+public
+prisma/migrations
+package-lock.json
+demo-assets/quotes
+src/backend/ai/fixtures
+*.md
+*.css

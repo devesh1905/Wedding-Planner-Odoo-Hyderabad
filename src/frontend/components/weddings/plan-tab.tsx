@@ -2,17 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  DndContext,
-  DragOverlay,
-  PointerSensor,
-  TouchSensor,
-  useDraggable,
-  useDroppable,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core";
+import { DndContext, DragOverlay, PointerSensor, TouchSensor, useDraggable, useDroppable, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { Icon, type IconName } from "@/frontend/components/icons/icon";
 import { ListChecks, Loader2, Plus, Sparkles } from "lucide-react";
 import { toast } from "sonner";
@@ -82,10 +72,7 @@ export function PlanTab({ weddingId, tasks, users, hasPlan }: { weddingId: strin
   );
 
   const visible = useMemo(
-    () =>
-      items.filter(
-        (t) => (event === "ALL" || t.event === event) && (owner === "ALL" || t.owner?.id === owner) && (!onlyOverdue || isOverdue(t)),
-      ),
+    () => items.filter((t) => (event === "ALL" || t.event === event) && (owner === "ALL" || t.owner?.id === owner) && (!onlyOverdue || isOverdue(t))),
     [items, event, owner, onlyOverdue],
   );
   const overdueCount = items.filter(isOverdue).length;
@@ -151,11 +138,11 @@ export function PlanTab({ weddingId, tasks, users, hasPlan }: { weddingId: strin
         <p className="mr-auto flex items-center gap-1.5 text-sm text-muted-foreground">
           <Icon name="checklist" className="size-4" />
           <span>
-          <b className="text-foreground tabular">
-            {done}/{items.length}
-          </b>{" "}
-          tasks done
-          {overdueCount > 0 && <span className="ml-2 font-medium text-rose">· {overdueCount} overdue</span>}
+            <b className="text-foreground tabular">
+              {done}/{items.length}
+            </b>{" "}
+            tasks done
+            {overdueCount > 0 && <span className="ml-2 font-medium text-rose">· {overdueCount} overdue</span>}
           </span>
         </p>
         <Select value={event} onValueChange={setEvent}>
@@ -190,7 +177,8 @@ export function PlanTab({ weddingId, tasks, users, hasPlan }: { weddingId: strin
         <AddTask weddingId={weddingId} />
       </div>
 
-      <DndContext id="plan-board"
+      <DndContext
+        id="plan-board"
         sensors={sensors}
         onDragStart={(e) => setDragging(items.find((t) => t.id === e.active.id) ?? null)}
         onDragEnd={onDragEnd}
@@ -242,7 +230,9 @@ function TaskCard({ t, users, onReassign, overlay }: { t: Task; users: User[]; o
       <p className={cn("text-sm leading-snug font-medium", t.stage === "DONE" && "line-through decoration-muted-foreground/50")}>{t.title}</p>
       <div className="mt-2.5 flex items-center gap-2">
         <span className={cn("rounded-md px-1.5 py-0.5 text-[11px] font-medium", EVENT_TONE[t.event] ?? "bg-muted")}>{EVENT_LABEL[t.event] ?? t.event}</span>
-        {t.dueDate && <span className={cn("text-xs tabular", late ? "font-medium text-rose" : "text-muted-foreground")}>{formatDate(t.dueDate).slice(0, 6)}</span>}
+        {t.dueDate && (
+          <span className={cn("text-xs tabular", late ? "font-medium text-rose" : "text-muted-foreground")}>{formatDate(t.dueDate).slice(0, 6)}</span>
+        )}
         <span className="ml-auto" onPointerDown={(e) => e.stopPropagation()}>
           {onReassign ? (
             <Select value={t.owner?.id ?? ""} onValueChange={(v) => onReassign(t, v)}>

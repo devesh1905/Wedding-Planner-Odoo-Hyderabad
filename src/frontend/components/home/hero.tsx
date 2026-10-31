@@ -24,10 +24,7 @@ export function Hero() {
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-b from-transparent to-background" aria-hidden />
 
-      <div
-        aria-hidden
-        className="pointer-events-none absolute top-1/2 right-[-6rem] -z-10 hidden -translate-y-1/2 text-foreground/[0.06] lg:block"
-      >
+      <div aria-hidden className="pointer-events-none absolute top-1/2 right-[-6rem] -z-10 hidden -translate-y-1/2 text-foreground/[0.06] lg:block">
         <KnotMark className="h-[34rem] w-[56rem]" flameClassName="opacity-25" effects={false} />
       </div>
 
@@ -48,37 +45,41 @@ export function Hero() {
         {/* editorial stack: headline, then the sentence and the actions on one line, then the picture
             full width — no column is left waiting for a taller neighbour */}
         <div className="mt-8 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
-        <motion.p
-          initial={reduce ? false : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.5 }}
-          data-cast
-          className="max-w-[34rem] text-lg leading-relaxed text-pretty text-foreground/75"
-        >
-          Twenty-five palace weddings a season in Jaipur and Udaipur, each with its own team and a clear view of every rupee.
-        </motion.p>
-        <motion.div
-          initial={reduce ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.75 }}
-          data-cast
-          className="flex shrink-0 flex-wrap items-center gap-5"
-        >
-          <Magnetic>
-            <ViewTransition name="enquiry-card" share="morph" default="none">
-            <Link
-              href="/enquire"
-              className="group inline-flex items-center gap-3 rounded-full bg-cta px-8 py-4 text-base font-medium text-cta-foreground shadow-[0_10px_30px_-10px_oklch(0.38_0.12_18/0.6)] transition-colors hover:bg-cta/90"
+          <motion.p
+            initial={reduce ? false : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.5 }}
+            data-cast
+            className="max-w-[34rem] text-lg leading-relaxed text-pretty text-foreground/75"
+          >
+            Twenty-five palace weddings a season in Jaipur and Udaipur, each with its own team and a clear view of every rupee.
+          </motion.p>
+          <motion.div
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.75 }}
+            data-cast
+            className="flex shrink-0 flex-wrap items-center gap-5"
+          >
+            <Magnetic>
+              <ViewTransition name="enquiry-card" share="morph" default="none">
+                <Link
+                  href="/enquire"
+                  className="group inline-flex items-center gap-3 rounded-full bg-cta px-8 py-4 text-base font-medium text-cta-foreground shadow-[0_10px_30px_-10px_oklch(0.38_0.12_18/0.6)] transition-colors hover:bg-cta/90"
+                >
+                  Plan your wedding
+                  <Icon name="arrow" className="size-5 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </ViewTransition>
+            </Magnetic>
+            <a
+              href="#journey"
+              className="hit-44 inline-flex items-center gap-1.5 text-sm font-medium text-foreground/70 underline-offset-4 hover:text-foreground hover:underline"
             >
-              Plan your wedding
-              <Icon name="arrow" className="size-5 transition-transform group-hover:translate-x-1" />
-            </Link>
-            </ViewTransition>
-          </Magnetic>
-          <a href="#journey" className="hit-44 inline-flex items-center gap-1.5 text-sm font-medium text-foreground/70 underline-offset-4 hover:text-foreground hover:underline">
-            <Icon name="route" />See how it works
-          </a>
-        </motion.div>
+              <Icon name="route" />
+              See how it works
+            </a>
+          </motion.div>
         </div>
 
         <motion.figure

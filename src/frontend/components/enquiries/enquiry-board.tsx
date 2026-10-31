@@ -4,17 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ScrollRail } from "@/frontend/components/common/scroll-rail";
 import { useRouter } from "next/navigation";
-import {
-  DndContext,
-  DragOverlay,
-  PointerSensor,
-  TouchSensor,
-  useDraggable,
-  useDroppable,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core";
+import { DndContext, DragOverlay, PointerSensor, TouchSensor, useDraggable, useDroppable, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { AlertTriangle, AtSign, Globe, Inbox, MessageCircle, Phone, Search, Users, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/frontend/components/ui/input";
@@ -111,7 +101,8 @@ export function EnquiryBoard({ enquiries, planners }: { enquiries: EnquiryCardDa
         <ScrollRail target={boardRef} className="ml-auto" />
       </div>
 
-      <DndContext id="enquiry-board"
+      <DndContext
+        id="enquiry-board"
         sensors={sensors}
         onDragStart={(e) => setDragging(items.find((i) => i.id === e.active.id) ?? null)}
         onDragEnd={onDragEnd}
@@ -143,9 +134,7 @@ function Column({ status, items, onOpen }: { status: string; items: EnquiryCardD
         <span className="ml-auto rounded-full bg-background px-2 text-xs text-muted-foreground tabular">{items.length}</span>
       </header>
       <div className="flex min-h-24 flex-col gap-2">
-        {items.length === 0 && (
-          <p className="rounded-xl border border-dashed px-3 py-6 text-center text-xs text-muted-foreground">Nothing here yet</p>
-        )}
+        {items.length === 0 && <p className="rounded-xl border border-dashed px-3 py-6 text-center text-xs text-muted-foreground">Nothing here yet</p>}
         {items.map((e) => (
           <DraggableCard key={e.id} e={e} onOpen={onOpen} />
         ))}

@@ -27,8 +27,19 @@ export function OverviewTab({ wedding: w, openIssues }: { wedding: W; openIssues
   return (
     <div className="space-y-6">
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Stat icon="checklist" label="Tasks open" value={w.tasks.filter((t) => t.stage !== "DONE").length} sub={overdue ? `${overdue} overdue` : "On track"} danger={overdue > 0} />
-        <Stat icon="wallet" label="Received from couple" value={<Amount rupees={received} compact />} sub={nextDue ? `Next: ${formatDate(nextDue.dueDate)}` : "All paid"} />
+        <Stat
+          icon="checklist"
+          label="Tasks open"
+          value={w.tasks.filter((t) => t.stage !== "DONE").length}
+          sub={overdue ? `${overdue} overdue` : "On track"}
+          danger={overdue > 0}
+        />
+        <Stat
+          icon="wallet"
+          label="Received from couple"
+          value={<Amount rupees={received} compact />}
+          sub={nextDue ? `Next: ${formatDate(nextDue.dueDate)}` : "All paid"}
+        />
         <Stat icon="shop" label="Vendors booked" value={w.bookings.length} sub={<Amount rupees={vendorCost} compact className="font-normal" />} />
         <Stat icon="warning" label="Open issues" value={openIssues} sub={openIssues ? "Needs attention" : "None"} danger={openIssues > 0} />
       </div>
@@ -36,7 +47,9 @@ export function OverviewTab({ wedding: w, openIssues }: { wedding: W; openIssues
       <div className="grid gap-6 lg:grid-cols-2">
         <Card icon="checklist" title="Coming up" href={`/weddings/${w.id}?tab=plan`}>
           {upcoming.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No open tasks{w.tasks.length === 0 ? " — the plan is generated when the booking payment is recorded." : "."}</p>
+            <p className="text-sm text-muted-foreground">
+              No open tasks{w.tasks.length === 0 ? " — the plan is generated when the booking payment is recorded." : "."}
+            </p>
           ) : (
             <ul className="divide-y">
               {upcoming.map((t) => {

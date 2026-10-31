@@ -28,7 +28,12 @@ const DAYS = [
     credit: (
       <>
         City Palace, Udaipur · Ashwin Geet D&apos;Sa,{" "}
-        <a href="https://commons.wikimedia.org/wiki/File:Udaipur_City_Palace_at_Night.jpg" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">
+        <a
+          href="https://commons.wikimedia.org/wiki/File:Udaipur_City_Palace_at_Night.jpg"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-2 hover:text-foreground"
+        >
           CC BY-SA 4.0
         </a>
       </>

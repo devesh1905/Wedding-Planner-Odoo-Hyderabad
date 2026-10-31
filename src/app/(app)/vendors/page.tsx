@@ -1,5 +1,5 @@
 import { requirePageUser } from "@/backend/auth";
-import { VendorDirectory } from "@/frontend/components/vendors/VendorDirectory";
+import { VendorDirectory } from "@/frontend/components/vendors/vendor-directory";
 
 export const metadata = { title: "Vendors" };
 

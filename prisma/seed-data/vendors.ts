@@ -11,13 +11,19 @@ const names = [
   ["Raj Tent House", "Sheesh Mahal Canopies", "Lakeview Shamiana", "Mewar Marquees"],
   ["Rajputana Rides", "Gulabi Safar", "Lake City Coaches", "Mewar Guest Transit"],
 ] as const;
-export const vendors: VendorSeed[] = vendorCategories.flatMap((category, categoryIndex) => names[categoryIndex]!.map((name, localIndex) => {
-  const index = categoryIndex * 4 + localIndex;
-  return {
-    id: seedId(1, index + 1), name, category, phone: `9${String(810000000 + index).padStart(9, "0")}`,
-    email: `${name.toLowerCase().replace(/[^a-z0-9]+/g, ".")}@example.com`,
-    city: localIndex < 2 ? "Jaipur" : "Udaipur",
-    backupVendorId: seedId(1, categoryIndex * 4 + (localIndex ^ 1) + 1),
-    createdAt: seedTimestamp, updatedAt: seedTimestamp,
-  };
-}));
+export const vendors: VendorSeed[] = vendorCategories.flatMap((category, categoryIndex) =>
+  names[categoryIndex]!.map((name, localIndex) => {
+    const index = categoryIndex * 4 + localIndex;
+    return {
+      id: seedId(1, index + 1),
+      name,
+      category,
+      phone: `9${String(810000000 + index).padStart(9, "0")}`,
+      email: `${name.toLowerCase().replace(/[^a-z0-9]+/g, ".")}@example.com`,
+      city: localIndex < 2 ? "Jaipur" : "Udaipur",
+      backupVendorId: seedId(1, categoryIndex * 4 + (localIndex ^ 1) + 1),
+      createdAt: seedTimestamp,
+      updatedAt: seedTimestamp,
+    };
+  }),
+);

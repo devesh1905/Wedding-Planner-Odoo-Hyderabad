@@ -18,7 +18,15 @@ import { bookingTotals, extraClientCharge, extraCost } from "@/shared/settlement
 import { formatINR } from "@/shared/format";
 import { cn } from "@/shared/utils";
 
-type Extra = { id: string; description: string; qty: number; unitPrice: number; clientUnitPrice: number | null; billableToClient: boolean; milestoneId: string | null };
+type Extra = {
+  id: string;
+  description: string;
+  qty: number;
+  unitPrice: number;
+  clientUnitPrice: number | null;
+  billableToClient: boolean;
+  milestoneId: string | null;
+};
 type Booking = {
   id: string;
   category: string;
@@ -104,12 +112,32 @@ export function SettlementTab({ weddingId, stage, bookings }: { weddingId: strin
           <table className="w-full min-w-[860px] text-sm">
             <thead className="bg-muted/50 text-left text-xs text-muted-foreground">
               <tr>
-                <th className="p-3 font-medium"><Th icon="shop">Vendor</Th></th>
-                <th className="p-3 text-right font-medium"><Th icon="doc" right>Agreed</Th></th>
-                <th className="p-3 text-right font-medium"><Th icon="add" right>Extras</Th></th>
-                <th className="p-3 font-medium"><Th icon="bill">Vendor bill</Th></th>
-                <th className="p-3 text-right font-medium"><Th icon="check" right>Paid</Th></th>
-                <th className="p-3 text-right font-medium"><Th icon="wallet" right>Balance</Th></th>
+                <th className="p-3 font-medium">
+                  <Th icon="shop">Vendor</Th>
+                </th>
+                <th className="p-3 text-right font-medium">
+                  <Th icon="doc" right>
+                    Agreed
+                  </Th>
+                </th>
+                <th className="p-3 text-right font-medium">
+                  <Th icon="add" right>
+                    Extras
+                  </Th>
+                </th>
+                <th className="p-3 font-medium">
+                  <Th icon="bill">Vendor bill</Th>
+                </th>
+                <th className="p-3 text-right font-medium">
+                  <Th icon="check" right>
+                    Paid
+                  </Th>
+                </th>
+                <th className="p-3 text-right font-medium">
+                  <Th icon="wallet" right>
+                    Balance
+                  </Th>
+                </th>
                 <th className="p-3" />
               </tr>
             </thead>
@@ -155,7 +183,9 @@ export function SettlementTab({ weddingId, stage, bookings }: { weddingId: strin
                   </td>
                   <td className="p-3 text-right">
                     <Amount rupees={t.paid} />
-                    <p className="text-xs text-muted-foreground">{b.payments.length} payment{b.payments.length === 1 ? "" : "s"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {b.payments.length} payment{b.payments.length === 1 ? "" : "s"}
+                    </p>
                   </td>
                   <td className="p-3 text-right">
                     {t.balance <= 0 ? (
@@ -253,7 +283,13 @@ function ExtraDialog({ booking: b, onClose }: { booking: Booking; onClose: () =>
     : b.hourlyRate
       ? { description: "Extended hours", unitPrice: b.hourlyRate, unit: "hours" }
       : { description: "", unitPrice: 0, unit: "units" };
-  const [v, setV] = useState({ description: preset.description, qty: "", unitPrice: String(preset.unitPrice || ""), clientUnitPrice: "", billableToClient: true });
+  const [v, setV] = useState({
+    description: preset.description,
+    qty: "",
+    unitPrice: String(preset.unitPrice || ""),
+    clientUnitPrice: "",
+    billableToClient: true,
+  });
   const { errors, pending, submit } = useSubmit(`/api/bookings/${b.id}/extras`, onClose);
   const total = (Number(v.qty) || 0) * (Number(v.unitPrice) || 0);
   const clientTotal = (Number(v.qty) || 0) * (Number(v.clientUnitPrice || v.unitPrice) || 0);
@@ -270,10 +306,7 @@ function ExtraDialog({ booking: b, onClose }: { booking: Booking; onClose: () =>
           className="space-y-4"
           onSubmit={(e) => {
             e.preventDefault();
-            submit(
-              { ...v, clientUnitPrice: v.clientUnitPrice || undefined },
-              () => `Extra of ${formatINR(total)} added`,
-            );
+            submit({ ...v, clientUnitPrice: v.clientUnitPrice || undefined }, () => `Extra of ${formatINR(total)} added`);
           }}
         >
           <Field label="What changed" error={errors.description}>
@@ -296,7 +329,13 @@ function ExtraDialog({ booking: b, onClose }: { booking: Booking; onClose: () =>
           </label>
           {v.billableToClient && (
             <Field label="Rate charged to couple (₹)" hint="Leave empty to charge the vendor's rate" error={errors.clientUnitPrice}>
-              <Input type="number" inputMode="numeric" value={v.clientUnitPrice} onChange={(e) => setV({ ...v, clientUnitPrice: e.target.value })} placeholder={v.unitPrice} />
+              <Input
+                type="number"
+                inputMode="numeric"
+                value={v.clientUnitPrice}
+                onChange={(e) => setV({ ...v, clientUnitPrice: e.target.value })}
+                placeholder={v.unitPrice}
+              />
             </Field>
           )}
           <div className="rounded-xl bg-muted/60 p-3 text-sm">
@@ -345,7 +384,9 @@ function BillDialog({ booking: b, onClose }: { booking: Booking; onClose: () => 
           onSubmit={(e) => {
             e.preventDefault();
             submit({ billNo, amount }, (r) =>
-              r.match === "MATCHED" ? "Bill matches the agreed amount" : `Bill recorded — ${r.match === "OVER_BILLED" ? "over" : "under"} by ${formatINR(Math.abs(r.diff as number))}`,
+              r.match === "MATCHED"
+                ? "Bill matches the agreed amount"
+                : `Bill recorded — ${r.match === "OVER_BILLED" ? "over" : "under"} by ${formatINR(Math.abs(r.diff as number))}`,
             );
           }}
         >
@@ -357,7 +398,11 @@ function BillDialog({ booking: b, onClose }: { booking: Booking; onClose: () => 
           </Field>
           {amount && (
             <p className={cn("rounded-lg px-3 py-2 text-sm", diff === 0 ? "bg-teal-soft text-teal" : diff > 0 ? "bg-rose-soft text-rose" : "bg-marigold-soft")}>
-              {diff === 0 ? "Matches the agreed amount" : diff > 0 ? `${formatINR(diff)} more than agreed — check before paying` : `${formatINR(-diff)} less than agreed`}
+              {diff === 0
+                ? "Matches the agreed amount"
+                : diff > 0
+                  ? `${formatINR(diff)} more than agreed — check before paying`
+                  : `${formatINR(-diff)} less than agreed`}
             </p>
           )}
           {errors.form && <p className="text-sm text-rose">{errors.form}</p>}

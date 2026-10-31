@@ -18,10 +18,14 @@ export const POST = handle(async (request: Request) => {
     await lockWedding(tx, data.weddingId);
     const wedding = await requireSignedWedding(tx, data.weddingId);
     if (wedding.stage === "CANCELLED" || wedding.stage === "SETTLED") throw new HttpError(409, "This wedding no longer accepts quote requests");
-    if (await tx.booking.findFirst({ where: { weddingId: data.weddingId, category: data.category }, select: { id: true } })) throw new HttpError(409, "A vendor has already been booked in this category");
+    if (await tx.booking.findFirst({ where: { weddingId: data.weddingId, category: data.category }, select: { id: true } }))
+      throw new HttpError(409, "A vendor has already been booked in this category");
     const vendors = await tx.vendor.findMany({ where: { id: { in: vendorIds }, category: data.category }, select: { id: true } });
     if (vendors.length !== vendorIds.length) throw new HttpError(400, "Choose existing vendors in the requested category");
-    return tx.quoteRequest.create({ data: { ...data, quotes: { create: vendorIds.map((vendorId) => ({ vendorId, token: newToken() })) } }, select: requestSelect });
+    return tx.quoteRequest.create({
+      data: { ...data, quotes: { create: vendorIds.map((vendorId) => ({ vendorId, token: newToken() })) } },
+      select: requestSelect,
+    });
   });
   return privateJson({ request: requestView(result) }, 201);
 });

@@ -37,7 +37,11 @@ export function WaxSeal({ className }: { className?: string }) {
             strokeOpacity="0.55"
             strokeWidth="4"
           />
-          <path d="M50 4 C 58 13, 60 22, 55 29 C 53 31.4, 51.6 32.8, 50 34.6 C 48.4 32.8, 47 31.4, 45 29 C 40 22, 42 13, 50 4 Z" fill="#e9a6a9" fillOpacity="0.5" />
+          <path
+            d="M50 4 C 58 13, 60 22, 55 29 C 53 31.4, 51.6 32.8, 50 34.6 C 48.4 32.8, 47 31.4, 45 29 C 40 22, 42 13, 50 4 Z"
+            fill="#e9a6a9"
+            fillOpacity="0.5"
+          />
         </g>
       </svg>
     </motion.div>

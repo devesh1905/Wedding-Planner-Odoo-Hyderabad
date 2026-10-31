@@ -38,12 +38,20 @@ export function DayOf({ items, now }: { items: DayOfItem[]; now: Date }) {
         <div className="rounded-xl bg-cta p-4 text-cta-foreground">
           <p className="text-xs tracking-wider uppercase opacity-80">Happening now</p>
           <p className="mt-1 text-lg leading-snug font-semibold">{current ? current.title : "Getting ready"}</p>
-          {current && <p className="text-sm opacity-85">{current.event} · since {time(current.startsAt)}</p>}
+          {current && (
+            <p className="text-sm opacity-85">
+              {current.event} · since {time(current.startsAt)}
+            </p>
+          )}
         </div>
         <div className="rounded-xl border p-4">
           <p className="text-xs tracking-wider text-muted-foreground uppercase">Up next</p>
           <p className="mt-1 text-lg leading-snug font-semibold">{next ? next.title : "That's a wrap!"}</p>
-          {next && <p className="text-sm text-muted-foreground">{next.event} · {time(next.startsAt)}</p>}
+          {next && (
+            <p className="text-sm text-muted-foreground">
+              {next.event} · {time(next.startsAt)}
+            </p>
+          )}
         </div>
       </div>
 

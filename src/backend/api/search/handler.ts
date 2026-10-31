@@ -21,8 +21,5 @@ export const GET = handle(async () => {
     }),
     db.vendor.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, category: true, city: true, phone: true } }),
   ]);
-  return NextResponse.json(
-    { weddings, enquiries, vendors },
-    { headers: { "Cache-Control": "private, no-store" } },
-  );
+  return NextResponse.json({ weddings, enquiries, vendors }, { headers: { "Cache-Control": "private, no-store" } });
 });

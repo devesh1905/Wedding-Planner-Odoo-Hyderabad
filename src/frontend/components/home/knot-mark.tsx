@@ -9,8 +9,7 @@
 import { useId } from "react";
 import { ShaderFlame } from "@/frontend/components/cave/shader-flame";
 
-const KNOT =
-  "M50 34 C 40 22, 26 16, 15 21 C 5 26, 6 42, 17 45 C 29 48, 40 41, 50 34 C 60 27, 71 20, 83 23 C 94 26, 95 42, 85 45 C 74 49, 60 42, 50 34 Z";
+const KNOT = "M50 34 C 40 22, 26 16, 15 21 C 5 26, 6 42, 17 45 C 29 48, 40 41, 50 34 C 60 27, 71 20, 83 23 C 94 26, 95 42, 85 45 C 74 49, 60 42, 50 34 Z";
 
 // Base of every layer sits at the crossing (y≈34), hidden by the knot stroke.
 const OUTER = "M50 4 C 58.5 13, 60.5 22, 55.2 29 C 53.4 31.4, 51.6 32.8, 50 34.6 C 48.4 32.8, 46.6 31.4, 44.8 29 C 39.5 22, 41.5 13, 50 4 Z";
@@ -70,7 +69,17 @@ export function KnotMark({
       {/* shadow cast by the knot, falling away (down) from the flame */}
       {effects && (
         <g className={`flame-shadow ${flameState}`}>
-          <path d={KNOT} stroke="#2a0a10" strokeWidth="3.4" strokeLinejoin="round" opacity="0.28" transform="translate(0 2.6)" filter={u("soft")} pathLength={1} className={draw} />
+          <path
+            d={KNOT}
+            stroke="#2a0a10"
+            strokeWidth="3.4"
+            strokeLinejoin="round"
+            opacity="0.28"
+            transform="translate(0 2.6)"
+            filter={u("soft")}
+            pathLength={1}
+            className={draw}
+          />
         </g>
       )}
 

@@ -27,7 +27,9 @@ function leveragePoints(target: Offer, offers: Offer[], guestCount: number | nul
     const pct = Math.round((gap / target.total) * 100);
     points.push(`The lowest quote is ${formatINR(best.total)} in total, ${formatINR(gap)} (${pct}%) below this quote of ${formatINR(target.total)}.`);
     if (target.perPlate !== null && best.perPlate !== null && best.perPlate < target.perPlate) {
-      points.push(`Per plate: ${formatINR(target.perPlate)} here against ${formatINR(best.perPlate)} in the lowest quote${guestCount ? ` (${guestCount} guests)` : ""}.`);
+      points.push(
+        `Per plate: ${formatINR(target.perPlate)} here against ${formatINR(best.perPlate)} in the lowest quote${guestCount ? ` (${guestCount} guests)` : ""}.`,
+      );
     }
   }
   if (cheaper.length > 1) points.push(`${cheaper.length} of the ${offers.length - 1} other quotes are cheaper than this one.`);

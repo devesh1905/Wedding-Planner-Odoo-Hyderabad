@@ -22,7 +22,10 @@ export const POST = handle(async (_req: Request, { params }: { params: Promise<{
       data: {
         weddingId: id,
         type: "ADDON",
-        label: `Add-ons: ${extras.map((e) => e.description).join(", ").slice(0, 120)}`,
+        label: `Add-ons: ${extras
+          .map((e) => e.description)
+          .join(", ")
+          .slice(0, 120)}`,
         amount,
         dueDate: addDays(new Date(), 7),
       },

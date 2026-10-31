@@ -6,20 +6,8 @@
 // confirm button picks the time for the booking form instead of booking directly.
 
 import { ArrowRight, Check, Globe } from "lucide-react";
-import {
-  AnimatePresence,
-  motion,
-  type Transition,
-  useReducedMotion,
-} from "framer-motion";
-import {
-  type KeyboardEvent,
-  type MouseEvent,
-  type PointerEvent,
-  useId,
-  useRef,
-  useState,
-} from "react";
+import { AnimatePresence, motion, type Transition, useReducedMotion } from "framer-motion";
+import { type KeyboardEvent, type MouseEvent, type PointerEvent, useId, useRef, useState } from "react";
 import { cn } from "@/shared/utils";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
@@ -27,8 +15,7 @@ const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 const STEP = 15;
 /** Height of one minute on the day rail, in px. */
 const PX = 0.8;
-const HATCH =
-  "repeating-linear-gradient(135deg, currentColor 0 1px, transparent 1px 6px)";
+const HATCH = "repeating-linear-gradient(135deg, currentColor 0 1px, transparent 1px 6px)";
 
 /** Minutes from midnight. */
 type Span = [number, number];
@@ -57,20 +44,7 @@ export interface SlotPickerProps {
 const h = (hours: number, minutes = 0) => hours * 60 + minutes;
 
 const WEEKDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const MONTH = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
+const MONTH = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const parse = (iso: string) => {
   const [y, m, d] = iso.split("-").map(Number);
@@ -87,9 +61,7 @@ const clock = (minutes: number, suffix = true) => {
   const hours = Math.floor(wrapped / 60);
   const mins = wrapped % 60;
   const twelve = hours % 12 || 12;
-  const time = mins
-    ? `${twelve}:${String(mins).padStart(2, "0")}`
-    : `${twelve}`;
+  const time = mins ? `${twelve}:${String(mins).padStart(2, "0")}` : `${twelve}`;
   return suffix ? `${time}${hours >= 12 ? "pm" : "am"}` : time;
 };
 
@@ -100,8 +72,7 @@ const range = (start: number, minutes: number) => {
   return `${clock(start, !same)} – ${clock(end)}`;
 };
 
-const lengthLabel = (minutes: number) =>
-  minutes < 60 ? `${minutes} min` : `${minutes / 60} hr`;
+const lengthLabel = (minutes: number) => (minutes < 60 ? `${minutes} min` : `${minutes / 60} hr`);
 
 /** Every quarter hour where the whole meeting fits. */
 function startsFor(day: SlotDay, minutes: number) {
@@ -126,11 +97,7 @@ function nearest(starts: number[], target: number) {
 }
 
 function freeMinutes(day: SlotDay) {
-  const busy = day.busy.reduce(
-    (sum, [a, b]) =>
-      sum + Math.max(0, Math.min(b, day.open[1]) - Math.max(a, day.open[0])),
-    0
-  );
+  const busy = day.busy.reduce((sum, [a, b]) => sum + Math.max(0, Math.min(b, day.open[1]) - Math.max(a, day.open[0])), 0);
   return day.open[1] - day.open[0] - busy;
 }
 
@@ -162,41 +129,19 @@ function DayStrip({
             aria-pressed={i === active}
             className={cn(
               "relative flex flex-col items-center rounded-2xl py-2 outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed",
-              i !== active && "hover:bg-muted/60"
+              i !== active && "hover:bg-muted/60",
             )}
             disabled={full}
             key={d.date}
             onClick={() => onPick(i)}
             type="button"
           >
-            {i === active && (
-              <motion.span
-                className="absolute inset-0 rounded-2xl border border-cta"
-                layoutId={layoutId}
-                transition={spring}
-              />
-            )}
-            <span className="text-[11px] text-muted-foreground">
-              {WEEKDAY[date.getUTCDay()]}
-            </span>
-            <span
-              className={cn(
-                "font-semibold text-lg tabular-nums leading-tight",
-                full
-                  ? "text-muted-foreground/40"
-                  : "text-foreground"
-              )}
-            >
+            {i === active && <motion.span className="absolute inset-0 rounded-2xl border border-cta" layoutId={layoutId} transition={spring} />}
+            <span className="text-[11px] text-muted-foreground">{WEEKDAY[date.getUTCDay()]}</span>
+            <span className={cn("font-semibold text-lg tabular-nums leading-tight", full ? "text-muted-foreground/40" : "text-foreground")}>
               {date.getUTCDate()}
             </span>
-            <span
-              className={cn(
-                "text-[10px] tabular-nums leading-[14px]",
-                full
-                  ? "text-muted-foreground/60"
-                  : "text-teal"
-              )}
-            >
+            <span className={cn("text-[10px] tabular-nums leading-[14px]", full ? "text-muted-foreground/60" : "text-teal")}>
               {full ? "Full" : `${free || 0}h free`}
             </span>
           </button>
@@ -207,34 +152,18 @@ function DayStrip({
 }
 
 /** A meeting already in the calendar, or the hours outside the day. */
-function Blocked({
-  span,
-  from,
-  label,
-}: {
-  span: Span;
-  from: number;
-  label?: string;
-}) {
+function Blocked({ span, from, label }: { span: Span; from: number; label?: string }) {
   const height = (span[1] - span[0]) * PX;
   return (
     <div
-      className={cn(
-        "absolute inset-x-0 overflow-hidden text-border",
-        label &&
-          "rounded-lg border bg-muted"
-      )}
+      className={cn("absolute inset-x-0 overflow-hidden text-border", label && "rounded-lg border bg-muted")}
       style={{
         top: (span[0] - from) * PX,
         height,
         backgroundImage: HATCH,
       }}
     >
-      {label && height >= 20 && (
-        <span className="absolute top-1 left-2 font-medium text-[10px] text-muted-foreground leading-3">
-          {label}
-        </span>
-      )}
+      {label && height >= 20 && <span className="absolute top-1 left-2 font-medium text-[10px] text-muted-foreground leading-3">{label}</span>}
     </div>
   );
 }
@@ -256,10 +185,7 @@ function ConfirmBar({
   onConfirm: () => void;
   fade: Transition;
 }) {
-  const hostTime =
-    start !== null && host.offset
-      ? `${clock(start + host.offset)} for ${host.name.split(" ")[0]}${host.city ? ` in ${host.city}` : ""}`
-      : null;
+  const hostTime = start !== null && host.offset ? `${clock(start + host.offset)} for ${host.name.split(" ")[0]}${host.city ? ` in ${host.city}` : ""}` : null;
   return (
     <div className="mt-4 flex items-center gap-3 border-t pt-4">
       <div className="relative h-9 min-w-0 flex-1 overflow-hidden">
@@ -273,19 +199,13 @@ function ConfirmBar({
             transition={fade}
           >
             {start === null || !day ? (
-              <p className="text-xs text-muted-foreground">
-                Click a free gap, then drag it to move.
-              </p>
+              <p className="text-xs text-muted-foreground">Click a free gap, then drag it to move.</p>
             ) : (
               <>
                 <p className="truncate font-medium text-sm text-foreground tabular-nums">
                   {longDate(day.date)} · {range(start, minutes)}
                 </p>
-                {hostTime && (
-                  <p className="truncate text-xs text-muted-foreground tabular-nums">
-                    {hostTime}
-                  </p>
-                )}
+                {hostTime && <p className="truncate text-xs text-muted-foreground tabular-nums">{hostTime}</p>}
               </>
             )}
           </motion.div>
@@ -294,9 +214,7 @@ function ConfirmBar({
       <button
         className={cn(
           "flex h-9 shrink-0 items-center gap-1.5 rounded-xl px-3.5 font-medium text-xs outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40",
-          booked
-            ? "bg-teal text-white"
-            : "bg-cta text-cta-foreground hover:bg-cta/90"
+          booked ? "bg-teal text-white" : "bg-cta text-cta-foreground hover:bg-cta/90",
         )}
         disabled={start === null}
         onClick={onConfirm}
@@ -365,9 +283,7 @@ export function SlotPicker({
     hours.push(t);
   }
 
-  const spring = reduceMotion
-    ? { duration: 0 }
-    : { type: "spring" as const, duration: 0.35, bounce: 0 };
+  const spring = reduceMotion ? { duration: 0 } : { type: "spring" as const, duration: 0.35, bounce: 0 };
   const fade = { duration: reduceMotion ? 0 : 0.18, ease: EASE_OUT };
 
   /** Minutes on the rail under the pointer. */
@@ -407,11 +323,7 @@ export function SlotPicker({
       return;
     }
     const over = start !== null && at >= start && at <= start + minutes;
-    setGhost(
-      event.pointerType === "mouse" && !over && !booked
-        ? nearest(starts, at - minutes / 2)
-        : null
-    );
+    setGhost(event.pointerType === "mouse" && !over && !booked ? nearest(starts, at - minutes / 2) : null);
   };
 
   const onKey = (event: KeyboardEvent<HTMLButtonElement>) => {
@@ -462,85 +374,54 @@ export function SlotPicker({
     .slice(0, 2);
 
   return (
-    <div
-      className={cn(
-        "w-full max-w-sm rounded-3xl border bg-card p-5",
-        className
-      )}
-    >
+    <div className={cn("w-full max-w-sm rounded-3xl border bg-card p-5", className)}>
       <div className="flex items-center gap-3">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-cta font-medium text-cta-foreground text-xs">
-          {initials}
-        </span>
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-cta font-medium text-cta-foreground text-xs">{initials}</span>
         <div className="min-w-0 flex-1 leading-tight">
-          <p className="truncate font-medium text-sm text-foreground">
-            {host.title}
-          </p>
-          <p className="truncate text-xs text-muted-foreground">
-            with {host.name}
-          </p>
+          <p className="truncate font-medium text-sm text-foreground">{host.title}</p>
+          <p className="truncate text-xs text-muted-foreground">with {host.name}</p>
         </div>
       </div>
 
       {durations.length > 1 && (
-      <div className="mt-4 flex rounded-full bg-muted p-0.5">
-        {durations.map((d) => (
-          <button
-            aria-pressed={d === minutes}
-            className={cn(
-              "relative z-10 h-8 flex-1 rounded-full font-medium text-xs tabular-nums outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-ring",
-              d === minutes
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-            key={d}
-            onClick={() => pickMinutes(d)}
-            type="button"
-          >
-            {d === minutes && (
-              <motion.span
-                className="absolute inset-0 -z-10 rounded-full bg-background shadow-[0_1px_2px_rgb(0_0_0/0.08)]"
-                layoutId={`${layoutScope}-length`}
-                transition={spring}
-              />
-            )}
-            {lengthLabel(d)}
-          </button>
-        ))}
-      </div>
+        <div className="mt-4 flex rounded-full bg-muted p-0.5">
+          {durations.map((d) => (
+            <button
+              aria-pressed={d === minutes}
+              className={cn(
+                "relative z-10 h-8 flex-1 rounded-full font-medium text-xs tabular-nums outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-ring",
+                d === minutes ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+              )}
+              key={d}
+              onClick={() => pickMinutes(d)}
+              type="button"
+            >
+              {d === minutes && (
+                <motion.span
+                  className="absolute inset-0 -z-10 rounded-full bg-background shadow-[0_1px_2px_rgb(0_0_0/0.08)]"
+                  layoutId={`${layoutScope}-length`}
+                  transition={spring}
+                />
+              )}
+              {lengthLabel(d)}
+            </button>
+          ))}
+        </div>
       )}
 
-      <DayStrip
-        active={dayIndex}
-        days={days}
-        layoutId={`${layoutScope}-day`}
-        minutes={minutes}
-        onPick={pickDay}
-        spring={spring}
-      />
+      <DayStrip active={dayIndex} days={days} layoutId={`${layoutScope}-day`} minutes={minutes} onPick={pickDay} spring={spring} />
 
       {/* The day: hour lines, what's taken, and the meeting you're placing. */}
       <div className="mt-4 flex gap-2">
-        <div
-          aria-hidden="true"
-          className="relative w-9 shrink-0"
-          style={{ height: (to - from) * PX }}
-        >
+        <div aria-hidden="true" className="relative w-9 shrink-0" style={{ height: (to - from) * PX }}>
           {hours.map((t) => (
-            <span
-              className="absolute right-0 -translate-y-1/2 text-[10px] text-muted-foreground tabular-nums"
-              key={t}
-              style={{ top: (t - from) * PX }}
-            >
+            <span className="absolute right-0 -translate-y-1/2 text-[10px] text-muted-foreground tabular-nums" key={t} style={{ top: (t - from) * PX }}>
               {clock(t)}
             </span>
           ))}
         </div>
         <div
-          className={cn(
-            "relative flex-1 touch-none select-none",
-            dragging ? "cursor-grabbing" : "cursor-pointer"
-          )}
+          className={cn("relative flex-1 touch-none select-none", dragging ? "cursor-grabbing" : "cursor-pointer")}
           onPointerCancel={() => setDragging(false)}
           onPointerDown={onDown}
           onPointerLeave={() => setGhost(null)}
@@ -558,25 +439,12 @@ export function SlotPicker({
             />
           )}
           {hours.map((t) => (
-            <span
-              className="absolute inset-x-0 border-t border-border/60"
-              key={t}
-              style={{ top: (t - from) * PX }}
-            />
+            <span className="absolute inset-x-0 border-t border-border/60" key={t} style={{ top: (t - from) * PX }} />
           ))}
-          {day && day.open[0] > from && (
-            <Blocked from={from} span={[from, day.open[0]]} />
-          )}
-          {day && day.open[1] < to && (
-            <Blocked from={from} span={[day.open[1], to]} />
-          )}
+          {day && day.open[0] > from && <Blocked from={from} span={[from, day.open[0]]} />}
+          {day && day.open[1] < to && <Blocked from={from} span={[day.open[1], to]} />}
           {day?.busy.map((span) => (
-            <Blocked
-              from={from}
-              key={`${day.date}-${span[0]}`}
-              label="Busy"
-              span={span}
-            />
+            <Blocked from={from} key={`${day.date}-${span[0]}`} label="Busy" span={span} />
           ))}
 
           {ghost !== null && start !== ghost && (
@@ -584,9 +452,7 @@ export function SlotPicker({
               className="pointer-events-none absolute inset-x-0 rounded-lg border border-cta/60 border-dashed bg-cta/10"
               style={{ top: (ghost - from) * PX, height: minutes * PX }}
             >
-              <span className="absolute top-1 left-2 font-medium text-[10px] text-cta tabular-nums leading-3">
-                {range(ghost, minutes)}
-              </span>
+              <span className="absolute top-1 left-2 font-medium text-[10px] text-cta tabular-nums leading-3">{range(ghost, minutes)}</span>
             </div>
           )}
 
@@ -602,22 +468,14 @@ export function SlotPicker({
                 aria-label={`${longDate(day?.date ?? "")}, ${range(start, minutes)}. Arrow keys move it.`}
                 className={cn(
                   "flex h-full w-full items-start gap-1 overflow-hidden rounded-lg px-2 py-1 text-left font-medium text-[11px] tabular-nums leading-4 outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                  booked
-                    ? "bg-teal text-white"
-                    : "bg-cta text-cta-foreground shadow-sm",
-                  !(booked || dragging) && "cursor-grab"
+                  booked ? "bg-teal text-white" : "bg-cta text-cta-foreground shadow-sm",
+                  !(booked || dragging) && "cursor-grab",
                 )}
                 onKeyDown={onKey}
                 ref={meetingRef}
                 type="button"
               >
-                {booked && (
-                  <Check
-                    aria-hidden
-                    className="mt-0.5 size-3 shrink-0"
-                    strokeWidth={3}
-                  />
-                )}
+                {booked && <Check aria-hidden className="mt-0.5 size-3 shrink-0" strokeWidth={3} />}
                 <span className="truncate">{range(start, minutes)}</span>
               </button>
             </motion.div>

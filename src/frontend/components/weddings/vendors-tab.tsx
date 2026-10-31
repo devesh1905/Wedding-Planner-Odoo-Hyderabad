@@ -64,7 +64,8 @@ export function VendorsTab({ weddingId, bookings, quotePanel }: { weddingId: str
                         </>
                       ) : b.hourlyRate != null && b.agreedHours != null ? (
                         <>
-                          {b.agreedHours} h · extra <Amount rupees={b.hourlyRate} className="font-normal" />/h
+                          {b.agreedHours} h · extra <Amount rupees={b.hourlyRate} className="font-normal" />
+                          /h
                         </>
                       ) : (
                         "Fixed price"
