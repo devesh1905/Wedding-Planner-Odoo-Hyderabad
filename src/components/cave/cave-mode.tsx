@@ -111,7 +111,8 @@ function Cave() {
     const html = document.documentElement;
     const diya = diyaRef.current!;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const bigRadius = () => Math.hypot(innerWidth, innerHeight) * 1.3;
+    // docked light reaches well past the far edge, so the whole page is readable
+    const bigRadius = () => Math.hypot(innerWidth, innerHeight) * 2.6;
 
     const goToSlot = (id: string) => {
       if (!slots.has(id)) return;
