@@ -27,7 +27,10 @@ export async function extractAndPersistQuote(id: string, expectedUpdatedAt?: Dat
     const text = await extractTextFromPdf(bytes);
     const extraction = await extractQuote(text);
     data = extractionForStorage(extraction.data, snapshot);
-  } catch { throw new HttpError(422, extractionFallbackMessage); }
+  } catch (error) {
+    console.error("Quote PDF reading failed", error);
+    throw new HttpError(422, extractionFallbackMessage);
+  }
   return quoteTransaction(async (tx) => {
     await lockWedding(tx, snapshot.request.weddingId);
     const currentWedding = await requireSignedWedding(tx, snapshot.request.weddingId);
