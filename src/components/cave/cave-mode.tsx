@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { flameState, ShaderFlame } from "./shader-flame";
 
 /**
  * Cave mode (couples' home, dark theme only).
@@ -265,6 +266,7 @@ function Cave() {
       const lean = Math.max(-18, Math.min(18, -st.vx * 0.02));
       diya.style.transform = `translate3d(${st.x - 36}px, ${st.y - 62}px, 0)`;
       diya.style.setProperty("--lean", `${lean.toFixed(1)}deg`);
+      flameState.lean = (lean / 18) * 0.6;
 
       // light
       const t = now / 1000;
@@ -342,13 +344,16 @@ function Cave() {
 }
 
 /**
- * HD brass diya (photo, transparent PNG) with our animated vector flame sitting on the wick tip.
+ * HD brass diya (photo, transparent PNG) with a live WebGL flame on the wick tip (vector flame as fallback).
  * Element box 72×96: bowl image at the bottom, flame above the spout. The flame leans with --lean.
  */
 function DiyaGraphic() {
   return (
     <>
       <span className="diya-flame-glow" aria-hidden />
+      <ShaderFlame
+        className="diya-flame-gl"
+        fallback={
       <svg viewBox="20 4 20 30" className="diya-flame" aria-hidden>
         <defs>
           <linearGradient id="diya-outer" x1="0" y1="0" x2="0" y2="1">
@@ -368,6 +373,8 @@ function DiyaGraphic() {
           </g>
         </g>
       </svg>
+        }
+      />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/brand/diya-bowl.png" srcSet="/brand/diya-bowl.png 1x, /brand/diya-bowl@2x.png 2x" alt="" draggable={false} className="diya-bowl" />
     </>

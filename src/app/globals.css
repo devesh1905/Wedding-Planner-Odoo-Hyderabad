@@ -544,3 +544,14 @@ html { scroll-behavior: smooth; }
   background: radial-gradient(circle, rgb(255 190 100 / 0.55) 0%, rgb(255 150 60 / 0.22) 35%, transparent 70%);
   animation: halo-breathe 3.1s ease-in-out infinite;
 }
+/* Live shader flame over the wick; screen-blended so it glows like real fire. */
+.diya-flame-gl {
+  position: absolute;
+  left: -10px;
+  top: 4px;
+  width: 44px;
+  height: 64px;
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: screen;
+}
