@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Download } from "lucide-react";
 import { requirePageUser } from "@/lib/auth";
-import { getSeasonReport, type Period } from "@/lib/reports";
+import { getReport, type Period } from "@/lib/reports";
 import { PageHeader } from "@/components/common/page-header";
 import { Button } from "@/components/ui/button";
 import { DashboardView } from "@/components/dashboard/dashboard-view";
@@ -21,7 +21,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   await requirePageUser("FOUNDER");
   const { period: p } = await searchParams;
   const period = (PERIODS.some((x) => x.key === p) ? p : "season") as Period;
-  const report = await getSeasonReport(period);
+  const report = await getReport(period);
 
   return (
     <>

@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { db } from "./db";
 import { bookingTotals } from "./settlement";
 
@@ -47,7 +48,9 @@ export async function getSeasonReport(period: Period = "season") {
   const inPeriod = (d: Date) => !win || (d >= win.from && d < win.to);
 
   const [allWeddings, vendors, issues] = await Promise.all([
+    // One joined query instead of a round trip per relation — the dashboard's biggest cost.
     db.wedding.findMany({
+      relationLoadStrategy: "join",
       where: { stage: { not: "CANCELLED" } },
       orderBy: { startDate: "asc" },
       include: {
@@ -58,6 +61,8 @@ export async function getSeasonReport(period: Period = "season") {
       },
     }),
     db.vendor.findMany({
+      relationLoadStrategy: "join",
+      where: { bookings: { some: {} } },
       include: {
         bookings: { include: { checkins: true, bills: true, extras: true, payments: true } },
       },
@@ -172,3 +177,20 @@ export async function getSeasonReport(period: Period = "season") {
 }
 
 export type SeasonReport = Awaited<ReturnType<typeof getSeasonReport>>;
+
+/** Cache tag for every number on the dashboard; any API write expires it (see `handle()` in lib/auth). */
+export const REPORT_TAG = "report";
+
+const ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
+// The data cache stores JSON, so dates come back as strings — turn them back into Dates.
+const revive = <T,>(v: T): T => JSON.parse(JSON.stringify(v), (_k, x) => (typeof x === "string" && ISO.test(x) ? new Date(x) : x));
+
+const cachedReport = unstable_cache((period: Period) => getSeasonReport(period), ["season-report"], { tags: [REPORT_TAG], revalidate: 60 });
+
+/**
+ * The dashboard's report, served from cache so the page is instant. Fresh within a moment of any
+ * change made through the app; at most 60 s old for changes made outside it (e.g. seed scripts).
+ */
+export async function getReport(period: Period = "season"): Promise<SeasonReport> {
+  return revive(await cachedReport(period));
+}

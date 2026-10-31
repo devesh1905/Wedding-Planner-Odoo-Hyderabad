@@ -10,7 +10,7 @@ export function ProfitChart({ rows }: { rows: Row[] }) {
   const data = rows.map((r) => ({ ...r, label: r.couple.split(" & ")[0] }));
   return (
     <div className="h-72 w-full">
-      <ResponsiveContainer>
+      <ResponsiveContainer initialDimension={{ width: 800, height: 288 }}>
         <BarChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
           <CartesianGrid vertical={false} stroke="var(--border)" />
           <XAxis dataKey="label" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} interval={0} angle={-35} textAnchor="end" height={56} tickLine={false} axisLine={false} />

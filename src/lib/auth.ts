@@ -2,6 +2,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { SESSION_COOKIE, verifySession, type SessionPayload } from "./session";
 
 export async function getSession(): Promise<SessionPayload | null> {
@@ -35,7 +36,11 @@ export async function requireUser(role?: SessionPayload["role"]) {
 export function handle<A extends unknown[]>(fn: (...args: A) => Promise<Response>) {
   return async (...args: A) => {
     try {
-      return await fn(...args);
+      const res = await fn(...args);
+      // Any successful write may change dashboard numbers: drop the cached report right away.
+      const req = args[0];
+      if (res.ok && req instanceof Request && req.method !== "GET") revalidateTag("report", { expire: 0 });
+      return res;
     } catch (e) {
       if (e instanceof HttpError) return NextResponse.json({ error: e.message }, { status: e.status });
       if (e && typeof e === "object" && "issues" in e) {
