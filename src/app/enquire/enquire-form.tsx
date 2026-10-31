@@ -7,6 +7,7 @@ import { EnquiryFields, emptyEnquiry, toPayload, type EnquiryValues } from "@/co
 import { enquiryInput } from "@/lib/validation/enquiry";
 import { api, ApiError } from "@/lib/api-client";
 import { cue } from "@/lib/sound";
+import { petalShower } from "@/components/home/petals";
 
 export function EnquireForm() {
   const [values, setValues] = useState<EnquiryValues>(emptyEnquiry);
@@ -30,6 +31,7 @@ export function EnquireForm() {
       const res = await api<{ reference: string }>("/api/public/enquiries", { method: "POST", body: payload });
       setReference(res.reference);
       cue("success", "strong");
+      petalShower("soft");
     } catch (err) {
       if (err instanceof ApiError && err.fields) setErrors(err.fields);
       else setErrors({ form: err instanceof Error ? err.message : "Could not send" });

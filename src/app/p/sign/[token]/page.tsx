@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { formatDateTime } from "@/lib/format";
 import { SignForm } from "./sign-form";
 
-export const metadata: Metadata = { title: "Your service agreement", robots: { index: false } };
+export const metadata: Metadata = { title: { absolute: "Your service agreement · The Royal Knot" }, robots: { index: false } };
 
 export default async function SignPage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;

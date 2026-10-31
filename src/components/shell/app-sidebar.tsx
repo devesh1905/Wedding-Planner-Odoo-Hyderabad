@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { CalendarHeart, Inbox, LayoutDashboard, LogOut, Store } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { initials } from "@/lib/format";
+import { KnotMark } from "@/components/home/knot-mark";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, founderOnly: true },
@@ -27,10 +28,7 @@ export function AppSidebar({ user, onNavigate }: { user: { name: string; role: s
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-3 px-5 py-6">
         <div className="grid size-9 place-items-center rounded-full bg-marigold text-maroon">
-          <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-            <circle cx="9" cy="12" r="5" />
-            <circle cx="15" cy="12" r="5" />
-          </svg>
+          <KnotMark className="h-4 w-7" />
         </div>
         <div className="leading-tight">
           <p className="font-serif text-xl font-semibold">The Royal Knot</p>
