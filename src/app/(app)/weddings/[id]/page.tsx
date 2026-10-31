@@ -13,6 +13,7 @@ import { PlanTab } from "@/components/weddings/plan-tab";
 import { PaymentsTab } from "@/components/weddings/payments-tab";
 import { OverviewTab } from "@/components/weddings/overview-tab";
 import { VendorsTab } from "@/components/weddings/vendors-tab";
+import { SettlementTab } from "@/components/weddings/settlement-tab";
 
 const TABS = [
   { key: "overview", label: "Overview" },
@@ -48,7 +49,10 @@ export default async function WeddingPage({
         include: { owner: { select: { id: true, name: true, avatarColor: true } } },
       },
       milestones: { orderBy: { dueDate: "asc" } },
-      bookings: { include: { vendor: { select: { id: true, name: true, phone: true } } }, orderBy: { category: "asc" } },
+      bookings: {
+        include: { vendor: { select: { id: true, name: true, phone: true } }, extras: true, payments: true, bills: true },
+        orderBy: { category: "asc" },
+      },
       issues: { where: { status: "OPEN" }, select: { id: true } },
     },
   });
@@ -136,9 +140,7 @@ export default async function WeddingPage({
       {tab === "plan" && <PlanTab weddingId={wedding.id} tasks={plain.tasks} users={users} hasPlan={wedding.tasks.length > 0} />}
       {tab === "vendors" && <VendorsTab weddingId={wedding.id} bookings={plain.bookings} />}
       {tab === "payments" && <PaymentsTab milestones={plain.milestones} contractValue={wedding.contractValue} />}
-      {tab === "settlement" && (
-        <div className="rounded-2xl border border-dashed p-10 text-center text-muted-foreground">Settlement is being built next.</div>
-      )}
+      {tab === "settlement" && <SettlementTab weddingId={wedding.id} stage={wedding.stage} bookings={plain.bookings} />}
     </>
   );
 }
