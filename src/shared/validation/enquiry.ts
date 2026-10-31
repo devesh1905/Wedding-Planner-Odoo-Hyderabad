@@ -4,19 +4,16 @@ import { email, guestCount, name, optionalEmail, phone, rupees } from "./common"
 
 export const SOURCES = ["WEB_FORM", "PHONE", "INSTAGRAM", "WHATSAPP", "REFERRAL", "WALK_IN"] as const;
 export const STATUSES = ["NEW", "CONTACTED", "MEETING_BOOKED", "AGREEMENT_SENT", "SIGNED", "LOST"] as const;
-export const THEMES = [
-  "Royal Heritage",
-  "Beach Chic",
-  "Pastel Garden",
-  "Modern Minimal",
-  "Desert Boho",
-  "Lakeside Ivory",
-  "Mehendi Marigold",
-] as const;
+export const THEMES = ["Royal Heritage", "Beach Chic", "Pastel Garden", "Modern Minimal", "Desert Boho", "Lakeside Ivory", "Mehendi Marigold"] as const;
 export const CITIES = ["Jaipur", "Udaipur", "Jodhpur", "Other"] as const;
 
 const optionalText = (max: number) =>
-  z.string().trim().max(max, "Too long").optional().transform((v) => v || undefined);
+  z
+    .string()
+    .trim()
+    .max(max, "Too long")
+    .optional()
+    .transform((v) => v || undefined);
 
 /** Shared by the public form and the planner's quick-add. */
 export const enquiryInput = z.object({
@@ -35,14 +32,26 @@ export const enquiryInput = z.object({
   notes: optionalText(1000),
   // "Build your package" selection. The estimate is NOT accepted from the client: the server
   // recomputes it from these fields (see shared/package-builder.ts).
-  services: z.array(z.enum(SERVICE_KEYS)).max(10).optional().transform((v) => (v ? [...new Set(v)] : undefined)),
-  events: z.array(z.enum(EVENTS)).max(EVENTS.length).optional().transform((v) => (v ? [...new Set(v)] : undefined)),
+  services: z
+    .array(z.enum(SERVICE_KEYS))
+    .max(10)
+    .optional()
+    .transform((v) => (v ? [...new Set(v)] : undefined)),
+  events: z
+    .array(z.enum(EVENTS))
+    .max(EVENTS.length)
+    .optional()
+    .transform((v) => (v ? [...new Set(v)] : undefined)),
   planning: z.enum(PLANNING_KEYS).optional(),
 });
 
 export const staffEnquiryInput = enquiryInput.extend({
   source: z.enum(SOURCES).default("PHONE"),
-  assignedToId: z.string().uuid().optional().or(z.literal("").transform(() => undefined)),
+  assignedToId: z
+    .string()
+    .uuid()
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
 });
 
 export const enquiryPatch = z
@@ -72,10 +81,7 @@ export const meetingInput = z.object({
 
 export const signInput = z.object({
   signerName: name,
-  signature: z
-    .string()
-    .startsWith("data:image/png;base64,", "Please sign in the box")
-    .max(400_000, "Signature image too large"),
+  signature: z.string().startsWith("data:image/png;base64,", "Please sign in the box").max(400_000, "Signature image too large"),
   agree: z.literal(true, { message: "Please accept the agreement" }),
 });
 

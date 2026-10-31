@@ -96,7 +96,12 @@ export function ConvertDialog({ enquiry, trigger, onDone }: Props) {
             <Field label="Guests" icon="guests" error={errors.guestCount}>
               <Input type="number" inputMode="numeric" value={v.guestCount} onChange={set("guestCount")} />
             </Field>
-            <Field label="Contract value (₹)" icon="money" error={errors.contractValue} hint={enquiry.maxBudget ? `Budget up to ${formatINR(enquiry.maxBudget)}` : undefined}>
+            <Field
+              label="Contract value (₹)"
+              icon="money"
+              error={errors.contractValue}
+              hint={enquiry.maxBudget ? `Budget up to ${formatINR(enquiry.maxBudget)}` : undefined}
+            >
               <Input type="number" inputMode="numeric" value={v.contractValue} onChange={set("contractValue")} placeholder="4500000" />
             </Field>
           </div>

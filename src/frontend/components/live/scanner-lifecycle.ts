@@ -10,7 +10,10 @@ export class CameraLifecycle {
   private stopRequested = false;
   disposed = false;
   constructor(private readonly onPhase: (phase: CameraPhase) => void) {}
-  private setPhase(phase: CameraPhase): void { this.phase = phase; if (!this.disposed) this.onPhase(phase); }
+  private setPhase(phase: CameraPhase): void {
+    this.phase = phase;
+    if (!this.disposed) this.onPhase(phase);
+  }
   async start(createAndStart: () => Promise<CameraEngine>): Promise<boolean> {
     if (this.disposed || this.phase !== "idle") return false;
     this.stopRequested = false;
@@ -33,16 +36,22 @@ export class CameraLifecycle {
     this.setPhase("stopping");
     this.stopping = (async () => {
       await this.starting?.catch(() => {});
-      try { if (this.engine?.isScanning) await this.engine.stop(); }
-      finally {
+      try {
+        if (this.engine?.isScanning) await this.engine.stop();
+      } finally {
         this.starting = undefined;
         if (!this.engine?.isScanning) this.engine = undefined;
         this.setPhase(this.engine ? "active" : "idle");
       }
-    })().finally(() => { this.stopping = undefined; });
+    })().finally(() => {
+      this.stopping = undefined;
+    });
     return this.stopping;
   }
-  dispose(): void { this.disposed = true; void this.stop().catch(() => {}); }
+  dispose(): void {
+    this.disposed = true;
+    void this.stop().catch(() => {});
+  }
 }
 
 /** Keep repeated camera frames and repeated manual submits from creating duplicate actions. */
@@ -51,8 +60,12 @@ export class ScanDelivery {
   deliver(token: string, callback: (token: string) => void): boolean {
     if (this.accepted.has(token)) return false;
     this.accepted.add(token);
-    try { callback(token); }
-    catch (error) { this.accepted.delete(token); throw error; }
+    try {
+      callback(token);
+    } catch (error) {
+      this.accepted.delete(token);
+      throw error;
+    }
     return true;
   }
 }

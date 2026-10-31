@@ -38,7 +38,13 @@ export function ScrollRail({ target, className }: { target: React.RefObject<HTML
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <button type="button" onClick={() => page(-1)} disabled={m.left <= 0} aria-label="Scroll left" className="grid size-7 place-items-center rounded-full border bg-card text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40">
+      <button
+        type="button"
+        onClick={() => page(-1)}
+        disabled={m.left <= 0}
+        aria-label="Scroll left"
+        className="grid size-7 place-items-center rounded-full border bg-card text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+      >
         <ChevronLeft className="size-4" />
       </button>
       <div
@@ -76,7 +82,13 @@ export function ScrollRail({ target, className }: { target: React.RefObject<HTML
           }}
         />
       </div>
-      <button type="button" onClick={() => page(1)} disabled={m.left >= m.max - 1} aria-label="Scroll right" className="grid size-7 place-items-center rounded-full border bg-card text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40">
+      <button
+        type="button"
+        onClick={() => page(1)}
+        disabled={m.left >= m.max - 1}
+        aria-label="Scroll right"
+        className="grid size-7 place-items-center rounded-full border bg-card text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+      >
         <ChevronRight className="size-4" />
       </button>
     </div>

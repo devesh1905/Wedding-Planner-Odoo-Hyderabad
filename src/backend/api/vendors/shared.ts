@@ -4,8 +4,15 @@ import { HttpError } from "@/backend/auth";
 import { db } from "@/backend/db";
 
 export const vendorSelect = {
-  id: true, name: true, category: true, contactName: true, phone: true, email: true, city: true,
-  notes: true, backupVendorId: true,
+  id: true,
+  name: true,
+  category: true,
+  contactName: true,
+  phone: true,
+  email: true,
+  city: true,
+  notes: true,
+  backupVendorId: true,
   backupVendor: { select: { id: true, name: true, phone: true } },
   _count: { select: { bookings: true } },
 } satisfies Prisma.VendorSelect;
@@ -13,13 +20,15 @@ export const vendorDetailSelect = {
   ...vendorSelect,
   bookings: {
     orderBy: { createdAt: "desc" },
-    select: { id: true, agreedAmount: true, createdAt: true,
-      wedding: { select: { id: true, partner1: true, partner2: true, startDate: true } } },
+    select: { id: true, agreedAmount: true, createdAt: true, wedding: { select: { id: true, partner1: true, partner2: true, startDate: true } } },
   },
 } satisfies Prisma.VendorSelect;
 export async function parseJson(request: Request): Promise<unknown> {
-  try { return await request.json(); }
-  catch { throw new HttpError(400, "Send a valid JSON object"); }
+  try {
+    return await request.json();
+  } catch {
+    throw new HttpError(400, "Send a valid JSON object");
+  }
 }
 function fieldError(field: string, message: string): never {
   throw new z.ZodError([{ code: "custom", path: [field], message }]);
@@ -53,8 +62,9 @@ export async function validateBackup(
 /** Serializable retries prevent two simultaneous edits from creating an unchecked backup cycle. */
 export async function vendorTransaction<T>(run: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
   for (let attempt = 0; attempt < 3; attempt++) {
-    try { return await db.$transaction(run, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }); }
-    catch (error) {
+    try {
+      return await db.$transaction(run, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+    } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2034") {
         if (attempt < 2) continue;
         throw new HttpError(409, "Another vendor edit happened at the same time. Please retry.");

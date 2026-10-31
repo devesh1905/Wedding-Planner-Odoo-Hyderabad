@@ -12,7 +12,6 @@ const TODAY = new Date("2026-10-31T00:00:00.000Z");
 const DAY = 86400000;
 // Seed data is in paise; the database stores whole rupees.
 
-
 const scaleMoney = (paise: number) => Math.round(paise / 100);
 const addDays = (d: Date, n: number) => new Date(d.getTime() + n * DAY);
 
@@ -27,14 +26,30 @@ const STAGE_MAP: Record<WeddingStage, DbStage> = {
 };
 
 const CATEGORY_WEIGHT: [DbCategory, number][] = [
-  ["CATERER", 30], ["DECORATOR", 22], ["PHOTOGRAPHER", 10], ["FLORIST", 8], ["LIGHTING", 8],
-  ["TENT", 7], ["MAKEUP", 6], ["DJ", 4], ["TRANSPORT", 3], ["DHOL", 2],
+  ["CATERER", 30],
+  ["DECORATOR", 22],
+  ["PHOTOGRAPHER", 10],
+  ["FLORIST", 8],
+  ["LIGHTING", 8],
+  ["TENT", 7],
+  ["MAKEUP", 6],
+  ["DJ", 4],
+  ["TRANSPORT", 3],
+  ["DHOL", 2],
 ];
 
 type BookingRow = {
-  id: string; weddingId: string; vendorId: string; category: DbCategory; agreedAmount: number;
-  checkinToken: string; expectedArrival: Date; agreedHours: number | null; hourlyRate: number | null;
-  agreedGuests: number | null; perPlate: number | null;
+  id: string;
+  weddingId: string;
+  vendorId: string;
+  category: DbCategory;
+  agreedAmount: number;
+  checkinToken: string;
+  expectedArrival: Date;
+  agreedHours: number | null;
+  hourlyRate: number | null;
+  agreedGuests: number | null;
+  perPlate: number | null;
 };
 
 async function insertAll<T>(rows: T[], fn: (batch: T[]) => Promise<unknown>, size = 1000) {
@@ -70,8 +85,14 @@ export async function seedDemo(db: PrismaClient) {
   // Vendors: insert first, then link backups.
   await db.vendor.createMany({
     data: vendors.map((v) => ({
-      id: v.id, name: v.name, category: v.category, phone: v.phone, email: v.email, city: v.city,
-      createdAt: new Date(v.createdAt), updatedAt: new Date(v.updatedAt),
+      id: v.id,
+      name: v.name,
+      category: v.category,
+      phone: v.phone,
+      email: v.email,
+      city: v.city,
+      createdAt: new Date(v.createdAt),
+      updatedAt: new Date(v.updatedAt),
     })),
   });
   for (const v of vendors) {
@@ -81,12 +102,25 @@ export async function seedDemo(db: PrismaClient) {
   // Weddings
   await db.wedding.createMany({
     data: weddings.map((w, i) => ({
-      id: w.id, code: w.code, packageId: pkgByKind.get(w.packageName)!.id, leadPlannerId: plannerFor(i).id,
-      partner1: w.partner1, partner2: w.partner2, phone: `98${String(76500000 + i * 1373).padStart(8, "0")}`,
+      id: w.id,
+      code: w.code,
+      packageId: pkgByKind.get(w.packageName)!.id,
+      leadPlannerId: plannerFor(i).id,
+      partner1: w.partner1,
+      partner2: w.partner2,
+      phone: `98${String(76500000 + i * 1373).padStart(8, "0")}`,
       email: `${w.partner1}.${w.partner2}@example.com`.toLowerCase(),
-      startDate: new Date(w.startDate), endDate: new Date(w.endDate), city: w.city, venue: w.venue,
-      guestCount: w.guestCount, theme: w.theme, contractValue: scaleMoney(w.contractValue), stage: STAGE_MAP[w.stage],
-      portalToken: newToken(), createdAt: new Date(w.createdAt), updatedAt: new Date(w.updatedAt),
+      startDate: new Date(w.startDate),
+      endDate: new Date(w.endDate),
+      city: w.city,
+      venue: w.venue,
+      guestCount: w.guestCount,
+      theme: w.theme,
+      contractValue: scaleMoney(w.contractValue),
+      stage: STAGE_MAP[w.stage],
+      portalToken: newToken(),
+      createdAt: new Date(w.createdAt),
+      updatedAt: new Date(w.updatedAt),
     })),
   });
 
@@ -107,9 +141,15 @@ export async function seedDemo(db: PrismaClient) {
       else if (due.getTime() < TODAY.getTime() + 7 * DAY) status = "IN_PROGRESS";
       else if (due.getTime() < TODAY.getTime() + 21 * DAY && t.offsetDays < -30) status = "WAITING";
       taskRows.push({
-        weddingId: w.id, templateId: t.id, ownerId: t.defaultRole === "FOUNDER" ? founder.id : planner.id,
-        title: t.title, event: t.event, stage: status, dueDate: due,
-        doneAt: status === "DONE" ? addDays(due, -1) : null, sortOrder: t.sortOrder,
+        weddingId: w.id,
+        templateId: t.id,
+        ownerId: t.defaultRole === "FOUNDER" ? founder.id : planner.id,
+        title: t.title,
+        event: t.event,
+        stage: status,
+        dueDate: due,
+        doneAt: status === "DONE" ? addDays(due, -1) : null,
+        sortOrder: t.sortOrder,
       });
     }
   });
@@ -138,7 +178,10 @@ export async function seedDemo(db: PrismaClient) {
     for (const m of items) {
       const st = status(m.type);
       milestoneRows.push({
-        weddingId: w.id, ...m, status: st, paidAt: st === "PAID" ? m.dueDate : null,
+        weddingId: w.id,
+        ...m,
+        status: st,
+        paidAt: st === "PAID" ? m.dueDate : null,
         reference: st === "PAID" ? `RCPT-${w.code}-${m.type}` : null,
       });
     }
@@ -162,10 +205,17 @@ export async function seedDemo(db: PrismaClient) {
     const rows: BookingRow[] = [];
     const make = (vendorId: string, category: DbCategory, agreedAmount: number, extra: Partial<BookingRow> = {}) => {
       rows.push({
-        id: randomUUID(), weddingId: w.id, vendorId, category, agreedAmount, checkinToken: newToken(),
+        id: randomUUID(),
+        weddingId: w.id,
+        vendorId,
+        category,
+        agreedAmount,
+        checkinToken: newToken(),
         expectedArrival: new Date(start.getTime() + 3 * 3600000),
-        agreedHours: category === "DJ" ? 4 : null, hourlyRate: category === "DJ" ? 15000 : null,
-        agreedGuests: category === "CATERER" ? w.guestCount : null, perPlate: category === "CATERER" ? 2450 : null,
+        agreedHours: category === "DJ" ? 4 : null,
+        hourlyRate: category === "DJ" ? 15000 : null,
+        agreedGuests: category === "CATERER" ? w.guestCount : null,
+        perPlate: category === "CATERER" ? 2450 : null,
         ...extra,
       });
     };
@@ -175,21 +225,31 @@ export async function seedDemo(db: PrismaClient) {
       for (const b of hist) {
         const v = vendorById.get(b.vendorId)!;
         make(v.id, v.category, scaleMoney(b.agreedAmount), {
-          id: b.id, expectedArrival: new Date(b.expectedArrival), agreedGuests: b.agreedGuests,
-          agreedHours: b.agreedHours, hourlyRate: b.hourlyRate == null ? null : scaleMoney(b.hourlyRate), perPlate: b.perPlate == null ? null : scaleMoney(b.perPlate),
+          id: b.id,
+          expectedArrival: new Date(b.expectedArrival),
+          agreedGuests: b.agreedGuests,
+          agreedHours: b.agreedHours,
+          hourlyRate: b.hourlyRate == null ? null : scaleMoney(b.hourlyRate),
+          perPlate: b.perPlate == null ? null : scaleMoney(b.perPlate),
         });
       }
       const covered = new Set(rows.map((r) => r.category));
       const rest = CATEGORY_WEIGHT.filter(([c]) => !covered.has(c));
       const remaining = fin.vendorCosts - rows.reduce((s, r) => s + r.agreedAmount, 0);
       if (remaining <= 0) throw new Error(`Vendor cost for ${w.code} is below its historical bookings`);
-      const parts = splitByWeight(remaining, rest.map(([, wt]) => wt));
+      const parts = splitByWeight(
+        remaining,
+        rest.map(([, wt]) => wt),
+      );
       rest.forEach(([cat], k) => {
         const v = pickVendor(w.city, cat, i);
         make(v.id, cat, parts[k]!);
       });
     } else {
-      const parts = splitByWeight(fin.vendorCosts, CATEGORY_WEIGHT.map(([, wt]) => wt));
+      const parts = splitByWeight(
+        fin.vendorCosts,
+        CATEGORY_WEIGHT.map(([, wt]) => wt),
+      );
       CATEGORY_WEIGHT.forEach(([cat], k) => make(pickVendor(w.city, cat, i).id, cat, parts[k]!));
     }
     bookingsByWedding.set(w.id, rows);
@@ -198,9 +258,17 @@ export async function seedDemo(db: PrismaClient) {
   await insertAll(bookingRows, (data) =>
     db.booking.createMany({
       data: data.map((b) => ({
-        id: b.id, weddingId: b.weddingId, vendorId: b.vendorId, category: b.category, agreedAmount: b.agreedAmount,
-        checkinToken: b.checkinToken, expectedArrival: b.expectedArrival, agreedHours: b.agreedHours,
-        hourlyRate: b.hourlyRate, agreedGuests: b.agreedGuests, perPlate: b.perPlate,
+        id: b.id,
+        weddingId: b.weddingId,
+        vendorId: b.vendorId,
+        category: b.category,
+        agreedAmount: b.agreedAmount,
+        checkinToken: b.checkinToken,
+        expectedArrival: b.expectedArrival,
+        agreedHours: b.agreedHours,
+        hourlyRate: b.hourlyRate,
+        agreedGuests: b.agreedGuests,
+        perPlate: b.perPlate,
       })),
     }),
   );
@@ -221,7 +289,9 @@ export async function seedDemo(db: PrismaClient) {
       }
       const advance = Math.round(b.agreedAmount * 0.5);
       const wantsAdvance =
-        stage === "SETTLED" || stage === "SETTLEMENT" || stage === "BIG_DAY" ||
+        stage === "SETTLED" ||
+        stage === "SETTLEMENT" ||
+        stage === "BIG_DAY" ||
         (stage === "PLANNING" && (b.category === "CATERER" || b.category === "DECORATOR"));
       if (wantsAdvance) {
         payRows.push({ bookingId: b.id, amount: advance, paidAt: addDays(start, -21), reference: `UTR-${tag}-ADV`, isAdvance: true });
@@ -248,11 +318,14 @@ export async function seedDemo(db: PrismaClient) {
       { user: plannerFor(i + 1), share: 0.3, notes: ["Venue coordination", "Guest and hospitality tracking", "On-site support"] },
     ];
     for (const p of parts) {
-      const each = ((budget * p.share) / p.user.hourlyCost) / p.notes.length;
+      const each = (budget * p.share) / p.user.hourlyCost / p.notes.length;
       p.notes.forEach((note, k) => {
         timeRows.push({
-          userId: p.user.id, weddingId: w.id, date: addDays(start, -45 + k * 22),
-          hours: Math.round(each * 1000) / 1000, note,
+          userId: p.user.id,
+          weddingId: w.id,
+          date: addDays(start, -45 + k * 22),
+          hours: Math.round(each * 1000) / 1000,
+          note,
         });
       });
     }
@@ -262,7 +335,12 @@ export async function seedDemo(db: PrismaClient) {
   // Demo wedding events, schedule, and historical check-ins
   await db.weddingEvent.createMany({
     data: weddingEvents.map((e, idx) => ({
-      id: e.id, weddingId: e.weddingId, name: e.name, startsAt: new Date(e.startTime), venue: e.venue, sortOrder: idx,
+      id: e.id,
+      weddingId: e.weddingId,
+      name: e.name,
+      startsAt: new Date(e.startTime),
+      venue: e.venue,
+      sortOrder: idx,
     })),
   });
   const demoId = weddingEvents[0]!.weddingId;
@@ -273,17 +351,27 @@ export async function seedDemo(db: PrismaClient) {
   await insertAll(schedule, (batch) =>
     db.scheduleItem.createMany({
       data: batch.map((s) => ({
-        id: s.id, eventId: s.eventId, responsibleId: responsible(s.responsibleRole),
+        id: s.id,
+        eventId: s.eventId,
+        responsibleId: responsible(s.responsibleRole),
         bookingId: demoBookings.find((b) => b.category === s.vendorCategory)?.id ?? null,
-        startsAt: new Date(s.startTime), durationMin: 12, title: s.title, status: s.status, notes: s.notes,
+        startsAt: new Date(s.startTime),
+        durationMin: 12,
+        title: s.title,
+        status: s.status,
+        notes: s.notes,
       })),
     }),
   );
   await insertAll(checkins, (batch) =>
     db.checkin.createMany({
       data: batch.map((c) => ({
-        id: c.id, clientId: c.clientId, bookingId: c.bookingId, expectedAt: new Date(c.expectedAt),
-        arrivedAt: new Date(c.arrivedAt), method: c.method,
+        id: c.id,
+        clientId: c.clientId,
+        bookingId: c.bookingId,
+        expectedAt: new Date(c.expectedAt),
+        arrivedAt: new Date(c.arrivedAt),
+        method: c.method,
       })),
     }),
   );

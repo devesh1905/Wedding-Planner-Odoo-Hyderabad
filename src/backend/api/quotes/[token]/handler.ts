@@ -22,18 +22,31 @@ export const POST = handle(async (request: Request, context: Context) => {
     if (wedding.stage === "CANCELLED" || wedding.stage === "SETTLED") throw new HttpError(409, "This wedding no longer accepts quote submissions");
     const current = await tx.vendorQuote.findUnique({ where: { token }, select: { id: true, status: true, request: { select: { status: true } } } });
     if (!current) throw new HttpError(404, "Invitation not found");
-    if (current.request.status !== "OPEN" || current.status === "WON" || current.status === "NOT_SELECTED") throw new HttpError(409, "This quote request is closed and cannot be changed");
+    if (current.request.status !== "OPEN" || current.status === "WON" || current.status === "NOT_SELECTED")
+      throw new HttpError(409, "This quote request is closed and cannot be changed");
     await tx.quoteLine.deleteMany({ where: { quoteId: current.id } });
     const { lines, ...summary } = data;
-    return tx.vendorQuote.update({ where: { id: current.id }, data: {
-      ...summary, fileUrl, status: "SUBMITTED", submittedAt: new Date(), aiExtracted: false, aiReviewed: false,
-      lines: { create: lines.map((line, sortOrder) => ({ ...line, sortOrder })) },
-    }, select: portalSelect });
+    return tx.vendorQuote.update({
+      where: { id: current.id },
+      data: {
+        ...summary,
+        fileUrl,
+        status: "SUBMITTED",
+        submittedAt: new Date(),
+        aiExtracted: false,
+        aiReviewed: false,
+        lines: { create: lines.map((line, sortOrder) => ({ ...line, sortOrder })) },
+      },
+      select: portalSelect,
+    });
   });
   let extractionError: string | undefined;
   if (fileUrl) {
-    try { quote = await extractAndPersistQuote(quote.id, quote.updatedAt); }
-    catch { extractionError = extractionFallbackMessage; }
+    try {
+      quote = await extractAndPersistQuote(quote.id, quote.updatedAt);
+    } catch {
+      extractionError = extractionFallbackMessage;
+    }
   }
   return privateJson({ quote: portalView(quote), ...(extractionError ? { extractionError } : {}) });
 });

@@ -153,7 +153,16 @@ export function HoursTab({ weddingId, logs, users, currentUserId }: { weddingId:
               <Input type="date" value={v.date} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setV({ ...v, date: e.target.value })} />
             </Field>
             <Field label="Hours" error={errors.hours}>
-              <Input type="number" inputMode="decimal" step="0.5" min="0.5" max="24" value={v.hours} onChange={(e) => setV({ ...v, hours: e.target.value })} placeholder="3.5" />
+              <Input
+                type="number"
+                inputMode="decimal"
+                step="0.5"
+                min="0.5"
+                max="24"
+                value={v.hours}
+                onChange={(e) => setV({ ...v, hours: e.target.value })}
+                placeholder="3.5"
+              />
             </Field>
           </div>
           <Field label="What was done" error={errors.note}>

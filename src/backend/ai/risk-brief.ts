@@ -61,9 +61,25 @@ export async function findRisks(user: { sub: string; role: string }): Promise<Ri
       const late = now - m.dueDate.getTime();
       if (late > 0) {
         // overdue money: urgent once a week late or when the wedding is close
-        risks.push({ ...base, id: `pay-${m.id}`, kind: "payment", severity: late > 7 * DAY || until < 14 * DAY ? 3 : 2, fact: `${m.label} of ${lakh(m.amount)} is ${daysText(late)} overdue.`, text: "", href: `/weddings/${w.id}?tab=payments` });
+        risks.push({
+          ...base,
+          id: `pay-${m.id}`,
+          kind: "payment",
+          severity: late > 7 * DAY || until < 14 * DAY ? 3 : 2,
+          fact: `${m.label} of ${lakh(m.amount)} is ${daysText(late)} overdue.`,
+          text: "",
+          href: `/weddings/${w.id}?tab=payments`,
+        });
       } else if (-late < 7 * DAY) {
-        risks.push({ ...base, id: `due-${m.id}`, kind: "deposit", severity: 1, fact: `${m.label} of ${lakh(m.amount)} falls due in ${daysText(-late)}.`, text: "", href: `/weddings/${w.id}?tab=payments` });
+        risks.push({
+          ...base,
+          id: `due-${m.id}`,
+          kind: "deposit",
+          severity: 1,
+          fact: `${m.label} of ${lakh(m.amount)} falls due in ${daysText(-late)}.`,
+          text: "",
+          href: `/weddings/${w.id}?tab=payments`,
+        });
       }
     }
 
@@ -71,19 +87,46 @@ export async function findRisks(user: { sub: string; role: string }): Promise<Ri
     if (until > 0 && until < 30 * DAY) {
       const missing = CORE.filter((c) => !w.bookings.some((b) => b.category === c));
       if (missing.length)
-        risks.push({ ...base, id: `ven-${w.id}`, kind: "vendor", severity: until < 14 * DAY ? 3 : 2, fact: `No ${missing.map((c) => nice(c).toLowerCase()).join(" or ")} booked, ${daysText(until)} before the wedding.`, text: "", href: `/weddings/${w.id}?tab=vendors` });
+        risks.push({
+          ...base,
+          id: `ven-${w.id}`,
+          kind: "vendor",
+          severity: until < 14 * DAY ? 3 : 2,
+          fact: `No ${missing.map((c) => nice(c).toLowerCase()).join(" or ")} booked, ${daysText(until)} before the wedding.`,
+          text: "",
+          href: `/weddings/${w.id}?tab=vendors`,
+        });
     }
 
     if (w.tasks.length >= 3)
-      risks.push({ ...base, id: `task-${w.id}`, kind: "tasks", severity: w.tasks.length >= 8 || until < 14 * DAY ? 2 : 1, fact: `${w.tasks.length} planning tasks are past their due date.`, text: "", href: `/weddings/${w.id}?tab=plan` });
+      risks.push({
+        ...base,
+        id: `task-${w.id}`,
+        kind: "tasks",
+        severity: w.tasks.length >= 8 || until < 14 * DAY ? 2 : 1,
+        fact: `${w.tasks.length} planning tasks are past their due date.`,
+        text: "",
+        href: `/weddings/${w.id}?tab=plan`,
+      });
 
     for (const i of w.issues)
-      risks.push({ ...base, id: `iss-${i.id}`, kind: "issue", severity: i.severity === "HIGH" ? 3 : i.severity === "MEDIUM" ? 2 : 1, fact: `Open ${i.severity.toLowerCase()} issue: ${i.description.slice(0, 90)}`, text: "", href: `/weddings/${w.id}/live` });
+      risks.push({
+        ...base,
+        id: `iss-${i.id}`,
+        kind: "issue",
+        severity: i.severity === "HIGH" ? 3 : i.severity === "MEDIUM" ? 2 : 1,
+        fact: `Open ${i.severity.toLowerCase()} issue: ${i.description.slice(0, 90)}`,
+        text: "",
+        href: `/weddings/${w.id}/live`,
+      });
   }
 
   // most severe first, then the soonest wedding
   const when = new Map(weddings.map((w) => [w.id, w.startDate.getTime()]));
-  return risks.sort((a, b) => b.severity - a.severity || when.get(a.weddingId)! - when.get(b.weddingId)!).slice(0, 5).map((r) => ({ ...r, text: r.fact }));
+  return risks
+    .sort((a, b) => b.severity - a.severity || when.get(a.weddingId)! - when.get(b.weddingId)!)
+    .slice(0, 5)
+    .map((r) => ({ ...r, text: r.fact }));
 }
 
 const worded = z.object({
@@ -104,7 +147,9 @@ Return JSON {"note": string, "items": [{"id": string, "text": string}]}.
 note: one calm sentence (max 25 words) on what matters most today.
 items: one per risk, same id, a short action-first sentence (max 22 words) that names the couple and says what to do.
 Use only the facts given; keep every amount and number exactly as written; never add risks, people or numbers.`,
-      input: JSON.stringify(risks.map((r) => ({ id: r.id, couple: r.couple, severity: r.severity === 3 ? "urgent" : r.severity === 2 ? "this week" : "watch", fact: r.fact }))),
+      input: JSON.stringify(
+        risks.map((r) => ({ id: r.id, couple: r.couple, severity: r.severity === 3 ? "urgent" : r.severity === 2 ? "this week" : "watch", fact: r.fact })),
+      ),
       schema: worded,
       temperature: 0.3,
     });

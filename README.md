@@ -86,6 +86,14 @@ Routes: `/dashboard`, `/vendors`, `/vendors/[id]`, `/share/[token]`, `/api/repor
 
 ---
 
+### 7. Assistant (Gemini, grounded in live data)
+Every assistant feature follows one rule: **plain code finds the facts, the model only words them or picks from a fixed menu**, and every answer links back to real records. Each one keeps working without a key.
+- **Ask KnotOS** (Ctrl+K): "December weddings that still owe us" → the model chooses filters from a fixed list → `src/backend/ai/ask.ts` turns them into a Prisma query. No SQL from the model.
+- **Morning brief** (dashboard, weddings): rules find overdue payments, missing core vendors near the date, stacks of overdue tasks and serious open issues; the model writes one sentence each and cannot add items.
+- **Draft counter-offer** (quote comparison): leverage points computed from the stored quotes; a draft quoting any number not in those facts is discarded for a template.
+- **Voice note → actions** (control room): speech becomes proposed issues and schedule changes, limited to this wedding's real items; nothing applies until the planner ticks and confirms.
+- **Call prep** (enquiry drawer): a rule-based vendor shortlist by city, category and budget, plus talking points.
+
 ### Across the app
 - **Global search (Ctrl/⌘ K or `/`):** pages, couples (by name, phone, code or city), a wedding's sections ("dhruv pay" → Payments), vendors and quick actions.
 - **Duplicate detection:** an enquiry whose mobile number matches another enquiry or a booked wedding shows "Same phone as …".
@@ -127,7 +135,7 @@ flowchart LR
     STORE[("Storage<br/>quote PDFs, signatures")]
   end
 
-  GEM["Gemini<br/>quote reader"]
+  GEM["Gemini<br/>quote reader + assistant"]
 
   UI --> NEXT
   UI -- "offline actions" --> IDB
@@ -148,7 +156,7 @@ flowchart LR
 - **Unique payment references** (`PaymentMilestone.reference` and vendor payment references are unique in the database), so the same receipt cannot be recorded twice.
 - **RLS enabled on every table** (migration `enable_rls`, no policies). The app talks to Postgres through Prisma only, so Supabase's public REST API exposes nothing.
 - **Token-based public access.** Agreements, couple portals, vendor quotes, check-ins and share links use unguessable tokens; staff pages require a signed session cookie (`src/proxy.ts`).
-- **Quote reader is constrained, not trusted.** It extracts embedded PDF text, requests facts with `null` for unknowns, validates the response against a strict schema (extra keys and negative prices rejected), allows one repair attempt, and always goes through planner review before saving. If the service is unavailable, the three bundled demo PDFs fall back to saved results (matched by text fingerprint; unknown documents never match) and manual entry is always available. See `src/lib/ai/README.md`.
+- **Quote reader is constrained, not trusted.** It extracts embedded PDF text, requests facts with `null` for unknowns, validates the response against a strict schema (extra keys and negative prices rejected), allows one repair attempt, and always goes through planner review before saving. If the service is unavailable, the three bundled demo PDFs fall back to saved results (matched by text fingerprint; unknown documents never match) and manual entry is always available. See `src/backend/ai/README.md`.
 
 ---
 
@@ -207,6 +215,7 @@ Own REST route handlers under `src/app/api`. Staff endpoints check the session; 
 | Control room | `/api/schedule-items/[id]`, `/api/checkins`, `/api/issues`, `/api/issues/[id]`, `POST /api/sync` (offline batch: `CHECKIN`, `SCHEDULE_STATUS`, `ISSUE`) |
 | Settlement | `/api/bookings/[id]/extras`, `/bills`, `/payments`, `POST /api/weddings/[id]/addon-bill`, `POST /api/weddings/[id]/settle` |
 | Reporting | `POST /api/share-links`, `GET /api/reports/season.csv` |
+| Assistant | `POST /api/ask`, `GET /api/brief`, `POST /api/quote-requests/[id]/counter-offer`, `POST /api/weddings/[id]/voice-note`, `POST /api/enquiries/[id]/call-prep` |
 
 ---
 
@@ -274,6 +283,9 @@ It makes the seeded demo wedding "happen today": shifts all of its event and run
 | `npm test` | Unit tests for the AI reader, offline queue and service worker, QR, and seed data |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint |
+| `npm run format` | Prettier (one style across the codebase; `format:check` in CI-style checks) |
+| `npm run test:integration` | API acceptance checks against a local server (`.env.itest`) |
+| `npm run quote:try -- <file.pdf>` | Run the quote reader on any PDF from the terminal |
 | `npm run build` | Production build |
 | `npm run db:reset` | Reset the database and reseed (destructive) |
 | `npm run db:studio` | Prisma Studio |
@@ -306,6 +318,7 @@ knotos/
 │   ├── seed/  seed-data/      # demo data (realistic vendors, weddings, money)
 ├── public/sw.js               # offline service worker
 ├── demo-assets/               # demo quote PDFs and their generators
+├── scripts/                   # one-off developer tools (quote reader from the terminal)
 ├── docker-compose.yml         # local Postgres
 ├── .github/workflows/ci.yml   # typecheck, lint, test, migrate+seed, build
 └── src/
@@ -320,7 +333,7 @@ knotos/
     │   ├── db.ts  auth.ts  session.ts         # Prisma client, guards, JWT sessions
     │   ├── reports.ts  plan.ts  agreement.ts  # dashboard maths, task plans, agreement text
     │   ├── activity.ts  tokens.ts  weddings.ts
-    │   └── ai/                # PDF → Gemini → validated quote, fallbacks
+    │   └── ai/                # gemini.ts (one client) · quote reader · ask · risk brief
     │
     ├── frontend/              # BROWSER UI
     │   ├── components/        # common, dashboard, enquiries, home, live, portal,
@@ -331,8 +344,18 @@ knotos/
         ├── schemas/           # Zod schemas for quotes, live day, vendors
         ├── validation/        # Zod schemas for enquiries, common fields
         ├── settlement.ts      # money maths (guards on the server, display in the UI)
+        ├── package-builder.ts # "Build your package" estimate (form and server agree)
         └── format.ts  utils.ts
 ```
+
+### How to read the code
+
+1. **Start at a page** in `src/app/` — it is a thin file that loads data and renders a component.
+2. **Follow the component** into `src/frontend/components/<area>/`. Folders are named after the screen (enquiries, weddings, quotes, live…).
+3. **Follow its API call** (`/api/x`) to `src/app/api/x/route.ts`, which points at `src/backend/api/x/handler.ts` — every handler reads the same way: `requireUser()` → Zod `parse` → Prisma (in a transaction when several rows change) → JSON.
+4. **Rules shared by both sides** (validation, money maths, estimates) live in `src/shared/`, so the form and the server can never disagree.
+
+Conventions: kebab-case file names, one formatter (`npm run format`), whole-rupee integers for money, comments only where the business rule is not obvious from the code.
 
 ---
 

@@ -43,7 +43,10 @@ async function callGemini(system: string, parts: Part[], temperature: number): P
     throw new AiUnavailableError();
   }
   if (!res.ok) throw new AiUnavailableError(res.status === 429 ? "The assistant is busy — try again in a minute" : undefined);
-  const raw = geminiResponse.parse(await res.json()).candidates?.[0]?.content.parts.map((p) => p.text ?? "").join("");
+  const raw = geminiResponse
+    .parse(await res.json())
+    .candidates?.[0]?.content.parts.map((p) => p.text ?? "")
+    .join("");
   if (!raw) throw new AiUnavailableError("The assistant returned nothing");
   return raw;
 }

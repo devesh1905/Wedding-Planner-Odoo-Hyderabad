@@ -51,7 +51,13 @@ function applyTheme(t: Theme) {
 function Avatar({ name, status, className }: { name: string; status?: Status; className?: string }) {
   const dot = STATUSES.find((s) => s.id === status)?.dot;
   return (
-    <span aria-hidden className={cn("relative grid shrink-0 place-items-center rounded-full bg-cta text-[11px] font-semibold tracking-wide text-cta-foreground select-none", className)}>
+    <span
+      aria-hidden
+      className={cn(
+        "relative grid shrink-0 place-items-center rounded-full bg-cta text-[11px] font-semibold tracking-wide text-cta-foreground select-none",
+        className,
+      )}
+    >
       {initials(name)}
       {dot && <span className={cn("absolute right-0 bottom-0 size-2.5 rounded-full ring-2 ring-background transition-colors duration-200", dot)} />}
     </span>
@@ -251,9 +257,15 @@ export function AccountMenu({
     const list = Array.from(panelRef.current?.querySelectorAll<HTMLElement>("[data-menu-item]") ?? []);
     const i = list.indexOf(document.activeElement as HTMLElement);
     const next =
-      e.key === "ArrowDown" ? list[(i + 1) % list.length] :
-      e.key === "ArrowUp" ? list[(i - 1 + list.length) % list.length] :
-      e.key === "Home" ? list[0] : e.key === "End" ? list.at(-1) : undefined;
+      e.key === "ArrowDown"
+        ? list[(i + 1) % list.length]
+        : e.key === "ArrowUp"
+          ? list[(i - 1 + list.length) % list.length]
+          : e.key === "Home"
+            ? list[0]
+            : e.key === "End"
+              ? list.at(-1)
+              : undefined;
     if (next) {
       e.preventDefault();
       next.focus({ preventScroll: true });

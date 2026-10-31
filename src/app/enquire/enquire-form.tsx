@@ -178,7 +178,11 @@ export function EnquireForm({ initialTheme }: { initialTheme?: string }) {
           <PackageBuilder sound value={pkg} onChange={setPkg} guests={guests} />
 
           <div id="step-send" ref={sendRef} className="scroll-mt-20 space-y-3">
-            {errors.form && <p role="alert" className="rounded-lg bg-rose-soft px-3 py-2.5 text-sm text-rose">{errors.form}</p>}
+            {errors.form && (
+              <p role="alert" className="rounded-lg bg-rose-soft px-3 py-2.5 text-sm text-rose">
+                {errors.form}
+              </p>
+            )}
             <Button type="submit" size="lg" className="squircle h-12 w-full rounded-xl text-base" disabled={pending} aria-busy={pending}>
               {pending && <Loader2 className="animate-spin" />} {pending ? "Sending…" : "Send enquiry"}
             </Button>
@@ -191,81 +195,83 @@ export function EnquireForm({ initialTheme }: { initialTheme?: string }) {
         {/* capped to the viewport: the details scroll inside (custom thumb), the Send button stays pinned below */}
         <div className="squircle flex max-h-[calc(100svh-3rem)] flex-col rounded-2xl border bg-card shadow-sm">
           <ScrollPanel innerClassName="space-y-5 p-6 pb-4">
-          <header>
-            <p className="text-xs font-semibold tracking-[0.2em] text-eyebrow uppercase">Summary</p>
-            <h2 className="mt-1 text-2xl font-semibold">Your celebration</h2>
-          </header>
+            <header>
+              <p className="text-xs font-semibold tracking-[0.2em] text-eyebrow uppercase">Summary</p>
+              <h2 className="mt-1 text-2xl font-semibold">Your celebration</h2>
+            </header>
 
-          <dl className="space-y-2 text-sm">
-            {values.theme && (
+            <dl className="space-y-2 text-sm">
+              {values.theme && (
+                <div className="flex justify-between gap-3">
+                  <dt className="text-muted-foreground">Theme</dt>
+                  <dd className="text-right font-medium">{values.theme}</dd>
+                </div>
+              )}
               <div className="flex justify-between gap-3">
-                <dt className="text-muted-foreground">Theme</dt>
-                <dd className="text-right font-medium">{values.theme}</dd>
+                <dt className="text-muted-foreground">Guests</dt>
+                <dd className="text-right font-medium tabular">
+                  {guests ?? <span className="font-normal text-muted-foreground">{DEFAULT_GUESTS} (example)</span>}
+                </dd>
               </div>
-            )}
-            <div className="flex justify-between gap-3">
-              <dt className="text-muted-foreground">Guests</dt>
-              <dd className="text-right font-medium tabular">{guests ?? <span className="font-normal text-muted-foreground">{DEFAULT_GUESTS} (example)</span>}</dd>
-            </div>
-            <div className="flex justify-between gap-3">
-              <dt className="text-muted-foreground">Planning</dt>
-              <dd className="text-right font-medium">{planningLabel(pkg.planning)}</dd>
-            </div>
-          </dl>
+              <div className="flex justify-between gap-3">
+                <dt className="text-muted-foreground">Planning</dt>
+                <dd className="text-right font-medium">{planningLabel(pkg.planning)}</dd>
+              </div>
+            </dl>
 
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">Events</p>
-            {pkg.events.length ? (
-              <ul className="flex flex-wrap gap-1.5">
-                {pkg.events.map((ev) => (
-                  <li key={ev} className="rounded-full bg-maroon-soft px-2.5 py-1 text-xs font-medium text-maroon">
-                    {EVENT_LABELS[ev]}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-muted-foreground">None picked yet.</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">Services</p>
-            {none ? (
-              <p className="text-sm text-muted-foreground">None picked yet.</p>
-            ) : (
-              <ul className="space-y-1 text-sm">
-                {est.lines
-                  .filter((l) => l.key !== "fee")
-                  .map((l) => (
-                    <li key={l.key} className="flex items-center gap-2">
-                      <Icon name="check" className="size-3.5 shrink-0 text-teal" />
-                      {l.label}
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Events</p>
+              {pkg.events.length ? (
+                <ul className="flex flex-wrap gap-1.5">
+                  {pkg.events.map((ev) => (
+                    <li key={ev} className="rounded-full bg-maroon-soft px-2.5 py-1 text-xs font-medium text-maroon">
+                      {EVENT_LABELS[ev]}
                     </li>
                   ))}
-              </ul>
-            )}
-          </div>
-
-          <div className="border-t pt-4">
-            <div role="status" aria-live="polite">
-              <p className="text-xs font-semibold tracking-[0.15em] text-eyebrow uppercase">Indicative estimate</p>
-              <EstimateFigure est={est} none={none} />
+                </ul>
+              ) : (
+                <p className="text-sm text-muted-foreground">None picked yet.</p>
+              )}
             </div>
-            {!none && (
-              <>
-                <EstimateBreakdown est={est} contained={false} />
-                <p className="mt-1 text-xs text-pretty text-muted-foreground">{INCLUDED_NOTE}</p>
-              </>
-            )}
-          </div>
+
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Services</p>
+              {none ? (
+                <p className="text-sm text-muted-foreground">None picked yet.</p>
+              ) : (
+                <ul className="space-y-1 text-sm">
+                  {est.lines
+                    .filter((l) => l.key !== "fee")
+                    .map((l) => (
+                      <li key={l.key} className="flex items-center gap-2">
+                        <Icon name="check" className="size-3.5 shrink-0 text-teal" />
+                        {l.label}
+                      </li>
+                    ))}
+                </ul>
+              )}
+            </div>
+
+            <div className="border-t pt-4">
+              <div role="status" aria-live="polite">
+                <p className="text-xs font-semibold tracking-[0.15em] text-eyebrow uppercase">Indicative estimate</p>
+                <EstimateFigure est={est} none={none} />
+              </div>
+              {!none && (
+                <>
+                  <EstimateBreakdown est={est} contained={false} />
+                  <p className="mt-1 text-xs text-pretty text-muted-foreground">{INCLUDED_NOTE}</p>
+                </>
+              )}
+            </div>
           </ScrollPanel>
 
           <div className="space-y-3 border-t p-6 pt-4">
-          {hasErrors && !errors.form && <p className="text-sm text-rose">Please check the highlighted fields.</p>}
-          <Button type="submit" form={FORM_ID} size="lg" className="squircle h-12 w-full rounded-xl text-base" disabled={pending} aria-busy={pending}>
-            {pending && <Loader2 className="animate-spin" />} {pending ? "Sending…" : "Send enquiry"}
-          </Button>
-          <p className="text-center text-xs text-muted-foreground">An estimate, not a quote — your planner confirms after the first call.</p>
+            {hasErrors && !errors.form && <p className="text-sm text-rose">Please check the highlighted fields.</p>}
+            <Button type="submit" form={FORM_ID} size="lg" className="squircle h-12 w-full rounded-xl text-base" disabled={pending} aria-busy={pending}>
+              {pending && <Loader2 className="animate-spin" />} {pending ? "Sending…" : "Send enquiry"}
+            </Button>
+            <p className="text-center text-xs text-muted-foreground">An estimate, not a quote — your planner confirms after the first call.</p>
           </div>
         </div>
       </aside>
@@ -275,9 +281,7 @@ export function EnquireForm({ initialTheme }: { initialTheme?: string }) {
 
 function ThankYou({ sent }: { sent: Sent }) {
   const { reference, saved: s } = sent;
-  const date = s.roughDate
-    ? new Date(s.roughDate).toLocaleDateString("en-IN", { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" })
-    : null;
+  const date = s.roughDate ? new Date(s.roughDate).toLocaleDateString("en-IN", { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }) : null;
   const whatsappText = `Hi! I just sent a wedding enquiry to The Royal Knot. My reference is ${reference}.`;
   const rows: [string, React.ReactNode][] = [
     ["Couple", `${s.partner1} & ${s.partner2}`],
@@ -330,19 +334,16 @@ function ThankYou({ sent }: { sent: Sent }) {
 
           <div className="mt-6 rounded-xl bg-muted px-4 py-3">
             <p className="text-sm font-semibold">What happens next</p>
-            <p className="mt-0.5 text-sm text-pretty text-muted-foreground">Your planner will call within one day to talk it through and book a first meeting.</p>
+            <p className="mt-0.5 text-sm text-pretty text-muted-foreground">
+              Your planner will call within one day to talk it through and book a first meeting.
+            </p>
           </div>
 
           <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
             <a href={`tel:${PHONE_TEL}`} className={linkCls} aria-label={`Call us on ${PHONE_LABEL}`}>
               <Icon name="phone" className="size-4" /> Call us
             </a>
-            <a
-              href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(whatsappText)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={linkCls}
-            >
+            <a href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(whatsappText)}`} target="_blank" rel="noopener noreferrer" className={linkCls}>
               <Icon name="chat" className="size-4" /> WhatsApp
             </a>
             <a

@@ -154,9 +154,13 @@ export const POST = handle(async (_req: Request, { params }: { params: Promise<{
 
   const points: string[] = [];
   if (e.maxBudget && e.estimateLow && e.maxBudget < e.estimateLow)
-    points.push(`Budget (${formatINRCompact(e.maxBudget)}) sits below the estimate low (${formatINRCompact(e.estimateLow)}). Ask what is flexible: guest count, events or services.`);
+    points.push(
+      `Budget (${formatINRCompact(e.maxBudget)}) sits below the estimate low (${formatINRCompact(e.estimateLow)}). Ask what is flexible: guest count, events or services.`,
+    );
   else if (e.maxBudget && e.estimateHigh && e.maxBudget > e.estimateHigh)
-    points.push(`Budget (${formatINRCompact(e.maxBudget)}) is above the estimate high (${formatINRCompact(e.estimateHigh)}). Ask whether they want a premium upgrade.`);
+    points.push(
+      `Budget (${formatINRCompact(e.maxBudget)}) is above the estimate high (${formatINRCompact(e.estimateHigh)}). Ask whether they want a premium upgrade.`,
+    );
   else if (!e.maxBudget) points.push("No budget stated. Ask for a comfortable range and who is contributing.");
   if (peak) points.push("The date falls in peak wedding season (Nov to Feb). Check venue and vendor availability early and ask if a nearby date works.");
   if (days != null && days >= 0 && days < 90) points.push("Timeline is tight. Confirm whether the venue is booked or still open.");

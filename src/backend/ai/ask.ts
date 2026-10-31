@@ -96,7 +96,13 @@ export async function runPlan(plan: AskPlan): Promise<AskRow[]> {
       take,
       select: { id: true, name: true, category: true, city: true, _count: { select: { bookings: true } } },
     });
-    return rows.map((v) => ({ id: v.id, title: v.name, meta: `${title(v.category)} · ${v.city} · ${v._count.bookings} bookings`, href: `/vendors/${v.id}`, icon: "shop" }));
+    return rows.map((v) => ({
+      id: v.id,
+      title: v.name,
+      meta: `${title(v.category)} · ${v.city} · ${v._count.bookings} bookings`,
+      href: `/vendors/${v.id}`,
+      icon: "shop",
+    }));
   }
 
   if (plan.entity === "enquiries") {
@@ -120,7 +126,15 @@ export async function runPlan(plan: AskPlan): Promise<AskRow[]> {
     return rows.map((e) => ({
       id: e.id,
       title: `${e.partner1} & ${e.partner2}`,
-      meta: [title(e.status), e.city, e.roughDate && dateFmt(e.roughDate), e.guestCount && `${e.guestCount} guests`, e.maxBudget && `up to ${lakh(e.maxBudget)}`].filter(Boolean).join(" · "),
+      meta: [
+        title(e.status),
+        e.city,
+        e.roughDate && dateFmt(e.roughDate),
+        e.guestCount && `${e.guestCount} guests`,
+        e.maxBudget && `up to ${lakh(e.maxBudget)}`,
+      ]
+        .filter(Boolean)
+        .join(" · "),
       href: `/enquiries?open=${e.id}`,
       icon: "inbox",
     }));
@@ -173,7 +187,13 @@ export async function runPlan(plan: AskPlan): Promise<AskRow[]> {
     return rows.map((t) => ({
       id: t.id,
       title: t.title,
-      meta: [`${t.wedding.partner1} & ${t.wedding.partner2}`, t.event, t.dueDate && (t.dueDate < now ? `overdue since ${dateFmt(t.dueDate)}` : `due ${dateFmt(t.dueDate)}`)].filter(Boolean).join(" · "),
+      meta: [
+        `${t.wedding.partner1} & ${t.wedding.partner2}`,
+        t.event,
+        t.dueDate && (t.dueDate < now ? `overdue since ${dateFmt(t.dueDate)}` : `due ${dateFmt(t.dueDate)}`),
+      ]
+        .filter(Boolean)
+        .join(" · "),
       href: `/weddings/${t.wedding.id}?tab=tasks`,
       icon: "checklist",
     }));
@@ -190,17 +210,38 @@ export async function runPlan(plan: AskPlan): Promise<AskRow[]> {
         f.hasVendor ? { bookings: { some: { category: f.hasVendor } } } : {},
         f.openIssues ? { issues: { some: { status: "OPEN" } } } : {},
         f.agreement === "signed" ? { enquiry: { agreement: { status: "SIGNED" } } } : {},
-        f.agreement === "unsigned" ? { OR: [{ enquiry: null }, { enquiry: { agreement: null } }, { enquiry: { agreement: { status: { not: "SIGNED" } } } }] } : {},
+        f.agreement === "unsigned"
+          ? { OR: [{ enquiry: null }, { enquiry: { agreement: null } }, { enquiry: { agreement: { status: { not: "SIGNED" } } } }] }
+          : {},
       ],
     },
-    orderBy: plan.sort === "value" ? { contractValue: "desc" } : plan.sort === "guests" ? { guestCount: "desc" } : plan.sort === "name" ? { partner1: "asc" } : { startDate: "asc" },
+    orderBy:
+      plan.sort === "value"
+        ? { contractValue: "desc" }
+        : plan.sort === "guests"
+          ? { guestCount: "desc" }
+          : plan.sort === "name"
+            ? { partner1: "asc" }
+            : { startDate: "asc" },
     take,
-    select: { id: true, partner1: true, partner2: true, city: true, startDate: true, guestCount: true, contractValue: true, stage: true, leadPlanner: { select: { name: true } } },
+    select: {
+      id: true,
+      partner1: true,
+      partner2: true,
+      city: true,
+      startDate: true,
+      guestCount: true,
+      contractValue: true,
+      stage: true,
+      leadPlanner: { select: { name: true } },
+    },
   });
   return rows.map((w) => ({
     id: w.id,
     title: `${w.partner1} & ${w.partner2}`,
-    meta: [dateFmt(w.startDate), w.city, `${w.guestCount} guests`, lakh(w.contractValue), title(w.stage), w.leadPlanner?.name.split(" ")[0]].filter(Boolean).join(" · "),
+    meta: [dateFmt(w.startDate), w.city, `${w.guestCount} guests`, lakh(w.contractValue), title(w.stage), w.leadPlanner?.name.split(" ")[0]]
+      .filter(Boolean)
+      .join(" · "),
     href: `/weddings/${w.id}`,
     icon: "heart",
   }));

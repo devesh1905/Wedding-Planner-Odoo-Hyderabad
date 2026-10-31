@@ -60,40 +60,40 @@ export function AppShell({ user, children }: { user: { name: string; role: strin
   }, []);
   return (
     <TooltipProvider delayDuration={200}>
-    <div className="app-ui flex min-h-svh">
-      <aside className={`sticky top-0 z-40 hidden h-svh shrink-0 transition-[width] duration-200 ease-out md:block ${rail ? "w-16" : "w-56"}`}>
-        <AppSidebar user={user} rail={rail} onToggle={toggle} onSearch={() => setSearchOpen(true)} />
-      </aside>
+      <div className="app-ui flex min-h-svh">
+        <aside className={`sticky top-0 z-40 hidden h-svh shrink-0 transition-[width] duration-200 ease-out md:block ${rail ? "w-16" : "w-56"}`}>
+          <AppSidebar user={user} rail={rail} onToggle={toggle} onSearch={() => setSearchOpen(true)} />
+        </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/85 px-4 backdrop-blur md:hidden">
-          <button onClick={() => setOpen(true)} className="rounded-md p-2 hover:bg-muted" aria-label="Open menu">
-            <Menu className="size-5" />
-          </button>
-          <span className="font-brand text-lg font-semibold">The Royal Knot</span>
-          <button onClick={() => setSearchOpen(true)} className="ml-auto rounded-md p-2 hover:bg-muted" aria-label="Search">
-            <Search className="size-5" />
-          </button>
-        </header>
-        <CommandPalette
-          open={searchOpen}
-          onOpenChange={setSearchOpen}
-          role={user.role}
-          actions={[
-            { label: "Switch light / dark", icon: "sun", run: toggleTheme },
-            { label: rail ? "Expand sidebar" : "Collapse sidebar", icon: "grid", run: toggle, shortcut: "Ctrl B" },
-          ]}
-        />
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetContent side="left" className="w-60 border-0 p-0">
-            <SheetTitle className="sr-only">Navigation</SheetTitle>
-            <AppSidebar user={user} onNavigate={() => setOpen(false)} onSearch={() => setSearchOpen(true)} />
-          </SheetContent>
-        </Sheet>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/85 px-4 backdrop-blur md:hidden">
+            <button onClick={() => setOpen(true)} className="rounded-md p-2 hover:bg-muted" aria-label="Open menu">
+              <Menu className="size-5" />
+            </button>
+            <span className="font-brand text-lg font-semibold">The Royal Knot</span>
+            <button onClick={() => setSearchOpen(true)} className="ml-auto rounded-md p-2 hover:bg-muted" aria-label="Search">
+              <Search className="size-5" />
+            </button>
+          </header>
+          <CommandPalette
+            open={searchOpen}
+            onOpenChange={setSearchOpen}
+            role={user.role}
+            actions={[
+              { label: "Switch light / dark", icon: "sun", run: toggleTheme },
+              { label: rail ? "Expand sidebar" : "Collapse sidebar", icon: "grid", run: toggle, shortcut: "Ctrl B" },
+            ]}
+          />
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetContent side="left" className="w-60 border-0 p-0">
+              <SheetTitle className="sr-only">Navigation</SheetTitle>
+              <AppSidebar user={user} onNavigate={() => setOpen(false)} onSearch={() => setSearchOpen(true)} />
+            </SheetContent>
+          </Sheet>
 
-        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8">{children}</main>
+          <main className="flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8">{children}</main>
+        </div>
       </div>
-    </div>
     </TooltipProvider>
   );
 }

@@ -3,19 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  CalendarPlus,
-  Check,
-  Copy,
-  Download,
-  ExternalLink,
-  FileSignature,
-  Loader2,
-  MessageCircle,
-  Phone,
-  Sparkles,
-  XCircle,
-} from "lucide-react";
+import { CalendarPlus, Check, Copy, Download, ExternalLink, FileSignature, Loader2, MessageCircle, Phone, Sparkles, XCircle } from "lucide-react";
 import { Icon, type IconName } from "@/frontend/components/icons/icon";
 import { toast } from "sonner";
 import { Button } from "@/frontend/components/ui/button";
@@ -243,9 +231,7 @@ function RequestedPackage({ data }: { data: Detail }) {
         <div>
           <dt className="text-xs text-muted-foreground">Indicative estimate</dt>
           <dd className="font-medium tabular">
-            {data.estimateLow != null && data.estimateHigh != null
-              ? `${formatINRCompact(data.estimateLow)} – ${formatINRCompact(data.estimateHigh)}`
-              : "—"}
+            {data.estimateLow != null && data.estimateHigh != null ? `${formatINRCompact(data.estimateLow)} – ${formatINRCompact(data.estimateHigh)}` : "—"}
           </dd>
         </div>
         {data.events.length > 0 && (
@@ -353,9 +339,7 @@ function Meetings({ data, onDone }: { data: Detail; onDone: () => Promise<void> 
               days={days}
               durations={[60]}
               host={{ name: data.partner1 + " & " + data.partner2, title: "Planning meeting" }}
-              onBook={({ date, start }) =>
-                setAt(`${date}T${String(Math.floor(start / 60)).padStart(2, "0")}:${String(start % 60).padStart(2, "0")}:00+05:30`)
-              }
+              onBook={({ date, start }) => setAt(`${date}T${String(Math.floor(start / 60)).padStart(2, "0")}:${String(start % 60).padStart(2, "0")}:00+05:30`)}
             />
           ) : (
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -448,7 +432,14 @@ function AgreementPanel({ data, onDone }: { data: Detail; onDone: () => Promise<
                 <ExternalLink /> Open
               </a>
             </Button>
-            <Button size="sm" variant="ghost" onClick={async () => { await onDone(); router.refresh(); }}>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={async () => {
+                await onDone();
+                router.refresh();
+              }}
+            >
               Check status
             </Button>
           </div>

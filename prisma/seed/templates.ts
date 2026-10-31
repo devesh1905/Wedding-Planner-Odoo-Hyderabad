@@ -64,8 +64,7 @@ export const PACKAGES = [
   {
     kind: "FULL_SERVICE" as const,
     name: "Full-Service Wedding",
-    description:
-      "Theme & design, venue booking, vendor sourcing, layout planning, guest tracking, rehearsal and on-the-day crisis handling.",
+    description: "Theme & design, venue booking, vendor sourcing, layout planning, guest tracking, rehearsal and on-the-day crisis handling.",
     basePrice: 35_00_000, // ₹35 L
     templates: FULL_SERVICE,
   },

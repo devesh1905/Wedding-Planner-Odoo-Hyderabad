@@ -11,7 +11,17 @@ import { formatDate } from "@/shared/format";
 import { cn } from "@/shared/utils";
 
 type Index = {
-  weddings: { id: string; code: string; partner1: string; partner2: string; city: string; venue: string | null; phone: string; stage: string; startDate: string }[];
+  weddings: {
+    id: string;
+    code: string;
+    partner1: string;
+    partner2: string;
+    city: string;
+    venue: string | null;
+    phone: string;
+    stage: string;
+    startDate: string;
+  }[];
   enquiries: { id: string; partner1: string; partner2: string; phone: string; city: string | null; status: string }[];
   vendors: { id: string; name: string; category: string; city: string; phone: string }[];
 };
@@ -98,7 +108,11 @@ export function CommandPalette({
       const data = await res.json();
       // ignore a late answer if the box has moved on to another question
       setAnswer((cur) =>
-        cur?.question !== question ? cur : res.ok ? { state: "done", question, meaning: data.meaning, rows: data.rows } : { state: "error", question, error: data.error ?? "Could not answer that" },
+        cur?.question !== question
+          ? cur
+          : res.ok
+            ? { state: "done", question, meaning: data.meaning, rows: data.rows }
+            : { state: "error", question, error: data.error ?? "Could not answer that" },
       );
     } catch {
       setAnswer((cur) => (cur?.question !== question ? cur : { state: "error", question, error: "You seem to be offline" }));
@@ -138,7 +152,10 @@ export function CommandPalette({
                 placeholder="Search, or ask “December weddings that still owe us”"
                 className="h-14 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground"
               />
-              <DialogPrimitive.Close className="grid size-7 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground" aria-label="Close">
+              <DialogPrimitive.Close
+                className="grid size-7 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+                aria-label="Close"
+              >
                 <X className="size-4" />
               </DialogPrimitive.Close>
             </div>
@@ -155,106 +172,120 @@ export function CommandPalette({
               {answer ? (
                 <AnswerView answer={answer} go={go} onRetry={() => askQuestion(answer.question)} />
               ) : (
-              <>
-              {/* a question always has the Ask row, so "nothing matches" would be wrong there */}
-              {!looksLikeQuestion(q) && (
-                <Command.Empty className="py-12 text-center text-sm text-muted-foreground">
-                  {index ? `Nothing matches “${query}”.` : "Loading…"}
-                </Command.Empty>
-              )}
-
-              {looksLikeQuestion(q) && (
-                <Command.Group heading="Ask KnotOS" forceMount>
-                  <Item forceMount value="__ask" icon="idea" title={`Ask: “${query.trim()}”`} meta="Answered from live data" onSelect={() => askQuestion(query.trim())} />
-                </Command.Group>
-              )}
-
-              <Command.Group heading="Pages">
-                {PAGES.filter((p) => !p.founderOnly || role === "FOUNDER").map((p) => (
-                  <Item key={p.href} value={p.label} keywords={p.keywords} icon={p.icon} onSelect={() => go(p.href)} title={p.label} />
-                ))}
-              </Command.Group>
-
-              {sectionTargets.map((w) => (
-                <Command.Group key={`s-${w.id}`} heading={`Jump into ${couple(w)}`}>
-                  {SECTIONS.map((s) => (
-                    <Item
-                      key={s.key}
-                      value={`${couple(w)} ${s.label} ${w.code}`}
-                      keywords={[w.partner1, w.partner2]}
-                      icon={s.icon}
-                      onSelect={() => go(`/weddings/${w.id}?tab=${s.key}`)}
-                      title={s.label}
-                      meta={couple(w)}
-                    />
-                  ))}
-                  {w.stage === "BIG_DAY" && (
-                    <Item value={`${couple(w)} control room live`} keywords={[w.partner1, w.partner2]} icon="radar" onSelect={() => go(`/weddings/${w.id}/live`)} title="Control room" meta="Live today" />
+                <>
+                  {/* a question always has the Ask row, so "nothing matches" would be wrong there */}
+                  {!looksLikeQuestion(q) && (
+                    <Command.Empty className="py-12 text-center text-sm text-muted-foreground">
+                      {index ? `Nothing matches “${query}”.` : "Loading…"}
+                    </Command.Empty>
                   )}
-                </Command.Group>
-              ))}
 
-              {weddings.length > 0 && (
-                <Command.Group heading={q ? "Weddings" : "Happening now"}>
-                  {weddings.map((w) => (
-                    <Item
-                      key={w.id}
-                      value={`${couple(w)} ${w.code} ${w.city} ${w.venue ?? ""} ${w.phone}`}
-                      icon="heart"
-                      onSelect={() => go(`/weddings/${w.id}`)}
-                      title={couple(w)}
-                      meta={`${w.code} · ${formatDate(w.startDate)} · ${statusLabel(w.stage)}`}
-                    />
+                  {looksLikeQuestion(q) && (
+                    <Command.Group heading="Ask KnotOS" forceMount>
+                      <Item
+                        forceMount
+                        value="__ask"
+                        icon="idea"
+                        title={`Ask: “${query.trim()}”`}
+                        meta="Answered from live data"
+                        onSelect={() => askQuestion(query.trim())}
+                      />
+                    </Command.Group>
+                  )}
+
+                  <Command.Group heading="Pages">
+                    {PAGES.filter((p) => !p.founderOnly || role === "FOUNDER").map((p) => (
+                      <Item key={p.href} value={p.label} keywords={p.keywords} icon={p.icon} onSelect={() => go(p.href)} title={p.label} />
+                    ))}
+                  </Command.Group>
+
+                  {sectionTargets.map((w) => (
+                    <Command.Group key={`s-${w.id}`} heading={`Jump into ${couple(w)}`}>
+                      {SECTIONS.map((s) => (
+                        <Item
+                          key={s.key}
+                          value={`${couple(w)} ${s.label} ${w.code}`}
+                          keywords={[w.partner1, w.partner2]}
+                          icon={s.icon}
+                          onSelect={() => go(`/weddings/${w.id}?tab=${s.key}`)}
+                          title={s.label}
+                          meta={couple(w)}
+                        />
+                      ))}
+                      {w.stage === "BIG_DAY" && (
+                        <Item
+                          value={`${couple(w)} control room live`}
+                          keywords={[w.partner1, w.partner2]}
+                          icon="radar"
+                          onSelect={() => go(`/weddings/${w.id}/live`)}
+                          title="Control room"
+                          meta="Live today"
+                        />
+                      )}
+                    </Command.Group>
                   ))}
-                </Command.Group>
-              )}
 
-              {enquiries.length > 0 && (
-                <Command.Group heading={q ? "Enquiries" : "Latest enquiries"}>
-                  {enquiries.map((e) => (
-                    <Item
-                      key={e.id}
-                      value={`${couple(e)} ${e.phone} ${e.city ?? ""} enquiry`}
-                      icon="inbox"
-                      onSelect={() => go(`/enquiries?open=${e.id}`)}
-                      title={couple(e)}
-                      meta={`${e.city ?? "City TBC"} · ${tidy(e.status)}`}
-                    />
-                  ))}
-                </Command.Group>
-              )}
+                  {weddings.length > 0 && (
+                    <Command.Group heading={q ? "Weddings" : "Happening now"}>
+                      {weddings.map((w) => (
+                        <Item
+                          key={w.id}
+                          value={`${couple(w)} ${w.code} ${w.city} ${w.venue ?? ""} ${w.phone}`}
+                          icon="heart"
+                          onSelect={() => go(`/weddings/${w.id}`)}
+                          title={couple(w)}
+                          meta={`${w.code} · ${formatDate(w.startDate)} · ${statusLabel(w.stage)}`}
+                        />
+                      ))}
+                    </Command.Group>
+                  )}
 
-              {vendors.length > 0 && (
-                <Command.Group heading="Vendors">
-                  {vendors.map((v) => (
-                    <Item
-                      key={v.id}
-                      value={`${v.name} ${v.category} ${v.city} ${v.phone}`}
-                      icon="shop"
-                      onSelect={() => go(`/vendors/${v.id}`)}
-                      title={v.name}
-                      meta={`${tidy(v.category)} · ${v.city}`}
-                    />
-                  ))}
-                </Command.Group>
-              )}
+                  {enquiries.length > 0 && (
+                    <Command.Group heading={q ? "Enquiries" : "Latest enquiries"}>
+                      {enquiries.map((e) => (
+                        <Item
+                          key={e.id}
+                          value={`${couple(e)} ${e.phone} ${e.city ?? ""} enquiry`}
+                          icon="inbox"
+                          onSelect={() => go(`/enquiries?open=${e.id}`)}
+                          title={couple(e)}
+                          meta={`${e.city ?? "City TBC"} · ${tidy(e.status)}`}
+                        />
+                      ))}
+                    </Command.Group>
+                  )}
 
-              <Command.Group heading="Actions">
-                {actions.map((a) => (
-                  <Item
-                    key={a.label}
-                    value={a.label}
-                    icon={a.icon}
-                    title={a.label}
-                    meta={a.shortcut}
-                    onSelect={() => {
-                      onOpenChange(false);
-                      a.run();
-                    }}
-                  />
-                ))}
-              </Command.Group>
-              </>
+                  {vendors.length > 0 && (
+                    <Command.Group heading="Vendors">
+                      {vendors.map((v) => (
+                        <Item
+                          key={v.id}
+                          value={`${v.name} ${v.category} ${v.city} ${v.phone}`}
+                          icon="shop"
+                          onSelect={() => go(`/vendors/${v.id}`)}
+                          title={v.name}
+                          meta={`${tidy(v.category)} · ${v.city}`}
+                        />
+                      ))}
+                    </Command.Group>
+                  )}
+
+                  <Command.Group heading="Actions">
+                    {actions.map((a) => (
+                      <Item
+                        key={a.label}
+                        value={a.label}
+                        icon={a.icon}
+                        title={a.label}
+                        meta={a.shortcut}
+                        onSelect={() => {
+                          onOpenChange(false);
+                          a.run();
+                        }}
+                      />
+                    ))}
+                  </Command.Group>
+                </>
               )}
             </Command.List>
 

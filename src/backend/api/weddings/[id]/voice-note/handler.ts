@@ -16,15 +16,20 @@ const pretty = (d: Date) => prettyFmt.format(d).toUpperCase();
 // The model must pick ids from the lists we send; anything else is dropped below.
 const modelOutput = z.object({
   transcript: z.string().default(""),
-  actions: z.array(z.object({
-    type: z.enum(["raise_issue", "update_schedule_item"]),
-    title: z.string().nullish(),
-    severity: z.string().nullish(),
-    vendorId: z.string().nullish(),
-    scheduleItemId: z.string().nullish(),
-    newTime: z.string().nullish(),
-    status: z.string().nullish(),
-  })).max(10).default([]),
+  actions: z
+    .array(
+      z.object({
+        type: z.enum(["raise_issue", "update_schedule_item"]),
+        title: z.string().nullish(),
+        severity: z.string().nullish(),
+        vendorId: z.string().nullish(),
+        scheduleItemId: z.string().nullish(),
+        newTime: z.string().nullish(),
+        status: z.string().nullish(),
+      }),
+    )
+    .max(10)
+    .default([]),
 });
 
 const SYSTEM = `You turn a wedding planner's spoken note into proposed actions for the wedding-day control room.
@@ -45,14 +50,21 @@ export const POST = handle(async (request: Request, { params }: Ctx) => {
   await requireUser();
   const weddingId = liveIdSchema.parse((await params).id);
   let body: unknown;
-  try { body = await request.json(); } catch { throw new HttpError(400, "Send a valid JSON object"); }
+  try {
+    body = await request.json();
+  } catch {
+    throw new HttpError(400, "Send a valid JSON object");
+  }
   const input = voiceNoteRequestSchema.parse(body);
 
   const wedding = await db.wedding.findUnique({
     where: { id: weddingId },
     select: {
       stage: true,
-      events: { orderBy: { sortOrder: "asc" }, select: { name: true, scheduleItems: { orderBy: { startsAt: "asc" }, select: { id: true, title: true, startsAt: true, status: true } } } },
+      events: {
+        orderBy: { sortOrder: "asc" },
+        select: { name: true, scheduleItems: { orderBy: { startsAt: "asc" }, select: { id: true, title: true, startsAt: true, status: true } } },
+      },
       bookings: { select: { vendor: { select: { id: true, name: true, category: true } } } },
     },
   });
@@ -112,7 +124,9 @@ export const POST = handle(async (request: Request, { params }: Ctx) => {
     if (nextStatus !== item.status) parts.push(actualAt ? `mark ${nextStatus.toLowerCase()}` : `Mark "${item.title}" as ${nextStatus.toLowerCase()}`);
     if (!parts.length) continue;
     actions.push({
-      key, kind: "schedule", summary: parts.join(", "),
+      key,
+      kind: "schedule",
+      summary: parts.join(", "),
       // Planned start stays untouched; the new time is recorded as the actual time, which is all the live API supports.
       payload: { itemId: item.id, status: nextStatus, actualAt: actualAt ? actualAt.toISOString() : null },
     });

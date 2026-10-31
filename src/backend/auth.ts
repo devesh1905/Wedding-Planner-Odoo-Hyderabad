@@ -19,7 +19,10 @@ export async function requirePageUser(role?: SessionPayload["role"]) {
 }
 
 export class HttpError extends Error {
-  constructor(public status: number, message: string) {
+  constructor(
+    public status: number,
+    message: string,
+  ) {
     super(message);
   }
 }

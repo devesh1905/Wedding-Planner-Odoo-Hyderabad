@@ -20,12 +20,22 @@ export function overlayPending(base: LiveData, actions: OfflineAction[]): LiveDa
       const itemId = String(payload.itemId ?? "");
       const status = payload.status as LiveData["events"][number]["scheduleItems"][number]["status"];
       const actualAt = typeof payload.actualAt === "string" ? payload.actualAt : null;
-      data = { ...data, events: data.events.map((event) => ({ ...event, scheduleItems: event.scheduleItems.map((item) => (item.id === itemId ? { ...item, status, actualAt } : item)) })) };
+      data = {
+        ...data,
+        events: data.events.map((event) => ({
+          ...event,
+          scheduleItems: event.scheduleItems.map((item) => (item.id === itemId ? { ...item, status, actualAt } : item)),
+        })),
+      };
     } else if (action.type === "ISSUE") {
       const ownerId = typeof payload.ownerId === "string" ? payload.ownerId : null;
       const issue = {
-        id: `pending-${action.clientId}`, description: String(payload.description ?? ""), severity: (payload.severity as "LOW" | "MEDIUM" | "HIGH") ?? "MEDIUM",
-        status: "OPEN" as const, ownerId, owner: data.staff.find((person) => person.id === ownerId) ?? null,
+        id: `pending-${action.clientId}`,
+        description: String(payload.description ?? ""),
+        severity: (payload.severity as "LOW" | "MEDIUM" | "HIGH") ?? "MEDIUM",
+        status: "OPEN" as const,
+        ownerId,
+        owner: data.staff.find((person) => person.id === ownerId) ?? null,
       };
       data = { ...data, issues: [issue, ...data.issues] };
     }

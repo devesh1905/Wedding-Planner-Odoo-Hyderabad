@@ -80,7 +80,14 @@ export function SignForm({ token, defaultName }: { token: string; defaultName: s
   return (
     <form onSubmit={submit} noValidate className="squircle space-y-6 rounded-2xl border bg-card p-5 shadow-sm sm:p-8">
       <Field label="Your full name" htmlFor="signerName" error={errors.signerName}>
-        <Input id="signerName" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" aria-invalid={!!errors.signerName} className="h-11 md:h-10" />
+        <Input
+          id="signerName"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          autoComplete="name"
+          aria-invalid={!!errors.signerName}
+          className="h-11 md:h-10"
+        />
       </Field>
 
       <Field label="Sign here" error={errors.signature}>
@@ -97,7 +104,13 @@ export function SignForm({ token, defaultName }: { token: string; defaultName: s
               </span>
             </span>
           )}
-          <Button type="button" size="sm" variant="ghost" onClick={clear} className="absolute right-2 bottom-2 h-9 px-3 text-stone-600 hover:bg-stone-100 hover:text-stone-900 dark:hover:bg-stone-100">
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            onClick={clear}
+            className="absolute right-2 bottom-2 h-9 px-3 text-stone-600 hover:bg-stone-100 hover:text-stone-900 dark:hover:bg-stone-100"
+          >
             <Eraser /> Clear
           </Button>
         </div>
@@ -114,11 +127,19 @@ export function SignForm({ token, defaultName }: { token: string; defaultName: s
         />
         <span>
           I have read and accept this service agreement.
-          {errors.agree && <span role="alert" className="mt-1 block text-xs text-rose">{errors.agree}</span>}
+          {errors.agree && (
+            <span role="alert" className="mt-1 block text-xs text-rose">
+              {errors.agree}
+            </span>
+          )}
         </span>
       </label>
 
-      {errors.form && <p role="alert" className="rounded-lg bg-rose-soft px-3 py-2.5 text-sm text-rose">{errors.form}</p>}
+      {errors.form && (
+        <p role="alert" className="rounded-lg bg-rose-soft px-3 py-2.5 text-sm text-rose">
+          {errors.form}
+        </p>
+      )}
 
       <Button type="submit" size="lg" className="squircle h-12 w-full rounded-xl text-base" disabled={pending} aria-busy={pending}>
         {pending && <Loader2 className="animate-spin" />} {pending ? "Signing…" : "Sign agreement"}

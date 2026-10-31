@@ -4,17 +4,7 @@
 
 import type { IconName } from "@/frontend/components/icons/icon";
 
-export type ServiceKey =
-  | "venue"
-  | "decor"
-  | "catering"
-  | "photo"
-  | "mehendi"
-  | "makeup"
-  | "music"
-  | "choreo"
-  | "hospitality"
-  | "invites";
+export type ServiceKey = "venue" | "decor" | "catering" | "photo" | "mehendi" | "makeup" | "music" | "choreo" | "hospitality" | "invites";
 
 export type ServiceGroup = "essentials" | "design" | "guests";
 
@@ -114,12 +104,7 @@ export type PackageEstimate = {
 /** "-/+ 12%, rounded to the nearest ₹50,000" — shown under the breakdown. */
 export const RANGE_NOTE = `Shown as a range of ${Math.round(SPREAD * 100)}% either side, rounded to the nearest ₹50,000.`;
 
-export function estimate(input: {
-  guests?: number | null;
-  services: readonly string[];
-  events: readonly string[];
-  planning?: string | null;
-}): PackageEstimate {
+export function estimate(input: { guests?: number | null; services: readonly string[]; events: readonly string[]; planning?: string | null }): PackageEstimate {
   const assumedGuests = !input.guests || input.guests < 1;
   const guests = assumedGuests ? DEFAULT_GUESTS : Math.round(input.guests as number);
   const eventCount = Math.max(1, input.events.length);
@@ -130,8 +115,7 @@ export function estimate(input: {
   for (const s of SERVICES) {
     if (!picked.has(s.key)) continue;
     const k = s.key;
-    const amount =
-      (PER_GUEST_PER_EVENT[k] ?? 0) * guests * eventCount + (PER_GUEST[k] ?? 0) * guests + (FIXED[k] ?? 0);
+    const amount = (PER_GUEST_PER_EVENT[k] ?? 0) * guests * eventCount + (PER_GUEST[k] ?? 0) * guests + (FIXED[k] ?? 0);
     lines.push({ key: k, label: s.label, amount });
   }
   const subtotal = lines.reduce((sum, l) => sum + l.amount, 0);

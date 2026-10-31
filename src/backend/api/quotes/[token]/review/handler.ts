@@ -13,13 +13,20 @@ export const PATCH = handle(async (request: Request, context: Context) => {
     if (!candidate) throw new HttpError(404, "Quote not found");
     await lockWedding(tx, candidate.request.weddingId);
     const wedding = await requireSignedWedding(tx, candidate.request.weddingId);
-    const current = await tx.vendorQuote.findUnique({ where: { id }, select: { status: true, updatedAt: true, aiExtracted: true, request: { select: { status: true } } } });
-    if (!current || current.status !== "SUBMITTED" || current.request.status !== "OPEN" || wedding.stage === "CANCELLED" || wedding.stage === "SETTLED") throw new HttpError(409, "Only an open submitted quote can be reviewed");
-    if (expectedUpdatedAt && current.updatedAt.getTime() !== new Date(expectedUpdatedAt).getTime()) throw new HttpError(409, "The vendor changed this proposal. Reload it before saving your review.");
+    const current = await tx.vendorQuote.findUnique({
+      where: { id },
+      select: { status: true, updatedAt: true, aiExtracted: true, request: { select: { status: true } } },
+    });
+    if (!current || current.status !== "SUBMITTED" || current.request.status !== "OPEN" || wedding.stage === "CANCELLED" || wedding.stage === "SETTLED")
+      throw new HttpError(409, "Only an open submitted quote can be reviewed");
+    if (expectedUpdatedAt && current.updatedAt.getTime() !== new Date(expectedUpdatedAt).getTime())
+      throw new HttpError(409, "The vendor changed this proposal. Reload it before saving your review.");
     await tx.quoteLine.deleteMany({ where: { quoteId: id } });
-    return tx.vendorQuote.update({ where: { id }, data: { ...summary, aiReviewed: current.aiExtracted,
-      lines: { create: lines.map((line, sortOrder) => ({ ...line, sortOrder })) },
-    }, select: portalSelect });
+    return tx.vendorQuote.update({
+      where: { id },
+      data: { ...summary, aiReviewed: current.aiExtracted, lines: { create: lines.map((line, sortOrder) => ({ ...line, sortOrder })) } },
+      select: portalSelect,
+    });
   });
   return privateJson({ quote: portalView(quote) });
 });

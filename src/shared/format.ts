@@ -33,7 +33,6 @@ function trim(n: number) {
   return n.toFixed(n >= 100 ? 0 : n >= 10 ? 1 : 2).replace(/\.?0+$/, "");
 }
 
-
 const dateFmt = new Intl.DateTimeFormat("en-IN", {
   day: "2-digit",
   month: "short",

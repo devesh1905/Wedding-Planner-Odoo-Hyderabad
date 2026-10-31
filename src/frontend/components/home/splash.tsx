@@ -75,7 +75,9 @@ export function Splash() {
       className={`splash fixed inset-0 z-[100] ${opening ? "pointer-events-none" : "cursor-pointer"}`}
     >
       {/* The dark: a hole opens from the flame and grows past the screen edges. */}
-      <div className={`splash-dark absolute inset-0 grid place-items-center bg-[oklch(0.2_0.06_18)] text-[oklch(0.93_0.04_80)] ${opening ? "splash-open" : ""}`}>
+      <div
+        className={`splash-dark absolute inset-0 grid place-items-center bg-[oklch(0.2_0.06_18)] text-[oklch(0.93_0.04_80)] ${opening ? "splash-open" : ""}`}
+      >
         <div className="flex flex-col items-center gap-6">
           <div ref={mark}>
             <KnotMark mode="draw" className="h-16 w-32" />

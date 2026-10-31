@@ -18,7 +18,11 @@ export function tokenFromScan(value: string): string {
   const trimmed = value.trim();
   if (TOKEN.test(trimmed)) return trimmed;
   let url: URL;
-  try { url = new URL(trimmed); } catch { throw new Error("Enter a booking code or scan a check-in QR"); }
+  try {
+    url = new URL(trimmed);
+  } catch {
+    throw new Error("Enter a booking code or scan a check-in QR");
+  }
   if (!["http:", "https:"].includes(url.protocol)) throw new Error("Invalid check-in link");
   const match = /^\/v\/([a-zA-Z0-9_-]{16,256})\/?$/.exec(url.pathname);
   if (!match?.[1]) throw new Error("This QR does not contain a booking code");

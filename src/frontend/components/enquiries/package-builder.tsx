@@ -79,29 +79,29 @@ export function EstimateBreakdown({ est, className, contained = true }: { est: P
       {/* in the phone bar the list scrolls on its own; in the desktop card the whole card scrolls */}
       <div id={id} hidden={!open}>
         <ScrollPanel className={contained ? "max-h-[45svh]" : undefined} innerClassName="pr-3">
-        <dl className="divide-y divide-border text-sm">
-          {services.map((l) => (
-            <div key={l.key} className="flex items-baseline justify-between gap-3 py-1.5">
-              <dt className="min-w-0 text-muted-foreground">{l.label}</dt>
-              <dd className="shrink-0 tabular">{formatINRCompact(l.amount)}</dd>
+          <dl className="divide-y divide-border text-sm">
+            {services.map((l) => (
+              <div key={l.key} className="flex items-baseline justify-between gap-3 py-1.5">
+                <dt className="min-w-0 text-muted-foreground">{l.label}</dt>
+                <dd className="shrink-0 tabular">{formatINRCompact(l.amount)}</dd>
+              </div>
+            ))}
+            <div className="flex items-baseline justify-between gap-3 py-1.5 font-medium">
+              <dt>Services subtotal</dt>
+              <dd className="shrink-0 tabular">{formatINRCompact(est.subtotal)}</dd>
             </div>
-          ))}
-          <div className="flex items-baseline justify-between gap-3 py-1.5 font-medium">
-            <dt>Services subtotal</dt>
-            <dd className="shrink-0 tabular">{formatINRCompact(est.subtotal)}</dd>
-          </div>
-          {fee && (
-            <div className="flex items-baseline justify-between gap-3 py-1.5">
-              <dt className="min-w-0 text-muted-foreground">{fee.label}</dt>
-              <dd className="shrink-0 tabular">{formatINRCompact(fee.amount)}</dd>
+            {fee && (
+              <div className="flex items-baseline justify-between gap-3 py-1.5">
+                <dt className="min-w-0 text-muted-foreground">{fee.label}</dt>
+                <dd className="shrink-0 tabular">{formatINRCompact(fee.amount)}</dd>
+              </div>
+            )}
+            <div className="flex items-baseline justify-between gap-3 py-1.5 font-semibold">
+              <dt>Total</dt>
+              <dd className="shrink-0 tabular">{formatINRCompact(est.total)}</dd>
             </div>
-          )}
-          <div className="flex items-baseline justify-between gap-3 py-1.5 font-semibold">
-            <dt>Total</dt>
-            <dd className="shrink-0 tabular">{formatINRCompact(est.total)}</dd>
-          </div>
-        </dl>
-        <p className="mt-1 text-xs text-pretty text-muted-foreground">{RANGE_NOTE}</p>
+          </dl>
+          <p className="mt-1 text-xs text-pretty text-muted-foreground">{RANGE_NOTE}</p>
         </ScrollPanel>
       </div>
     </div>
@@ -142,9 +142,7 @@ export function PackageBuilder({
         <h2 id="package-title" className="mt-1 text-2xl font-semibold sm:text-3xl">
           Build your package
         </h2>
-        <p className="mt-1 text-sm text-pretty text-muted-foreground">
-          Tick what you&apos;d like us to handle — you&apos;ll see an estimate as you go.
-        </p>
+        <p className="mt-1 text-sm text-pretty text-muted-foreground">Tick what you&apos;d like us to handle — you&apos;ll see an estimate as you go.</p>
       </header>
 
       <div role="radiogroup" aria-label="Planning level" className="grid gap-3 sm:grid-cols-2">
@@ -231,14 +229,25 @@ export function PackageBuilder({
                       on ? "border-cta bg-cta/10" : "bg-card hover:border-maroon/40",
                     )}
                   >
-                    <span className={cn("mt-0.5 grid size-9 shrink-0 place-items-center rounded-lg", on ? "bg-cta text-cta-foreground" : "bg-muted text-muted-foreground")}>
+                    <span
+                      className={cn(
+                        "mt-0.5 grid size-9 shrink-0 place-items-center rounded-lg",
+                        on ? "bg-cta text-cta-foreground" : "bg-muted text-muted-foreground",
+                      )}
+                    >
                       <Icon name={s.icon} className="size-5" />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-semibold">{s.label}</span>
                       <span className="block text-xs text-pretty text-muted-foreground">{s.description}</span>
                     </span>
-                    <span aria-hidden className={cn("mt-1 grid size-5 shrink-0 place-items-center rounded-md border", on ? "border-cta bg-cta text-cta-foreground" : "border-input")}>
+                    <span
+                      aria-hidden
+                      className={cn(
+                        "mt-1 grid size-5 shrink-0 place-items-center rounded-md border",
+                        on ? "border-cta bg-cta text-cta-foreground" : "border-input",
+                      )}
+                    >
                       {on && <Icon name="check" className="size-3.5" />}
                     </span>
                   </button>

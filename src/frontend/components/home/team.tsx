@@ -24,9 +24,7 @@ export function Team({ people }: { people: TeamMember[] }) {
       <h2 id="team-title" data-cast className="mt-3 max-w-xl text-4xl leading-tight font-semibold sm:text-5xl">
         The people behind your day
       </h2>
-      <p className="mt-4 max-w-xl text-muted-foreground">
-        Every wedding has one lead planner from the first call to the final payment — never a hand-off.
-      </p>
+      <p className="mt-4 max-w-xl text-muted-foreground">Every wedding has one lead planner from the first call to the final payment — never a hand-off.</p>
       <Reveal className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {people.map((p) => (
           <RevealItem key={p.id}>
@@ -38,11 +36,18 @@ export function Team({ people }: { people: TeamMember[] }) {
               <p className="text-sm text-muted-foreground">{p.role === "FOUNDER" ? "Founder · signs off every plan" : "Lead planner"}</p>
               <p className="mt-4 border-t pt-4 text-sm">
                 {p.role === "FOUNDER" ? (
-                  <>Oversees all <span className="font-semibold tabular-nums">{p.leading + p.done}</span> weddings on our books</>
+                  <>
+                    Oversees all <span className="font-semibold tabular-nums">{p.leading + p.done}</span> weddings on our books
+                  </>
                 ) : (
                   <>
                     Leading <span className="font-semibold tabular-nums">{p.leading}</span> weddings now
-                    {p.done > 0 && <> · <span className="font-semibold tabular-nums">{p.done}</span> delivered</>}
+                    {p.done > 0 && (
+                      <>
+                        {" "}
+                        · <span className="font-semibold tabular-nums">{p.done}</span> delivered
+                      </>
+                    )}
                   </>
                 )}
               </p>

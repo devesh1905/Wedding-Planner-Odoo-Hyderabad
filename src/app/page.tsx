@@ -62,10 +62,12 @@ export default async function Home() {
           <MonogramButton />
           <nav className="flex items-center gap-3 text-sm sm:gap-6">
             <a href="#journey" className="hit-44 hidden items-center gap-1.5 whitespace-nowrap text-foreground/85 hover:text-foreground lg:inline-flex">
-              <Icon name="route" />How it works
+              <Icon name="route" />
+              How it works
             </a>
             <a href="#celebrations" className="hit-44 hidden items-center gap-1.5 whitespace-nowrap text-foreground/85 hover:text-foreground lg:inline-flex">
-              <Icon name="confetti" />Celebrations
+              <Icon name="confetti" />
+              Celebrations
             </a>
             <ThemeToggle className="-my-2" />
             <Link
@@ -89,56 +91,59 @@ export default async function Home() {
       </header>
 
       <ViewTransition enter="page-rise" exit="page-fade" default="none">
-      <main data-snap-page>
-        <Hero />
+        <main data-snap-page>
+          <Hero />
 
-        <section className="relative mx-auto max-w-6xl px-6 pt-16 pb-24" aria-label="Our promise">
-          <DiyaSlot id="promise" className="absolute top-6 right-6" />
-          <Reveal className="grid gap-12 border-t border-border pt-10 md:grid-cols-3">
-            {PROMISES.map((p) => (
-              <RevealItem key={p.v}>
-                <div data-cast>
-                <p className="font-serif text-6xl font-semibold text-eyebrow"><NumberTicker value={p.k} from={p.from} />
-                </p>
-                <p className="mt-2 text-lg font-medium">{p.v}</p>
-                </div>
+          <section className="relative mx-auto max-w-6xl px-6 pt-16 pb-24" aria-label="Our promise">
+            <DiyaSlot id="promise" className="absolute top-6 right-6" />
+            <Reveal className="grid gap-12 border-t border-border pt-10 md:grid-cols-3">
+              {PROMISES.map((p) => (
+                <RevealItem key={p.v}>
+                  <div data-cast>
+                    <p className="font-serif text-6xl font-semibold text-eyebrow">
+                      <NumberTicker value={p.k} from={p.from} />
+                    </p>
+                    <p className="mt-2 text-lg font-medium">{p.v}</p>
+                  </div>
+                </RevealItem>
+              ))}
+            </Reveal>
+          </section>
+
+          <ThreeDays />
+          <Chapters />
+          <VenueMarquee />
+          <Celebrations />
+          <Team people={team} />
+
+          <section className="px-6 pb-24">
+            <Reveal className="squircle relative mx-auto max-w-6xl overflow-hidden rounded-[36px] bg-[oklch(0.24_0.07_18)] px-8 py-20 text-center text-[oklch(0.95_0.02_80)] sm:px-16">
+              <div className="aurora aurora-dim pointer-events-none absolute inset-0" aria-hidden>
+                <span className="aurora-a" />
+                <span className="aurora-b" />
+              </div>
+              <DiyaSlot id="cta" className="absolute top-8 right-8" />
+              <RevealItem className="relative">
+                <p className="text-xs tracking-[0.35em] text-marigold uppercase">Begin</p>
+                <h2 data-cast className="mx-auto mt-4 max-w-2xl text-5xl leading-tight font-semibold sm:text-6xl">
+                  Tell us the date you're dreaming of
+                </h2>
+                <p className="mx-auto mt-5 max-w-lg text-[oklch(0.95_0.02_80/0.75)]">Two minutes to share it. One day to hear from your planner.</p>
               </RevealItem>
-            ))}
-          </Reveal>
-        </section>
-
-        <ThreeDays />
-        <Chapters />
-        <VenueMarquee />
-        <Celebrations />
-        <Team people={team} />
-
-        <section className="px-6 pb-24">
-          <Reveal className="squircle relative mx-auto max-w-6xl overflow-hidden rounded-[36px] bg-[oklch(0.24_0.07_18)] px-8 py-20 text-center text-[oklch(0.95_0.02_80)] sm:px-16">
-            <div className="aurora aurora-dim pointer-events-none absolute inset-0" aria-hidden>
-              <span className="aurora-a" />
-              <span className="aurora-b" />
-            </div>
-            <DiyaSlot id="cta" className="absolute top-8 right-8" />
-            <RevealItem className="relative">
-              <p className="text-xs tracking-[0.35em] text-marigold uppercase">Begin</p>
-              <h2 data-cast className="mx-auto mt-4 max-w-2xl text-5xl leading-tight font-semibold sm:text-6xl">Tell us the date you're dreaming of</h2>
-              <p className="mx-auto mt-5 max-w-lg text-[oklch(0.95_0.02_80/0.75)]">Two minutes to share it. One day to hear from your planner.</p>
-            </RevealItem>
-            <RevealItem className="relative mt-10">
-              <Magnetic>
-                <Link
-                  href="/enquire"
-                  className="group inline-flex items-center gap-3 rounded-full bg-marigold px-6 py-4 text-base font-medium whitespace-nowrap sm:px-8 text-[oklch(0.22_0.05_30)] transition-colors hover:bg-[oklch(0.8_0.15_75)]"
-                >
-                  Start your enquiry
-                  <Icon name="arrow" className="size-5 transition-transform group-hover:translate-x-1" />
-                </Link>
-              </Magnetic>
-            </RevealItem>
-          </Reveal>
-        </section>
-      </main>
+              <RevealItem className="relative mt-10">
+                <Magnetic>
+                  <Link
+                    href="/enquire"
+                    className="group inline-flex items-center gap-3 rounded-full bg-marigold px-6 py-4 text-base font-medium whitespace-nowrap sm:px-8 text-[oklch(0.22_0.05_30)] transition-colors hover:bg-[oklch(0.8_0.15_75)]"
+                  >
+                    Start your enquiry
+                    <Icon name="arrow" className="size-5 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </Magnetic>
+              </RevealItem>
+            </Reveal>
+          </section>
+        </main>
       </ViewTransition>
 
       <footer className="border-t border-border">

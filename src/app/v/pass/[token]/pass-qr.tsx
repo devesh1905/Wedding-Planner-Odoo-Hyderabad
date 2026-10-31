@@ -7,7 +7,9 @@ import { checkinUrl, qrDataUrl } from "@/frontend/lib/qr";
 export function PassQr({ token, label }: { token: string; label: string }) {
   const [src, setSrc] = useState("");
   useEffect(() => {
-    qrDataUrl(checkinUrl(token)).then(setSrc).catch(() => setSrc(""));
+    qrDataUrl(checkinUrl(token))
+      .then(setSrc)
+      .catch(() => setSrc(""));
   }, [token]);
   return src ? (
     // eslint-disable-next-line @next/next/no-img-element
