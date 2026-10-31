@@ -6,6 +6,7 @@ import { CalendarHeart, Inbox, LayoutDashboard, LogOut, Store } from "lucide-rea
 import { cn } from "@/lib/utils";
 import { initials } from "@/lib/format";
 import { KnotMark } from "@/components/home/knot-mark";
+import { ThemeToggle } from "@/components/common/theme-toggle";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, founderOnly: true },
@@ -64,6 +65,7 @@ export function AppSidebar({ user, onNavigate }: { user: { name: string; role: s
           <p className="truncate text-sm font-medium">{user.name}</p>
           <p className="text-xs text-sidebar-foreground/60 capitalize">{user.role.toLowerCase()}</p>
         </div>
+        <ThemeToggle className="size-8 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" />
         <button onClick={logout} className="rounded-md p-1.5 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" aria-label="Sign out">
           <LogOut className="size-4" />
         </button>

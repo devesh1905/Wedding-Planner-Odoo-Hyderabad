@@ -358,3 +358,6 @@ html { scroll-behavior: smooth; }
   70% { opacity: 0.95; transform: translate(-50%, -50%) scale(1.01); }
 }
 @media (prefers-reduced-motion: reduce) { .dark .diya-ambient { animation: none; } }
+
+/* Theme switch: the new theme is revealed by a circle from the toggle (see ThemeToggle). */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }

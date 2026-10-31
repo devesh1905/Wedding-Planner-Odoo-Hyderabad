@@ -9,6 +9,7 @@ import { Celebrations } from "@/components/home/celebrations";
 import { Magnetic } from "@/components/home/magnetic";
 import { MonogramButton } from "@/components/home/monogram-button";
 import { Reveal, RevealItem } from "@/components/home/reveal";
+import { ThemeToggle } from "@/components/common/theme-toggle";
 
 export const metadata: Metadata = {
   title: { absolute: "The Royal Knot — Luxury weddings in Jaipur & Udaipur" },
@@ -39,6 +40,7 @@ export default async function Home() {
             <a href="#celebrations" className="hidden text-foreground/70 hover:text-foreground sm:inline">
               Celebrations
             </a>
+            <ThemeToggle className="-my-2" />
             <Link
               href={session ? (session.role === "FOUNDER" ? "/dashboard" : "/weddings") : "/login"}
               className="text-foreground/50 hover:text-foreground"
