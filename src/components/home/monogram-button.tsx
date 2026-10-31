@@ -22,7 +22,11 @@ export function MonogramButton() {
 
   return (
     <Link href="/" onClick={onClick} className="flex items-center gap-3" aria-label="The Royal Knot — home">
-      <KnotMark mode="ignite" className="h-7 w-14 text-maroon" />
+      <span className="relative">
+        {/* In dark mode the diya softly lights the area around it. */}
+        <span aria-hidden className="diya-ambient" />
+        <KnotMark mode="ignite" className="relative h-7 w-14 text-maroon dark:text-[oklch(0.93_0.03_80)]" />
+      </span>
       <span className="font-serif text-2xl font-semibold tracking-tight">The Royal Knot</span>
     </Link>
   );
