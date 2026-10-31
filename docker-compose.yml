@@ -1,0 +1,25 @@
+# Local PostgreSQL for running KnotOS fully offline from the cloud.
+#   docker compose up -d
+#   copy .env.example to .env and use the local URLs shown there
+#   npx prisma migrate deploy && npm run db:seed && npm run dev
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: knotos-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: knot
+      POSTGRES_PASSWORD: knot
+      POSTGRES_DB: knotos
+    ports:
+      - "5432:5432"
+    volumes:
+      - knotos-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U knot -d knotos"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  knotos-data:

@@ -41,6 +41,8 @@ const SEEDS: Seed[] = [
   { p1: "Tanvi Shekhawat", p2: "Pranav Mehra", phone: "9784432065", email: "tanvi.s@example.com", source: "WEB_FORM", date: "2026-12-30", guests: 280, theme: "Pastel Garden", budget: 11000000, city: "Jodhpur", status: "CONTACTED", createdDaysAgo: 5 },
   // MEETING_BOOKED x2
   { p1: "Riya Oberoi", p2: "Aditya Sethi", phone: "9873350912", email: "riya.oberoi@example.com", source: "PHONE", date: "2027-02-05", guests: 600, theme: "Royal Heritage", budget: 30000000, city: "Udaipur", notes: "Large guest list, many outstation relatives needing stays.", status: "MEETING_BOOKED", createdDaysAgo: 10, meetingInDays: 2 },
+  // Same family number as Riya Oberoi — shows the "Same phone as …" duplicate warning on the board.
+  { p1: "Rhea Oberoi", p2: "Kabir Malhotra", phone: "9873350912", source: "INSTAGRAM", date: "2027-03-20", guests: 300, theme: "Royal Heritage", budget: 12000000, city: "Udaipur", notes: "Riya's cousin — called from the family number.", status: "NEW", createdDaysAgo: 0 },
   { p1: "Naina Bhatia", p2: "Kunal Deshmukh", phone: "9166027713", source: "WHATSAPP", date: "2027-03-14", guests: 250, theme: "Modern Minimal", budget: 9000000, city: "Jaipur", status: "MEETING_BOOKED", createdDaysAgo: 7, meetingInDays: 4 },
   // AGREEMENT_SENT x2
   { p1: "Pooja Rajput", p2: "Harsh Vardhan", phone: "9549081276", email: "pooja.rajput@example.com", source: "REFERRAL", date: "2027-01-31", guests: 450, theme: "Desert Boho", budget: 18000000, city: "Jodhpur", notes: "Met twice; keen on a fort venue with a sunset ceremony.", status: "AGREEMENT_SENT", createdDaysAgo: 16 },

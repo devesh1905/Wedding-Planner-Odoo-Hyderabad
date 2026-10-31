@@ -7,6 +7,7 @@ import {
   CalendarPlus,
   Check,
   Copy,
+  Download,
   ExternalLink,
   FileSignature,
   Loader2,
@@ -409,6 +410,11 @@ function AgreementPanel({ data, onDone }: { data: Detail; onDone: () => Promise<
             <Button asChild size="sm" variant="outline">
               <a href={link} target="_blank" rel="noreferrer">
                 <ExternalLink /> View signed copy
+              </a>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <a href={`/api/public/agreements/${a.token}/pdf`} target="_blank" rel="noreferrer">
+                <Download /> Download PDF
               </a>
             </Button>
             {data.wedding ? (

@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+jobs:
+  check:
+    name: Typecheck, lint, test, build
+    runs-on: ubuntu-latest
+    # A throwaway Postgres, same as docker-compose.yml — proves migrations + seed run on plain Postgres.
+    services:
+      db:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: knot
+          POSTGRES_PASSWORD: knot
+          POSTGRES_DB: knotos
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U knot -d knotos" --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      # CI-only values; no real database or keys.
+      DATABASE_URL: postgresql://knot:knot@localhost:5432/knotos
+      DIRECT_URL: postgresql://knot:knot@localhost:5432/knotos
+      AUTH_SECRET: ci-only-secret-at-least-32-characters-long
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Unit tests
+        run: npm test
+      - name: Migrate and seed a fresh database
+        run: npx prisma migrate deploy && npm run db:seed
+      - name: Build
+        run: npm run build

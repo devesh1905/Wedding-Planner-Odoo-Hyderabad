@@ -2,6 +2,7 @@ import { Phone, QrCode, Store } from "lucide-react";
 import { Amount } from "@/components/common/amount";
 import { EmptyState } from "@/components/common/empty-state";
 import { formatTime } from "@/lib/format";
+import { WhatsAppLink } from "@/components/common/whatsapp-link";
 
 type Booking = {
   id: string;
@@ -83,6 +84,14 @@ export function VendorsTab({ weddingId, bookings, quotePanel }: { weddingId: str
                       >
                         <QrCode className="size-3.5" /> Open pass
                       </a>
+                      <WhatsAppLink
+                        compact
+                        className="ml-1.5 align-middle"
+                        phone={b.vendor.phone}
+                        path={`/v/pass/${b.checkinToken}`}
+                        message={`Namaste ${b.vendor.name}! Your gate pass for the wedding — please show this QR at the entrance on the day:`}
+                        label={`Send pass to ${b.vendor.name}`}
+                      />
                     </td>
                   </tr>
                 ))}

@@ -8,6 +8,7 @@ import { StagePill } from "@/components/common/stage-pill";
 import { OwnerAvatar } from "@/components/common/owner-avatar";
 import { Amount } from "@/components/common/amount";
 import { CopyLinkButton } from "@/components/common/copy-link-button";
+import { WhatsAppLink } from "@/components/common/whatsapp-link";
 import { formatDate, relativeDays } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { PlanTab } from "@/components/weddings/plan-tab";
@@ -113,6 +114,12 @@ export default async function WeddingPage({
             </div>
             <div className="flex flex-wrap justify-end gap-2">
               <CopyLinkButton path={`/p/${wedding.portalToken}`} label="Couple portal link" />
+              <WhatsAppLink
+                phone={wedding.phone}
+                path={`/p/${wedding.portalToken}`}
+                message={`Hi ${wedding.partner1} & ${wedding.partner2}! Your wedding page from The Royal Knot — plan, payments and your countdown, all in one place:`}
+                label="Send to couple"
+              />
               <Button asChild size="sm">
                 <Link href={`/weddings/${wedding.id}/live`}>
                   <Icon name="radar" className="size-4" /> Control room

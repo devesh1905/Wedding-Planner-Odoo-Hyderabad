@@ -46,6 +46,9 @@ export default async function SignPage({ params }: { params: Promise<{ token: st
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={agreement.signatureUrl} alt={`Signature of ${agreement.signerName ?? partner1}`} className="mx-auto mt-6 h-24 max-w-full rounded-lg border bg-white p-1" />
               )}
+              <a href={`/api/public/agreements/${token}/pdf`} download className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-cta px-6 text-sm font-medium text-cta-foreground transition-opacity hover:opacity-90">
+                Download signed PDF
+              </a>
             </div>
           ) : (
             <SignForm token={token} defaultName={partner1} />
