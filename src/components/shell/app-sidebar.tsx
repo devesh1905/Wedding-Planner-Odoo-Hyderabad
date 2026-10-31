@@ -4,9 +4,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Icon, type IconName } from "@/components/icons/icon";
 import { cn } from "@/lib/utils";
-import { initials } from "@/lib/format";
 import { KnotMark } from "@/components/home/knot-mark";
-import { ThemeToggle } from "@/components/common/theme-toggle";
+import { AccountMenu } from "./account-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const NAV: { href: string; label: string; icon: IconName; founderOnly?: boolean }[] = [
@@ -104,34 +103,19 @@ export function AppSidebar({
             </button>
           </Tip>
         )}
-        <Tip label="Theme">
-          <span className={cn("flex items-center gap-1 text-sm text-muted-foreground", !rail && "px-0.5")}>
-            <ThemeToggle className="size-9 rounded-lg text-muted-foreground hover:bg-muted/60 hover:text-foreground" />
-            {!rail && "Theme"}
-          </span>
-        </Tip>
-        <Tip label="Sign out">
-          <button
-            type="button"
-            onClick={logout}
-            aria-label="Sign out"
-            className={cn(item, rail ? "w-9 justify-center" : "px-2.5", "text-muted-foreground hover:bg-muted/60 hover:text-foreground")}
-          >
-            <Icon name="logout" className="size-[18px]" />
-            {!rail && "Sign out"}
-          </button>
-        </Tip>
-        <Tip label={`${user.name} · ${user.role.toLowerCase()}`}>
-          <div className={cn("mt-1 flex items-center gap-2.5", !rail && "px-1.5")}>
-            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-cta text-xs font-semibold text-cta-foreground">{initials(user.name)}</span>
-            {!rail && (
-              <span className="min-w-0 leading-tight">
-                <span className="block truncate text-sm font-medium">{user.name}</span>
-                <span className="block text-xs text-muted-foreground capitalize">{user.role.toLowerCase()}</span>
-              </span>
-            )}
-          </div>
-        </Tip>
+        <div className={cn("mt-1", !rail && "w-full")}>
+          <AccountMenu
+            user={user}
+            compact={rail}
+            onSignOut={logout}
+            items={[
+              ...(user.role === "FOUNDER" ? [{ label: "Dashboard", icon: <Icon name="chart" className="size-4" />, href: "/dashboard" }] : []),
+              { label: "Weddings", icon: <Icon name="heart" className="size-4" />, href: "/weddings" },
+              { label: "Couples' site", icon: <Icon name="home" className="size-4" />, href: "/" },
+              { label: rail ? "Expand sidebar" : "Collapse sidebar", icon: <Icon name="grid" className="size-4" />, value: "Ctrl B", onSelect: onToggle },
+            ]}
+          />
+        </div>
       </div>
     </div>
   );
