@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { animate, useReducedMotion } from "framer-motion";
 import { Icon } from "@/frontend/components/icons/icon";
 import { cn } from "@/shared/utils";
+import { ScrollPanel } from "@/frontend/components/common/scroll-panel";
 import { cue } from "@/frontend/lib/sound";
 import { formatINRCompact } from "@/shared/format";
 import {
@@ -58,7 +59,7 @@ export const INCLUDED_NOTE =
   "Includes vendor costs for the services you've ticked and our planning fee. Excludes GST (18%), venue rental, guest flights and gold/jewellery.";
 
 /** "View breakdown" disclosure: one row per service, subtotal, planning fee, total and how the range is made. */
-export function EstimateBreakdown({ est, className }: { est: PackageEstimate; className?: string }) {
+export function EstimateBreakdown({ est, className, contained = true }: { est: PackageEstimate; className?: string; contained?: boolean }) {
   const [open, setOpen] = useState(false);
   const id = useId();
   const services = est.lines.filter((l) => l.key !== "fee");
@@ -75,7 +76,9 @@ export function EstimateBreakdown({ est, className }: { est: PackageEstimate; cl
         {open ? "Hide breakdown" : "View breakdown"}
         <Icon name="arrow" className={cn("size-3.5 transition-transform motion-reduce:transition-none", open ? "-rotate-90" : "rotate-90")} />
       </button>
-      <div id={id} hidden={!open} className="max-h-[45svh] overflow-y-auto overscroll-contain">
+      {/* in the phone bar the list scrolls on its own; in the desktop card the whole card scrolls */}
+      <div id={id} hidden={!open}>
+        <ScrollPanel className={contained ? "max-h-[45svh]" : undefined} innerClassName="pr-3">
         <dl className="divide-y divide-border text-sm">
           {services.map((l) => (
             <div key={l.key} className="flex items-baseline justify-between gap-3 py-1.5">
@@ -99,6 +102,7 @@ export function EstimateBreakdown({ est, className }: { est: PackageEstimate; cl
           </div>
         </dl>
         <p className="mt-1 text-xs text-pretty text-muted-foreground">{RANGE_NOTE}</p>
+        </ScrollPanel>
       </div>
     </div>
   );

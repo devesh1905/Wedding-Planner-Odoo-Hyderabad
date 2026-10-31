@@ -620,6 +620,9 @@ html { scroll-behavior: smooth; }
   .dash-grow-x, .dash-grow-y, .dash-ring { animation: none; }
 }
 
+/* Page scrollbar in the palette instead of the browser's bright default (matters most in Night mode). */
+html { scrollbar-color: color-mix(in oklch, var(--muted-foreground) 45%, transparent) transparent; }
+
 /* Hide a native scrollbar where a custom scroller (ScrollRail) is shown instead. */
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }

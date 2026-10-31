@@ -1,5 +1,6 @@
 "use client";
 
+import { ScrollPanel } from "@/frontend/components/common/scroll-panel";
 import { startTransition, useEffect, useRef, useState, ViewTransition } from "react";
 import { useReducedMotion } from "framer-motion";
 import { CheckCircle2, Loader2 } from "lucide-react";
@@ -187,8 +188,9 @@ export function EnquireForm({ initialTheme }: { initialTheme?: string }) {
 
       {/* Desktop only: a running summary beside the form (phones get the sticky estimate bar instead). */}
       <aside aria-label="Your celebration" className="hidden lg:sticky lg:top-6 lg:block">
-        {/* capped to the viewport so the Send button stays reachable when the breakdown is open */}
-        <div className="squircle max-h-[calc(100svh-3rem)] space-y-5 overflow-y-auto overscroll-contain rounded-2xl border bg-card p-6 shadow-sm">
+        {/* capped to the viewport: the details scroll inside (custom thumb), the Send button stays pinned below */}
+        <div className="squircle flex max-h-[calc(100svh-3rem)] flex-col rounded-2xl border bg-card shadow-sm">
+          <ScrollPanel innerClassName="space-y-5 p-6 pb-4">
           <header>
             <p className="text-xs font-semibold tracking-[0.2em] text-eyebrow uppercase">Summary</p>
             <h2 className="mt-1 text-2xl font-semibold">Your celebration</h2>
@@ -251,17 +253,20 @@ export function EnquireForm({ initialTheme }: { initialTheme?: string }) {
             </div>
             {!none && (
               <>
-                <EstimateBreakdown est={est} />
+                <EstimateBreakdown est={est} contained={false} />
                 <p className="mt-1 text-xs text-pretty text-muted-foreground">{INCLUDED_NOTE}</p>
               </>
             )}
           </div>
+          </ScrollPanel>
 
+          <div className="space-y-3 border-t p-6 pt-4">
           {hasErrors && !errors.form && <p className="text-sm text-rose">Please check the highlighted fields.</p>}
           <Button type="submit" form={FORM_ID} size="lg" className="squircle h-12 w-full rounded-xl text-base" disabled={pending} aria-busy={pending}>
             {pending && <Loader2 className="animate-spin" />} {pending ? "Sending…" : "Send enquiry"}
           </Button>
           <p className="text-center text-xs text-muted-foreground">An estimate, not a quote — your planner confirms after the first call.</p>
+          </div>
         </div>
       </aside>
     </div>
