@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 const KEY = "knot:theme";
 
-/** Sun by day, diya by night. The new theme washes across the screen in a circle from the button. */
+/** Shows where you can go: a diya on the light page (light the lamp → dark), a sun on the dark page. The new theme washes across the screen in a circle from the button. */
 export function ThemeToggle({ className }: { className?: string }) {
   const [dark, setDark] = useState(false);
   useEffect(() => setDark(document.documentElement.classList.contains("dark")), []);
@@ -49,7 +49,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       className={cn("relative grid size-9 place-items-center overflow-hidden rounded-full transition-colors hover:bg-foreground/5", className)}
     >
       <AnimatePresence mode="wait" initial={false}>
-        {dark ? (
+        {!dark ? (
           <motion.svg
             key="diya"
             viewBox="0 0 24 24"

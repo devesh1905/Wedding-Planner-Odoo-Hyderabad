@@ -21,10 +21,10 @@ export const metadata: Metadata = {
 };
 
 const PROMISES = [
-  { icon: "guests", k: "25", from: 0, v: "weddings a season, never more", d: "So every couple has a lead planner who knows every detail." },
-  { icon: "phone", k: "1 day", from: 0, v: "to hear back from us", d: "Every enquiry has an owner the moment it arrives." },
-  { icon: "billCheck", k: "0", from: 9, v: "surprises on the final bill", d: "Every addition is shown to you, priced fairly, before it's billed." },
-] as const;
+  { k: "25", from: 0, v: "weddings a season, never more", d: "So every couple has a lead planner who knows every detail." },
+  { k: "1 day", from: 0, v: "to hear back from us", d: "Every enquiry has an owner the moment it arrives." },
+  { k: "0", from: 9, v: "surprises on the final bill", d: "Every addition is shown to you, priced fairly, before it's billed." },
+];
 
 // The couples' front door. Staff who are signed in get a quiet link back into KnotOS.
 export default async function Home() {
@@ -69,7 +69,7 @@ export default async function Home() {
                 <div data-cast>
                 <p className="font-serif text-6xl font-semibold text-eyebrow"><NumberTicker value={p.k} from={p.from} />
                 </p>
-                <p className="mt-2 flex items-center gap-2 text-lg font-medium"><Icon name={p.icon} className="size-5 text-eyebrow" />{p.v}</p>
+                <p className="mt-2 text-lg font-medium">{p.v}</p>
                 <p className="mt-2 leading-relaxed text-muted-foreground">{p.d}</p>
                 </div>
               </RevealItem>

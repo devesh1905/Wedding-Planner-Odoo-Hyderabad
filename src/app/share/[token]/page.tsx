@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { getSeasonReport } from "@/lib/reports";
+import { getReport } from "@/lib/reports";
 import { formatDateTime } from "@/lib/format";
 import { DashboardView } from "@/components/dashboard/dashboard-view";
 
@@ -12,7 +12,7 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
   const { token } = await params;
   const link = await db.shareLink.findUnique({ where: { token } });
   if (!link || (link.expiresAt && link.expiresAt < new Date())) notFound();
-  const report = await getSeasonReport();
+  const report = await getReport();
 
   return (
     <main className="min-h-svh bg-paper">

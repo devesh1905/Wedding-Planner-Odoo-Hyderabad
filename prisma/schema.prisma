@@ -2,7 +2,9 @@
 // Conventions: UUID ids (safe for records created offline), money in whole rupees (Int, max ₹214 Cr), timestamps on every table.
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  // lets heavy reads fetch a record and its relations in one SQL query (see lib/reports.ts)
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {

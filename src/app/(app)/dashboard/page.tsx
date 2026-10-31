@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Download } from "lucide-react";
 import { requirePageUser } from "@/lib/auth";
-import { getSeasonReport, type Period } from "@/lib/reports";
+import { getReport, type Period } from "@/lib/reports";
 import { PageHeader } from "@/components/common/page-header";
 import { Button } from "@/components/ui/button";
 import { DashboardView } from "@/components/dashboard/dashboard-view";
@@ -21,12 +21,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   await requirePageUser("FOUNDER");
   const { period: p } = await searchParams;
   const period = (PERIODS.some((x) => x.key === p) ? p : "season") as Period;
-  const report = await getSeasonReport(period);
+  const report = await getReport(period);
 
   return (
     <>
       <PageHeader
-        title="Season at a glance"
+        title={{ today: "Today", week: "This week", month: "This month", season: "Season" }[period] + " at a glance"}
         subtitle="Which weddings made money, what's still unfinished, and what's due"
         actions={
           <>
@@ -35,7 +35,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                 <Link
                   key={x.key}
                   href={`/dashboard?period=${x.key}`}
-                  className={cn("rounded-md px-3 py-1.5 text-sm", period === x.key ? "bg-maroon text-primary-foreground" : "text-muted-foreground hover:text-foreground")}
+                  className={cn("rounded-md px-3 py-1.5 text-sm", period === x.key ? "bg-cta text-cta-foreground" : "text-muted-foreground hover:text-foreground")}
                 >
                   {x.label}
                 </Link>

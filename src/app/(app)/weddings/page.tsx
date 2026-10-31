@@ -33,35 +33,47 @@ export default async function WeddingsPage({ searchParams }: { searchParams: Pro
     <>
       <PageHeader title="Weddings" subtitle={`${weddings.length} weddings this season · from booking to settlement`} />
 
-      {/* Journey tracker: where every wedding is right now. */}
+      {/* Journey tracker: where every wedding is right now. Equal segments, so the bar reads as one
+          pipeline; the thin meter under each stage shows its share of the season. */}
       <nav aria-label="Filter by stage" className="mb-6 overflow-x-auto">
-        <ol className="flex min-w-max items-stretch gap-0 rounded-2xl border bg-card p-1.5">
-          <li>
-            <Link
-              href="/weddings"
-              className={cn("flex h-full flex-col rounded-xl px-4 py-2 text-sm", !stage ? "bg-maroon text-primary-foreground" : "hover:bg-muted")}
-            >
-              <span className="text-xs opacity-80">All</span>
-              <span className="font-serif text-2xl leading-none font-semibold">{weddings.length}</span>
-            </Link>
-          </li>
-          {JOURNEY.map((s, i) => (
-            <li key={s} className="flex items-center">
-              <span className="mx-1 h-px w-4 bg-border" aria-hidden />
-              <Link
-                href={`/weddings?stage=${s}`}
-                className={cn(
-                  "flex flex-col rounded-xl px-4 py-2 text-sm transition-colors",
-                  stage === s ? "bg-maroon text-primary-foreground" : "hover:bg-muted",
-                )}
-              >
-                <span className="text-xs opacity-80">
-                  {i + 1}. {statusLabel(s)}
-                </span>
-                <span className="font-serif text-2xl leading-none font-semibold">{counts[s]}</span>
-              </Link>
-            </li>
-          ))}
+        <ol className="grid min-w-[44rem] grid-cols-7 gap-1 rounded-2xl border bg-card p-1.5">
+          {(["ALL", ...JOURNEY] as const).map((s, i) => {
+            const active = s === "ALL" ? !stage : stage === s;
+            const n = s === "ALL" ? weddings.length : counts[s];
+            return (
+              <li key={s}>
+                <Link
+                  href={s === "ALL" ? "/weddings" : `/weddings?stage=${s}`}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "group flex h-full flex-col gap-2 rounded-xl px-3 py-2.5 transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+                    active ? "bg-cta text-cta-foreground" : "hover:bg-muted",
+                  )}
+                >
+                  <span className={cn("flex items-center gap-1.5 text-xs font-medium", active ? "opacity-90" : "text-muted-foreground")}>
+                    {s !== "ALL" && (
+                      <span
+                        className={cn(
+                          "grid size-4 place-items-center rounded-full text-[10px] font-semibold",
+                          active ? "bg-cta-foreground/20" : "bg-muted text-foreground/70 group-hover:bg-background",
+                        )}
+                      >
+                        {i}
+                      </span>
+                    )}
+                    <span className="truncate">{s === "ALL" ? "All weddings" : statusLabel(s)}</span>
+                  </span>
+                  <span className="text-2xl leading-none font-semibold tabular-nums">{n}</span>
+                  <span className={cn("h-1 overflow-hidden rounded-full", active ? "bg-cta-foreground/20" : "bg-muted")} aria-hidden>
+                    <span
+                      className={cn("block h-full rounded-full", active ? "bg-cta-foreground" : "bg-marigold")}
+                      style={{ width: `${weddings.length ? Math.round((n / weddings.length) * 100) : 0}%` }}
+                    />
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
         </ol>
       </nav>
 
