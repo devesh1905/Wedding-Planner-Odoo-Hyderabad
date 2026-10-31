@@ -89,22 +89,32 @@ export function CaveMode() {
 
 type Mode = "docked" | "gliding" | "dragging" | "carried";
 
-const TRIED_KEY = "knot:diya-tried";
-
 function Cave() {
   const diyaRef = useRef<HTMLDivElement>(null);
-  // First-time hint: "grab" while docked, "drop" while carrying, then never again.
+  // Hint on every visit to the page: "grab" while docked, "drop" while carrying. It waits for the
+  // splash to finish (so it is never hidden behind it) and fades by itself if nobody tries.
   const [hint, setHint] = useState<"grab" | "drop" | null>(null);
   const hintRef = useRef(hint);
   hintRef.current = hint;
   useEffect(() => {
-    let tried = false;
-    try {
-      tried = localStorage.getItem(TRIED_KEY) === "1";
-    } catch {}
-    if (tried) return;
-    const t = setTimeout(() => setHint("grab"), 1400);
-    return () => clearTimeout(t);
+    let show = 0;
+    let hide = 0;
+    const start = () => {
+      show = window.setTimeout(() => setHint("grab"), 900);
+      hide = window.setTimeout(() => hintRef.current === "grab" && setHint(null), 9900);
+    };
+    // the splash is the only element with this class; poll until it has gone
+    const wait = window.setInterval(() => {
+      if (!document.querySelector(".splash")) {
+        window.clearInterval(wait);
+        start();
+      }
+    }, 200);
+    return () => {
+      window.clearInterval(wait);
+      window.clearTimeout(show);
+      window.clearTimeout(hide);
+    };
   }, []);
   // All live state lives in one ref, read and written only by the loop and event handlers.
   const s = useRef({
@@ -145,12 +155,7 @@ function Cave() {
     // ── pointer: grab, carry, drop ──
     const onDown = (e: PointerEvent) => {
       e.preventDefault();
-      if (hintRef.current === "grab") {
-        setHint("drop");
-        try {
-          localStorage.setItem(TRIED_KEY, "1");
-        } catch {}
-      }
+      if (hintRef.current === "grab") setHint("drop");
       diya.setPointerCapture(e.pointerId);
       clearTimeout(st.idleTimer);
       st.mode = "dragging";
