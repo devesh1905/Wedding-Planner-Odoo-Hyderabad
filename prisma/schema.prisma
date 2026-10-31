@@ -1,0 +1,616 @@
+// KnotOS data model
+// Conventions: UUID ids (safe for records created offline), money in paise (Int), timestamps on every table.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────
+
+enum Role {
+  FOUNDER
+  PLANNER
+}
+
+enum EnquirySource {
+  WEB_FORM
+  PHONE
+  INSTAGRAM
+  WHATSAPP
+  REFERRAL
+  WALK_IN
+}
+
+enum EnquiryStatus {
+  NEW
+  CONTACTED
+  MEETING_BOOKED
+  AGREEMENT_SENT
+  SIGNED
+  LOST
+}
+
+enum AgreementStatus {
+  DRAFT
+  SENT
+  SIGNED
+}
+
+enum PackageKind {
+  FULL_SERVICE
+  PARTIAL
+}
+
+enum WeddingStage {
+  BOOKED       // agreement signed, deposit pending
+  PLANNING     // deposit paid, plan generated
+  VENDORS      // vendors being finalised
+  BIG_DAY      // event in progress
+  SETTLEMENT   // event over, bills being matched
+  SETTLED      // all balances zero
+  CANCELLED
+}
+
+enum TaskStage {
+  TO_PLAN
+  IN_PROGRESS
+  WAITING
+  DONE
+}
+
+enum MilestoneType {
+  BOOKING
+  ADVANCE
+  FINAL
+  ADDON
+}
+
+enum MilestoneStatus {
+  DUE
+  PAID
+  CANCELLED
+}
+
+enum VendorCategory {
+  CATERER
+  DECORATOR
+  FLORIST
+  DJ
+  DHOL
+  MAKEUP
+  PHOTOGRAPHER
+  LIGHTING
+  TENT
+  TRANSPORT
+  VENUE
+  OTHER
+}
+
+enum QuoteRequestStatus {
+  OPEN
+  AWARDED
+  CLOSED
+}
+
+enum VendorQuoteStatus {
+  INVITED
+  SUBMITTED
+  WON
+  NOT_SELECTED
+}
+
+enum QuoteLineCategory {
+  MAIN
+  STARTER
+  DESSERT
+  BEVERAGE
+  LIVE_COUNTER
+  SERVICE
+  TAX
+  OTHER
+}
+
+enum ScheduleStatus {
+  UPCOMING
+  LIVE
+  DONE
+  DELAYED
+}
+
+enum CheckinMethod {
+  QR
+  MANUAL
+}
+
+enum IssueStatus {
+  OPEN
+  RESOLVED
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum BillMatch {
+  PENDING
+  MATCHED
+  OVER_BILLED
+  UNDER_BILLED
+}
+
+// ─── People ──────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(PLANNER)
+  hourlyCost   Int      @default(0) // paise per hour, used in profit
+  avatarColor  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  enquiries      Enquiry[]      @relation("EnquiryAssignee")
+  leadWeddings   Wedding[]      @relation("LeadPlanner")
+  tasks          Task[]
+  scheduleItems  ScheduleItem[]
+  issues         Issue[]
+  timeLogs       TimeLog[]
+  activity       ActivityLog[]
+}
+
+// ─── Scene 1: enquiry → agreement ────────────────────────────────────────
+
+model Enquiry {
+  id            String        @id @default(uuid()) @db.Uuid
+  partner1      String
+  partner2      String
+  phone         String
+  email         String?
+  source        EnquirySource @default(WEB_FORM)
+  roughDate     DateTime?     @db.Date
+  guestCount    Int?
+  theme         String?
+  maxBudget     Int? // paise
+  city          String?
+  notes         String?
+  status        EnquiryStatus @default(NEW)
+  lostReason    String?
+  nextFollowUp  DateTime?
+  assignedToId  String?       @db.Uuid
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  assignedTo User?      @relation("EnquiryAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  meetings   Meeting[]
+  agreement  Agreement?
+  wedding    Wedding?
+
+  @@index([status])
+  @@index([phone])
+}
+
+model Meeting {
+  id          String   @id @default(uuid()) @db.Uuid
+  enquiryId   String   @db.Uuid
+  scheduledAt DateTime
+  location    String?
+  notes       String?
+  outcome     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  enquiry Enquiry @relation(fields: [enquiryId], references: [id], onDelete: Cascade)
+
+  @@index([enquiryId])
+}
+
+model Agreement {
+  id           String          @id @default(uuid()) @db.Uuid
+  enquiryId    String          @unique @db.Uuid
+  token        String          @unique
+  body         String // rendered agreement text at time of sending
+  status       AgreementStatus @default(DRAFT)
+  sentAt       DateTime?
+  signedAt     DateTime?
+  signerName   String?
+  signatureUrl String? // stored image (storage URL or data URL)
+  pdfUrl       String?
+  signerIp     String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  enquiry Enquiry @relation(fields: [enquiryId], references: [id], onDelete: Cascade)
+}
+
+// ─── Scene 3: packages, plan, payments ───────────────────────────────────
+
+model Package {
+  id          String      @id @default(uuid()) @db.Uuid
+  kind        PackageKind @unique
+  name        String
+  description String
+  basePrice   Int // paise
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  templates TaskTemplate[]
+  weddings  Wedding[]
+}
+
+model TaskTemplate {
+  id          String   @id @default(uuid()) @db.Uuid
+  packageId   String   @db.Uuid
+  title       String
+  event       String // VENUE, DESIGN, VENDORS, MEHENDI, HALDI, SANGEET, WEDDING, RECEPTION, WRAP_UP
+  offsetDays  Int // relative to wedding start date; negative = before
+  defaultRole Role     @default(PLANNER)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  package Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  tasks   Task[]
+
+  @@index([packageId])
+}
+
+model Wedding {
+  id            String       @id @default(uuid()) @db.Uuid
+  code          String       @unique // e.g. RK-2026-014
+  enquiryId     String?      @unique @db.Uuid
+  packageId     String       @db.Uuid
+  leadPlannerId String?      @db.Uuid
+  partner1      String
+  partner2      String
+  phone         String
+  email         String?
+  startDate     DateTime     @db.Date
+  endDate       DateTime     @db.Date
+  city          String
+  venue         String?
+  guestCount    Int
+  theme         String?
+  contractValue Int // paise, what the couple pays the agency (excl. add-ons)
+  stage         WeddingStage @default(BOOKED)
+  portalToken   String       @unique
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  enquiry       Enquiry?           @relation(fields: [enquiryId], references: [id], onDelete: SetNull)
+  package       Package            @relation(fields: [packageId], references: [id])
+  leadPlanner   User?              @relation("LeadPlanner", fields: [leadPlannerId], references: [id], onDelete: SetNull)
+  events        WeddingEvent[]
+  tasks         Task[]
+  milestones    PaymentMilestone[]
+  quoteRequests QuoteRequest[]
+  bookings      Booking[]
+  issues        Issue[]
+  timeLogs      TimeLog[]
+
+  @@index([stage])
+  @@index([startDate])
+}
+
+model WeddingEvent {
+  id        String   @id @default(uuid()) @db.Uuid
+  weddingId String   @db.Uuid
+  name      String // Mehendi, Haldi, Sangeet, Wedding, Reception
+  startsAt  DateTime
+  venue     String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  wedding       Wedding        @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  scheduleItems ScheduleItem[]
+
+  @@index([weddingId])
+}
+
+model Task {
+  id         String    @id @default(uuid()) @db.Uuid
+  weddingId  String    @db.Uuid
+  templateId String?   @db.Uuid
+  ownerId    String?   @db.Uuid
+  title      String
+  event      String
+  stage      TaskStage @default(TO_PLAN)
+  dueDate    DateTime? @db.Date
+  doneAt     DateTime?
+  sortOrder  Int       @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  wedding  Wedding       @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  template TaskTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  owner    User?         @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+
+  @@index([weddingId, stage])
+  @@index([ownerId])
+}
+
+model PaymentMilestone {
+  id        String          @id @default(uuid()) @db.Uuid
+  weddingId String          @db.Uuid
+  type      MilestoneType
+  label     String
+  amount    Int // paise
+  dueDate   DateTime        @db.Date
+  status    MilestoneStatus @default(DUE)
+  paidAt    DateTime?
+  reference String?         @unique // payment reference, unique so the same receipt can't be recorded twice
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  extras  Extra[]
+
+  @@index([weddingId])
+  @@index([status, dueDate])
+}
+
+// ─── Scene 2: vendors and quotes ─────────────────────────────────────────
+
+model Vendor {
+  id             String         @id @default(uuid()) @db.Uuid
+  name           String
+  category       VendorCategory
+  contactName    String?
+  phone          String
+  email          String?
+  city           String
+  notes          String?
+  backupVendorId String?        @db.Uuid
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  backupVendor Vendor?       @relation("Backup", fields: [backupVendorId], references: [id], onDelete: SetNull)
+  backupFor    Vendor[]      @relation("Backup")
+  quotes       VendorQuote[]
+  bookings     Booking[]
+
+  @@index([category, city])
+}
+
+model QuoteRequest {
+  id           String             @id @default(uuid()) @db.Uuid
+  weddingId    String             @db.Uuid
+  category     VendorCategory
+  title        String
+  requirements String?
+  guestCount   Int?
+  status       QuoteRequestStatus @default(OPEN)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  wedding Wedding       @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  quotes  VendorQuote[]
+
+  @@index([weddingId])
+}
+
+model VendorQuote {
+  id             String            @id @default(uuid()) @db.Uuid
+  requestId      String            @db.Uuid
+  vendorId       String            @db.Uuid
+  token          String            @unique
+  status         VendorQuoteStatus @default(INVITED)
+  fileUrl        String?
+  perPlate       Int? // paise
+  extraHourRate  Int? // paise
+  total          Int? // paise
+  notes          String?
+  aiExtracted    Boolean           @default(false)
+  aiReviewed     Boolean           @default(false)
+  submittedAt    DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  request QuoteRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  vendor  Vendor       @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  lines   QuoteLine[]
+  booking Booking?
+
+  @@unique([requestId, vendorId])
+}
+
+model QuoteLine {
+  id        String            @id @default(uuid()) @db.Uuid
+  quoteId   String            @db.Uuid
+  item      String
+  category  QuoteLineCategory @default(OTHER)
+  qty       Float?
+  unit      String?
+  unitPrice Int? // paise
+  included  Boolean           @default(true)
+  sortOrder Int               @default(0)
+
+  quote VendorQuote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  @@index([quoteId])
+}
+
+// A vendor hired for a wedding, with the terms that were agreed.
+model Booking {
+  id              String         @id @default(uuid()) @db.Uuid
+  weddingId       String         @db.Uuid
+  vendorId        String         @db.Uuid
+  quoteId         String?        @unique @db.Uuid
+  category        VendorCategory
+  agreedAmount    Int // paise, base agreed cost
+  perPlate        Int? // paise
+  agreedGuests    Int?
+  agreedHours     Int?
+  hourlyRate      Int? // paise
+  expectedArrival DateTime?
+  checkinToken    String         @unique
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  wedding       Wedding         @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  vendor        Vendor          @relation(fields: [vendorId], references: [id])
+  quote         VendorQuote?    @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+  checkins      Checkin[]
+  extras        Extra[]
+  bills         VendorBill[]
+  payments      VendorPayment[]
+  scheduleItems ScheduleItem[]
+
+  @@index([weddingId])
+  @@index([vendorId])
+}
+
+// ─── Scene 4: wedding day ────────────────────────────────────────────────
+
+model ScheduleItem {
+  id            String         @id @default(uuid()) @db.Uuid
+  eventId       String         @db.Uuid
+  responsibleId String?        @db.Uuid
+  bookingId     String?        @db.Uuid
+  startsAt      DateTime
+  durationMin   Int            @default(15)
+  title         String
+  status        ScheduleStatus @default(UPCOMING)
+  actualAt      DateTime?
+  notes         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  event       WeddingEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  responsible User?        @relation(fields: [responsibleId], references: [id], onDelete: SetNull)
+  booking     Booking?     @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  @@index([eventId, startsAt])
+}
+
+model Checkin {
+  id         String        @id @default(uuid()) @db.Uuid
+  clientId   String        @unique // generated on device; makes offline sync idempotent
+  bookingId  String        @db.Uuid
+  expectedAt DateTime?
+  arrivedAt  DateTime
+  method     CheckinMethod @default(MANUAL)
+  createdAt  DateTime      @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+}
+
+model Issue {
+  id          String      @id @default(uuid()) @db.Uuid
+  clientId    String?     @unique
+  weddingId   String      @db.Uuid
+  ownerId     String?     @db.Uuid
+  description String
+  severity    Severity    @default(MEDIUM)
+  status      IssueStatus @default(OPEN)
+  resolvedAt  DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  owner   User?   @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+
+  @@index([weddingId, status])
+}
+
+// ─── Scene 5: settlement ─────────────────────────────────────────────────
+
+// Something beyond the agreed terms, e.g. +60 guests or +2 DJ hours.
+model Extra {
+  id               String   @id @default(uuid()) @db.Uuid
+  bookingId        String   @db.Uuid
+  description      String
+  qty              Float
+  unitPrice        Int // paise, vendor's rate
+  clientUnitPrice  Int? // paise, rate billed to client (defaults to unitPrice)
+  billableToClient Boolean  @default(true)
+  clientApproved   Boolean  @default(false)
+  milestoneId      String?  @db.Uuid // ADDON milestone it was billed on
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  booking   Booking           @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  milestone PaymentMilestone? @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+
+  @@index([bookingId])
+}
+
+model VendorBill {
+  id        String    @id @default(uuid()) @db.Uuid
+  bookingId String    @db.Uuid
+  billNo    String
+  amount    Int // paise
+  fileUrl   String?
+  match     BillMatch @default(PENDING)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@unique([bookingId, billNo])
+}
+
+model VendorPayment {
+  id        String   @id @default(uuid()) @db.Uuid
+  bookingId String   @db.Uuid
+  amount    Int // paise
+  paidAt    DateTime @default(now())
+  reference String   @unique // UTR / cheque no.; unique blocks paying the same thing twice
+  isAdvance Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+}
+
+// ─── Scene 6: founder review ─────────────────────────────────────────────
+
+model TimeLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  weddingId String   @db.Uuid
+  date      DateTime @db.Date
+  hours     Float
+  note      String?
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId])
+}
+
+model ShareLink {
+  id        String    @id @default(uuid()) @db.Uuid
+  token     String    @unique
+  scope     String // "season" | "wedding:<id>"
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  actorId   String?  @db.Uuid
+  entity    String
+  entityId  String
+  action    String
+  payload   Json?
+  createdAt DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId])
+}
