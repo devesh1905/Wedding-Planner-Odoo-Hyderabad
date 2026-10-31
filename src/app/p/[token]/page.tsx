@@ -2,6 +2,7 @@ import { ViewTransition } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CalendarHeart, MapPin, MessageCircle, Phone } from "lucide-react";
+import { KnotMark } from "@/components/home/knot-mark";
 import { Icon } from "@/components/icons/icon";
 import { db } from "@/lib/db";
 import { formatDate, formatINR, relativeDays } from "@/lib/format";
@@ -42,8 +43,13 @@ export default async function CouplePortal({ params }: { params: Promise<{ token
     <main className="min-h-svh bg-paper">
       <Reveal className="mx-auto max-w-xl space-y-6 px-6 pt-6 pb-16 sm:pt-10">
         <header className="space-y-4 text-center">
-          <div className="flex justify-end">
-            <SoundToggle />
+          {/* lit knot centred, sound toggle tucked to the right */}
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+            <span />
+            <KnotMark mode="ignite" className="h-12 w-24 text-maroon" />
+            <div className="flex justify-end">
+              <SoundToggle />
+            </div>
           </div>
           <p className="text-xs tracking-[0.25em] text-eyebrow uppercase">The Royal Knot</p>
           <h1 className="text-4xl leading-tight font-semibold text-balance break-words sm:text-5xl">

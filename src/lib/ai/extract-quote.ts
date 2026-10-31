@@ -1,5 +1,4 @@
 import { createHash } from 'node:crypto';
-import { PDFParse } from 'pdf-parse';
 import { z } from 'zod';
 import { quoteExtractionSchema, type QuoteExtraction } from './quote-schema';
 import { systemPrompt } from './prompts';
@@ -10,6 +9,11 @@ import royalThaal from './fixtures/caterer-c-royal-thaal.json';
 
 export async function extractTextFromPdf(buf: Buffer): Promise<string> {
   if (buf.length > 15 * 1024 * 1024 || !buf.subarray(0,1024).includes(Buffer.from('%PDF-'))) throw new Error('Upload a PDF smaller than 15 MB');
+  // Loaded only when a PDF is actually read, so pages that merely import this module never pull in
+  // pdf.js. The worker entry installs DOMMatrix/Path2D/ImageData from @napi-rs/canvas, which pdf.js
+  // needs on servers (Vercel has no DOM) — without it the import itself throws.
+  await import('pdf-parse/worker');
+  const { PDFParse } = await import('pdf-parse');
   const parser = new PDFParse({ data: new Uint8Array(buf) });
   try {
     const { text } = await parser.getText();
