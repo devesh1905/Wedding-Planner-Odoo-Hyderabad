@@ -35,10 +35,10 @@ export default async function Home() {
       <Splash />
       <CaveMode />
 
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-transparent bg-background/70 backdrop-blur-md supports-[backdrop-filter]:bg-background/55">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-5">
+      <header className="home-header fixed inset-x-0 top-0 z-50 border-b border-transparent bg-background/70 backdrop-blur-md supports-[backdrop-filter]:bg-background/55">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-3 sm:gap-4 sm:px-6 sm:py-5">
           <MonogramButton />
-          <nav className="flex items-center gap-6 text-sm">
+          <nav className="flex items-center gap-3 text-sm sm:gap-6">
             <a href="#journey" className="hidden items-center gap-1.5 text-foreground/70 hover:text-foreground sm:inline-flex">
               <Icon name="route" />How it works
             </a>
@@ -48,10 +48,12 @@ export default async function Home() {
             <ThemeToggle className="-my-2" />
             <Link
               href={session ? (session.role === "FOUNDER" ? "/dashboard" : "/weddings") : "/login"}
+              aria-label={session ? "Open KnotOS" : "Team sign in"}
               className="inline-flex items-center gap-1.5 text-foreground/50 hover:text-foreground"
             >
-              <Icon name={session ? "grid" : "login"} />
-              {session ? "Open KnotOS" : "Team sign in"}
+              <Icon name={session ? "grid" : "login"} className="size-5 sm:size-4" />
+              {/* icon only on phones so the header stays one line */}
+              <span className="hidden sm:inline">{session ? "Open KnotOS" : "Team sign in"}</span>
             </Link>
           </nav>
         </div>

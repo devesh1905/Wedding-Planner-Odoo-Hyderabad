@@ -55,6 +55,15 @@ export function DiyaSlot({ id, className, label = "Place the diya here" }: { id:
 const flicker = (t: number) => 0.5 * Math.sin(t * 2.1) + 0.3 * Math.sin(t * 5.3 + 1.7) + 0.2 * Math.sin(t * 11.7 + 0.4);
 const ease = (k: number, dt: number) => 1 - Math.exp(-k * dt);
 
+// Phones and touch tablets: the diya rests in a fixed corner dock instead of following niches as the
+// page scrolls (touch scrolling runs off the main thread, so chasing niches made it lag and jump).
+const PHONE_QUERY = "(max-width: 767px), (pointer: coarse)";
+const HOME = "home";
+const homePos = () => {
+  const h = window.visualViewport?.height ?? innerHeight;
+  return { x: innerWidth - 40, y: h - 64 };
+};
+
 function slotCenter(el: HTMLElement) {
   const r = el.getBoundingClientRect();
   return { x: r.left + r.width / 2, y: r.top + r.height * 0.6 };
@@ -137,17 +146,20 @@ function Cave() {
     const html = document.documentElement;
     const diya = diyaRef.current!;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const phone = matchMedia(PHONE_QUERY).matches;
+    const target = (id: string) => (id === HOME ? homePos() : slotCenter(slots.get(id)!));
     // docked light reaches well past the far edge, so the whole page is readable
     const bigRadius = () => Math.hypot(innerWidth, innerHeight) * 2.6;
 
     const goToSlot = (id: string) => {
-      if (!slots.has(id)) return;
+      if (id !== HOME && !slots.has(id)) return;
       clearTimeout(st.idleTimer);
       st.slotId = id;
       st.mode = "gliding";
       diya.classList.remove("is-carried");
     };
     const goToNearest = () => {
+      if (phone) return goToSlot(HOME);
       const best = nearestSlot(innerWidth / 2, innerHeight / 2, true) ?? nearestSlot(innerWidth / 2, innerHeight / 2, false);
       if (best) goToSlot(best.id);
     };
@@ -156,7 +168,10 @@ function Cave() {
     const onDown = (e: PointerEvent) => {
       e.preventDefault();
       if (hintRef.current === "grab") setHint("drop");
-      diya.setPointerCapture(e.pointerId);
+      // can throw if the touch already ended (very quick taps); dragging still works without it
+      try {
+        diya.setPointerCapture(e.pointerId);
+      } catch {}
       clearTimeout(st.idleTimer);
       st.mode = "dragging";
       st.slotId = null;
@@ -172,9 +187,14 @@ function Cave() {
     const onUp = (e: PointerEvent) => {
       if (st.mode !== "dragging") return;
       diya.releasePointerCapture?.(e.pointerId);
-      const best = nearestSlot(st.x, st.y, true);
       if (hintRef.current === "drop") setTimeout(() => setHint(null), 1200);
-      if (best && best.d < SNAP_DISTANCE) return goToSlot(best.id);
+      if (phone) {
+        const h = homePos();
+        if (Math.hypot(h.x - st.x, h.y - st.y) < SNAP_DISTANCE) return goToSlot(HOME);
+      } else {
+        const best = nearestSlot(st.x, st.y, true);
+        if (best && best.d < SNAP_DISTANCE) return goToSlot(best.id);
+      }
       st.mode = "carried";
       st.tx = st.x;
       st.ty = st.y;
@@ -192,7 +212,7 @@ function Cave() {
       scrollQueued = true;
       requestAnimationFrame(() => {
         scrollQueued = false;
-        if (st.mode === "dragging") return;
+        if (st.mode === "dragging" || phone) return;
         const best = nearestSlot(innerWidth / 2, innerHeight / 2, true);
         if (best && best.id !== st.slotId) goToSlot(best.id);
       });
@@ -209,6 +229,10 @@ function Cave() {
       } else goToNearest();
     };
     addEventListener("scroll", onScroll, { passive: true });
+    const onResize = () => {
+      wrote = false;
+    };
+    window.visualViewport?.addEventListener("resize", onResize);
     addEventListener("diya:slot", onSlot);
     addEventListener("keydown", onKey);
 
@@ -217,15 +241,16 @@ function Cave() {
     let last = performance.now();
     let casters: HTMLElement[] = [];
     let lastScan = 0;
+    let wrote = false;
     const tick = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
 
       // first frame: start already sitting in the top-most niche
       if (!st.placed) {
-        const first = nearestSlot(innerWidth / 2, 0, true) ?? nearestSlot(innerWidth / 2, 0, false);
+        const first = phone ? { id: HOME } : nearestSlot(innerWidth / 2, 0, true) ?? nearestSlot(innerWidth / 2, 0, false);
         if (first) {
-          const c = slotCenter(slots.get(first.id)!);
+          const c = target(first.id);
           st.x = st.tx = c.x;
           st.y = st.ty = c.y;
           st.slotId = first.id;
@@ -240,17 +265,19 @@ function Cave() {
       if (st.mode === "dragging") {
         st.tx = st.pointer.x + st.pointer.ox;
         st.ty = st.pointer.y + st.pointer.oy;
-        // magnetic: near a niche, the diya is drawn into it
-        const best = nearestSlot(st.tx, st.ty, true);
+        // magnetic: near a niche (or the phone dock), the diya is drawn into it
+        const best = phone
+          ? { id: HOME, d: Math.hypot(homePos().x - st.tx, homePos().y - st.ty) }
+          : nearestSlot(st.tx, st.ty, true);
         if (best && best.d < SNAP_DISTANCE) {
-          const c = slotCenter(slots.get(best.id)!);
+          const c = target(best.id);
           const pull = Math.pow(1 - best.d / SNAP_DISTANCE, 2) * 0.6;
           st.tx += (c.x - st.tx) * pull;
           st.ty += (c.y - st.ty) * pull;
         }
         k = FOLLOW_DRAG;
-      } else if (st.slotId && slots.has(st.slotId)) {
-        const c = slotCenter(slots.get(st.slotId)!); // live position, follows scrolling
+      } else if (st.slotId && (st.slotId === HOME || slots.has(st.slotId))) {
+        const c = target(st.slotId); // live position, follows scrolling
         st.tx = c.x;
         st.ty = c.y;
         k = st.mode === "docked" ? 40 : FOLLOW_GLIDE;
@@ -273,18 +300,30 @@ function Cave() {
       diya.style.setProperty("--lean", `${lean.toFixed(1)}deg`);
       flameState.lean = (lean / 18) * 0.6;
 
-      // light
+      // Phone: once settled, nothing moves — skip the frame's style writes entirely.
+      const settled = Math.abs(st.tx - st.x) < 0.3 && Math.abs(st.ty - st.y) < 0.3 && Math.abs(st.radiusTarget - st.radius) < 1;
+      if (phone && settled && st.mode !== "dragging" && wrote) {
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      wrote = true;
+
+      // light (no flicker on phones: repainting a full-screen gradient every frame is what lagged)
       const t = now / 1000;
-      const f = reduce ? 0 : flicker(t);
+      const f = reduce || phone ? 0 : flicker(t);
       const lx = st.x - 24 + f * 1.2; // the flame sits on the wick at the spout (left of centre)
-      const ly = st.y - 30 + flicker(t + 9) * (reduce ? 0 : 1.2);
+      const ly = st.y - 30 + flicker(t + 9) * (reduce || phone ? 0 : 1.2);
       const r = st.radius * (1 + f * 0.05);
       html.style.setProperty("--lx", `${lx.toFixed(1)}px`);
       html.style.setProperty("--ly", `${ly.toFixed(1)}px`);
       html.style.setProperty("--lr", `${r.toFixed(1)}px`);
       html.style.setProperty("--li", `${(0.9 + f * 0.08).toFixed(3)}`);
 
-      // shadows
+      // shadows (desktop only: a drop-shadow per element per frame is too heavy for phones)
+      if (phone) {
+        raf = requestAnimationFrame(tick);
+        return;
+      }
       if (now - lastScan > 800) {
         casters = Array.from(document.querySelectorAll<HTMLElement>("[data-cast]"));
         lastScan = now;
@@ -313,6 +352,7 @@ function Cave() {
       diya.removeEventListener("pointerup", onUp);
       diya.removeEventListener("pointercancel", onUp);
       removeEventListener("scroll", onScroll);
+      window.visualViewport?.removeEventListener("resize", onResize);
       removeEventListener("diya:slot", onSlot);
       removeEventListener("keydown", onKey);
       for (const el of document.querySelectorAll<HTMLElement>("[data-cast]")) el.style.filter = "";

@@ -114,7 +114,9 @@ export function ShaderFlame({
     const uTime = gl.getUniformLocation(prog, "u_time");
     const uLean = gl.getUniformLocation(prog, "u_lean");
 
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    // Phones: half resolution and 30 fps — the flame is tiny, and the GPU budget goes to scrolling.
+    const phone = matchMedia("(max-width: 767px), (pointer: coarse)").matches;
+    const dpr = phone ? 1 : Math.min(2, window.devicePixelRatio || 1);
     const resize = () => {
       const r = canvas.getBoundingClientRect();
       canvas.width = Math.max(8, Math.round(r.width * dpr));
@@ -128,7 +130,12 @@ export function ShaderFlame({
     let raf = 0;
     let lean = 0;
     const start = performance.now();
+    let skip = false;
     const frame = (now: number) => {
+      if (phone && (skip = !skip)) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
       lean += (state.lean - lean) * 0.15; // smooth so the flame sways rather than snaps
       gl.uniform2f(uRes, canvas.width, canvas.height);
       gl.uniform1f(uTime, reduce ? 1.0 : (now - start) / 1000);
