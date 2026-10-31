@@ -59,7 +59,7 @@ export function Splash() {
         className={`splash fixed inset-0 z-[100] grid cursor-pointer place-items-center bg-[oklch(0.2_0.06_18)] text-[oklch(0.93_0.04_80)] ${phase === "leave" ? "splash-leave" : ""}`}
       >
         <div className="flex flex-col items-center gap-6">
-          <KnotMark animate className="h-16 w-28 text-marigold" />
+          <KnotMark animate className="h-16 w-32 text-[oklch(0.93_0.04_80)]" />
           <p className="font-serif text-3xl tracking-wide">The Royal Knot</p>
         </div>
         <div className="absolute inset-x-6 bottom-8 flex items-end justify-between text-xs tracking-[0.3em] uppercase opacity-70 sm:inset-x-10">

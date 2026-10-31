@@ -1,3 +1,5 @@
+<p align="center"><img src="public/brand/knotos-ivory.png" alt="KnotOS" width="220" /></p>
+
 # KnotOS — The Royal Knot
 
 **One system that carries a wedding from the first enquiry to the final vendor payment, and rolls the whole season up for the founder.**
