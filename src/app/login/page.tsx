@@ -10,14 +10,13 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     <main className="grid min-h-svh lg:grid-cols-2">
       <section className="relative hidden overflow-hidden bg-[oklch(0.13_0.025_18)] text-sidebar-foreground lg:flex lg:flex-col lg:justify-between lg:p-12">
         <div className="absolute inset-0 opacity-20 [background:radial-gradient(600px_300px_at_20%_10%,var(--marigold),transparent_70%),radial-gradient(500px_400px_at_90%_90%,var(--rose),transparent_70%)]" />
-        <div className="relative flex items-center gap-3">
-          <KnotMark mode="ignite" className="h-7 w-14 text-sidebar-foreground" />
-          <span className="font-serif text-2xl font-semibold">KnotOS</span>
-          <span className="text-sm text-sidebar-foreground/70">for The Royal Knot</span>
-        </div>
+        <span />
         <div className="relative max-w-md space-y-4">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/knotos-glow.png" alt="KnotOS" className="-ml-8 mb-2 w-80" />
+          {/* live-flame knot in ivory, the KnotOS wordmark beneath it */}
+          <div className="mb-4 flex flex-col items-start gap-3" aria-label="KnotOS">
+            <KnotMark mode="ignite" className="h-24 w-48 text-[oklch(0.93_0.03_80)]" />
+            <span className="font-brand text-5xl text-[oklch(0.93_0.03_80)]">KnotOS</span>
+          </div>
           <p className="font-serif text-5xl leading-tight font-semibold">Every wedding, one calm place.</p>
           <div className="ornament w-40" />
           <p className="text-sidebar-foreground/80">
