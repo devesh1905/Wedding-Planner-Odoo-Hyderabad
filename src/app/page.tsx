@@ -6,6 +6,7 @@ import { ViewTransition } from "react";
 import { Splash } from "@/frontend/components/home/splash";
 import { Hero } from "@/frontend/components/home/hero";
 import { Chapters } from "@/frontend/components/home/chapters";
+import { ThreeDays } from "@/frontend/components/home/three-days";
 import { Celebrations } from "@/frontend/components/home/celebrations";
 import { VenueMarquee } from "@/frontend/components/home/venue-marquee";
 import { NumberTicker } from "@/frontend/components/home/number-ticker";
@@ -39,10 +40,10 @@ export default async function Home() {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-3 sm:gap-4 sm:px-6 sm:py-5">
           <MonogramButton />
           <nav className="flex items-center gap-3 text-sm sm:gap-6">
-            <a href="#journey" className="hidden items-center gap-1.5 text-foreground/85 hover:text-foreground md:inline-flex">
+            <a href="#journey" className="hidden items-center gap-1.5 whitespace-nowrap text-foreground/85 hover:text-foreground lg:inline-flex">
               <Icon name="route" />How it works
             </a>
-            <a href="#celebrations" className="hidden items-center gap-1.5 text-foreground/85 hover:text-foreground md:inline-flex">
+            <a href="#celebrations" className="hidden items-center gap-1.5 whitespace-nowrap text-foreground/85 hover:text-foreground lg:inline-flex">
               <Icon name="confetti" />Celebrations
             </a>
             <ThemeToggle className="-my-2" />
@@ -58,7 +59,7 @@ export default async function Home() {
             {/* the one action couples come for, always in reach */}
             <Link
               href="/enquire"
-              className="hidden items-center gap-1.5 rounded-full bg-cta px-4 py-2 text-sm font-medium text-cta-foreground transition-colors hover:bg-cta/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:inline-flex"
+              className="hidden items-center gap-1.5 whitespace-nowrap rounded-full bg-cta px-4 py-2 text-sm font-medium text-cta-foreground transition-colors hover:bg-cta/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:inline-flex"
             >
               Plan your wedding
             </Link>
@@ -85,6 +86,7 @@ export default async function Home() {
           </Reveal>
         </section>
 
+        <ThreeDays />
         <Chapters />
         <VenueMarquee />
         <Celebrations />
