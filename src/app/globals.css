@@ -371,3 +371,15 @@ html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
+
+/* Venue marquee: two identical rows, shift by one row width for a seamless loop. */
+@keyframes venue-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.venue-marquee-track { animation: venue-scroll 60s linear infinite; }
+.venue-marquee:hover .venue-marquee-track { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .venue-marquee { overflow-x: auto; }
+  .venue-marquee-track { animation: none; }
+}

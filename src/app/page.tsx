@@ -7,6 +7,8 @@ import { Splash } from "@/components/home/splash";
 import { Hero } from "@/components/home/hero";
 import { Chapters } from "@/components/home/chapters";
 import { Celebrations } from "@/components/home/celebrations";
+import { VenueMarquee } from "@/components/home/venue-marquee";
+import { NumberTicker } from "@/components/home/number-ticker";
 import { Magnetic } from "@/components/home/magnetic";
 import { MonogramButton } from "@/components/home/monogram-button";
 import { Reveal, RevealItem } from "@/components/home/reveal";
@@ -18,9 +20,9 @@ export const metadata: Metadata = {
 };
 
 const PROMISES = [
-  { k: "25", v: "weddings a season, never more", d: "So every couple has a lead planner who knows every detail." },
-  { k: "1 day", v: "to hear back from us", d: "Every enquiry has an owner the moment it arrives." },
-  { k: "0", v: "surprises on the final bill", d: "Every addition is shown to you, priced fairly, before it's billed." },
+  { k: "25", from: 0, v: "weddings a season, never more", d: "So every couple has a lead planner who knows every detail." },
+  { k: "1 day", from: 0, v: "to hear back from us", d: "Every enquiry has an owner the moment it arrives." },
+  { k: "0", from: 9, v: "surprises on the final bill", d: "Every addition is shown to you, priced fairly, before it's billed." },
 ];
 
 // The couples' front door. Staff who are signed in get a quiet link back into KnotOS.
@@ -60,7 +62,8 @@ export default async function Home() {
           <Reveal className="grid gap-12 border-t border-border pt-12 md:grid-cols-3">
             {PROMISES.map((p) => (
               <RevealItem key={p.v}>
-                <p className="font-serif text-6xl font-semibold text-eyebrow">{p.k}</p>
+                <p className="font-serif text-6xl font-semibold text-eyebrow"><NumberTicker value={p.k} from={p.from} />
+                </p>
                 <p className="mt-2 text-lg font-medium">{p.v}</p>
                 <p className="mt-2 leading-relaxed text-muted-foreground">{p.d}</p>
               </RevealItem>
@@ -69,6 +72,7 @@ export default async function Home() {
         </section>
 
         <Chapters />
+        <VenueMarquee />
         <Celebrations />
 
         <section className="px-6 pb-24">
