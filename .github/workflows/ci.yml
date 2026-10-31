@@ -38,6 +38,8 @@ jobs:
         run: npx next typegen && npm run typecheck
       - name: Lint
         run: npm run lint
+      - name: Formatting
+        run: npm run format:check
       - name: Unit tests
         run: npm test
       - name: Migrate and seed a fresh database
