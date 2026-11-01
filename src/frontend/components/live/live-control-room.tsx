@@ -215,14 +215,16 @@ export function LiveControlRoom({ weddingId }: { weddingId: string }) {
   );
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4">
-        <div className="flex flex-wrap gap-2">
+      {/* Status + actions stay pinned while the run sheet scrolls: just under the phone header (h-14),
+          at the top on desktop. Compact on phones so the timeline keeps most of the screen. */}
+      <div className="sticky top-[3.75rem] z-20 flex flex-wrap items-center justify-between gap-2 rounded-xl border bg-card/95 p-2.5 shadow-sm backdrop-blur sm:gap-3 sm:p-4 md:top-3">
+        <div className="no-scrollbar -mx-0.5 flex w-full flex-nowrap gap-2 overflow-x-auto px-0.5 sm:w-auto sm:flex-wrap">
           <Badge variant="outline">
             <Clock className="mr-1 size-3" />
-            Live · updates every 30s
+            Live<span className="hidden sm:inline">&nbsp;· updates every 30s</span>
           </Badge>
-          <Badge variant={late ? "destructive" : "secondary"}>{late} late vendors</Badge>
-          <Badge variant="secondary">{openIssues} open issues</Badge>
+          <Badge variant={late ? "destructive" : "secondary"}>{late} late {late === 1 ? "vendor" : "vendors"}</Badge>
+          <Badge variant="secondary">{openIssues} open {openIssues === 1 ? "issue" : "issues"}</Badge>
           {!online ? (
             <Badge className="bg-marigold-soft text-foreground" role="status">
               <WifiOff className="mr-1 size-3" />
@@ -244,20 +246,21 @@ export function LiveControlRoom({ weddingId }: { weddingId: string }) {
             </Badge>
           ) : null}
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button size="sm" className="min-h-11" onClick={() => setScanOpen(true)}>
+        <div className="flex w-full gap-2 sm:w-auto">
+          <Button size="sm" className="min-h-11 flex-1 sm:flex-none" onClick={() => setScanOpen(true)}>
             <QrCode className="size-4" />
             Scan QR
           </Button>
-          <Button size="sm" variant="outline" className="min-h-11" asChild>
+          <Button size="sm" variant="outline" className="min-h-11 flex-1 sm:flex-none" asChild>
             <Link href={`/weddings/${weddingId}/live/qr`}>
               <Printer className="size-4" />
-              Print QR passes
+              <span className="sm:hidden">QR passes</span>
+              <span className="hidden sm:inline">Print QR passes</span>
             </Link>
           </Button>
-          <Button size="sm" variant="ghost" className="min-h-11" disabled={loading || !online} onClick={() => void reload()}>
+          <Button size="sm" variant="ghost" className="min-h-11 min-w-11" disabled={loading || !online} onClick={() => void reload()} aria-label="Refresh">
             <RefreshCw className={`size-4 ${loading ? "animate-spin" : ""}`} />
-            Refresh
+            <span className="hidden sm:inline">Refresh</span>
           </Button>
         </div>
       </div>
