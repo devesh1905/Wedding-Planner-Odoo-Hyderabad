@@ -29,7 +29,8 @@ function valuesFor(quote: Pick<Quote, "perPlate" | "extraHourRate" | "total" | "
       : [emptyLine()],
   };
 }
-const optionalNumber = (value: string) => (value === "" ? null : Number(value));
+// Empty inputs and the stored null (fields the PDF read left blank) both mean "no value"; Number(null) would be 0.
+const optionalNumber = (value: string | number | null) => (value === "" || value === null ? null : Number(value));
 // Share a pending read across remounts so the same proposal is not parsed twice.
 const reads = new Map<string, Promise<{ quote: PortalQuote }>>();
 function readPdf(quote: Quote) {
