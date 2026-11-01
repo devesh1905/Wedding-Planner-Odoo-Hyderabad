@@ -223,8 +223,12 @@ export function LiveControlRoom({ weddingId }: { weddingId: string }) {
             <Clock className="mr-1 size-3" />
             Live<span className="hidden sm:inline">&nbsp;· updates every 30s</span>
           </Badge>
-          <Badge variant={late ? "destructive" : "secondary"}>{late} late {late === 1 ? "vendor" : "vendors"}</Badge>
-          <Badge variant="secondary">{openIssues} open {openIssues === 1 ? "issue" : "issues"}</Badge>
+          <Badge variant={late ? "destructive" : "secondary"}>
+            {late} late {late === 1 ? "vendor" : "vendors"}
+          </Badge>
+          <Badge variant="secondary">
+            {openIssues} open {openIssues === 1 ? "issue" : "issues"}
+          </Badge>
           {!online ? (
             <Badge className="bg-marigold-soft text-foreground" role="status">
               <WifiOff className="mr-1 size-3" />
