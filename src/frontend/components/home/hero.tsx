@@ -5,7 +5,6 @@ import { ViewTransition } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Icon } from "@/frontend/components/icons/icon";
 import { Magnetic } from "./magnetic";
-import { KnotMark } from "./knot-mark";
 import { DiyaSlot } from "@/frontend/components/cave/cave-mode";
 
 /**
@@ -23,10 +22,6 @@ export function Hero() {
         <span className="aurora-c" />
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-b from-transparent to-background" aria-hidden />
-
-      <div aria-hidden className="pointer-events-none absolute top-1/2 right-[-6rem] -z-10 hidden -translate-y-1/2 text-foreground/[0.06] lg:block">
-        <KnotMark className="h-[34rem] w-[56rem]" flameClassName="opacity-25" effects={false} />
-      </div>
 
       <DiyaSlot id="hero" className="absolute top-[26%] right-[9%] z-10" />
       <div className="mx-auto w-full max-w-6xl px-6 pt-24 pb-10 sm:pt-28">
