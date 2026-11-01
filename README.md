@@ -271,6 +271,7 @@ npm run dev                 # http://localhost:3000
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-only key for storage uploads; never exposed to the browser |
 | `AI_PROVIDER` | Quote reader provider, `gemini` by default |
 | `AI_API_KEY` | Server-only API key for the quote reader. Optional: without it the bundled demo PDFs use saved results and other quotes are entered manually |
+| `AI_API_KEY_BACKUP` | Optional second key. Used automatically when the first one hits its quota, is rejected or the service fails |
 | `AI_MODEL` | Model name, `gemini-3.1-flash-lite` by default |
 
 ### What `npm run demo:today` does

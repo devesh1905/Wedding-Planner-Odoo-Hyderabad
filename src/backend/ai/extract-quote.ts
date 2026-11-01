@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import { quoteExtractionSchema, type QuoteExtraction } from "./quote-schema";
 import { systemPrompt } from "./prompts";
+import { aiKeys, shouldTryNextKey } from "./keys";
 import manifest from "./fixtures/manifest.json";
 import shahiRasoi from "./fixtures/caterer-a-shahi-rasoi.json";
 import marwarFeasts from "./fixtures/caterer-b-marwar-feasts.json";
@@ -45,7 +46,7 @@ const responseSchema = z.object({
   content: z.array(z.object({ type: z.string(), text: z.string().optional() })).optional(),
 });
 
-async function requestJson(text: string, correction: string): Promise<string> {
+async function requestJson(text: string, correction: string, key: string): Promise<string> {
   const provider = process.env.AI_PROVIDER || "gemini";
   const protocol = process.env.AI_PROTOCOL || (provider === "gemini" ? "gemini" : "chat");
   const model = process.env.AI_MODEL || (protocol === "gemini" ? "gemini-3.1-flash-lite" : "");
@@ -60,17 +61,17 @@ async function requestJson(text: string, correction: string): Promise<string> {
   let headers: Record<string, string> = { "Content-Type": "application/json" };
   let body: unknown;
   if (protocol === "gemini") {
-    headers["x-goog-api-key"] = process.env.AI_API_KEY!;
+    headers["x-goog-api-key"] = key;
     body = {
       systemInstruction: { parts: [{ text: prompt }] },
       contents: [{ role: "user", parts: [{ text }] }],
       generationConfig: { responseMimeType: "application/json", temperature: 0 },
     };
   } else if (protocol === "messages") {
-    headers["x-api-key"] = process.env.AI_API_KEY!;
+    headers["x-api-key"] = key;
     body = { model, max_tokens: 8192, system: prompt, messages: [{ role: "user", content: text }], temperature: 0 };
   } else if (protocol === "chat") {
-    headers.Authorization = `Bearer ${process.env.AI_API_KEY!}`;
+    headers.Authorization = `Bearer ${key}`;
     body = {
       model,
       messages: [
@@ -101,6 +102,23 @@ async function requestJson(text: string, correction: string): Promise<string> {
   return raw;
 }
 
+/** Tries each configured key in turn; moves on only for network errors, timeouts, quota, auth or server errors. */
+async function requestWithFallback(text: string, correction: string): Promise<string> {
+  const keys = aiKeys();
+  for (let i = 0; i < keys.length; i++) {
+    try {
+      return await requestJson(text, correction, keys[i]);
+    } catch (error) {
+      const retryable =
+        error instanceof TypeError ||
+        (error instanceof DOMException && ["TimeoutError", "AbortError"].includes(error.name)) ||
+        (error instanceof ProviderHttpError && shouldTryNextKey(error.status));
+      if (!retryable || i === keys.length - 1) throw error;
+    }
+  }
+  throw new Error("No service key is configured");
+}
+
 class ProviderHttpError extends Error {
   constructor(public readonly status: number) {
     super(`Quote service failed (${status})`);
@@ -109,7 +127,7 @@ class ProviderHttpError extends Error {
 
 export async function extractQuote(text: string): Promise<{ data: QuoteExtraction; raw: string }> {
   if (!text.trim() || text.length > 100000) throw new Error("Quote text must contain 1 to 100000 characters");
-  if (!process.env.AI_API_KEY) {
+  if (!aiKeys().length) {
     const data = await fixtureFor(text);
     if (!data) throw new Error("No service key is configured. Enter this quote manually.");
     return { data, raw: JSON.stringify(data) };
@@ -118,7 +136,7 @@ export async function extractQuote(text: string): Promise<{ data: QuoteExtractio
   for (let attempt = 0; attempt < 2; attempt++) {
     let raw: string;
     try {
-      raw = await requestJson(text, correction);
+      raw = await requestWithFallback(text, correction);
     } catch (error) {
       // Only known demo documents may fall back; unknown PDFs never receive invented prices.
       const offline =

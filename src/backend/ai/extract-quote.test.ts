@@ -7,7 +7,9 @@ import { quoteExtractionSchema, toStoredRupees } from "./quote-schema";
 
 test("three PDF layouts match validated fixtures, prices and missing inclusions", async () => {
   const original = process.env.AI_API_KEY;
+  const originalBackup = process.env.AI_API_KEY_BACKUP;
   delete process.env.AI_API_KEY;
+  delete process.env.AI_API_KEY_BACKUP;
   try {
     const names = ["caterer-a-shahi-rasoi", "caterer-b-marwar-feasts", "caterer-c-royal-thaal"];
     const quotes = [];
@@ -51,6 +53,7 @@ test("three PDF layouts match validated fixtures, prices and missing inclusions"
   } finally {
     if (original === undefined) delete process.env.AI_API_KEY;
     else process.env.AI_API_KEY = original;
+    if (originalBackup !== undefined) process.env.AI_API_KEY_BACKUP = originalBackup;
   }
 });
 
@@ -90,6 +93,42 @@ test("invalid service JSON gets one repair retry; network failure only falls bac
     await assert.rejects(extractQuote("Unknown text"), /fetch failed/);
     globalThis.fetch = async () => new Response("Unauthorized", { status: 401 });
     await assert.rejects(extractQuote(text), /401/);
+  } finally {
+    globalThis.fetch = originalFetch;
+    for (const key of Object.keys(process.env)) if (!(key in old)) delete process.env[key];
+    Object.assign(process.env, old);
+  }
+});
+
+test("the backup key is used when the main key is out of quota or rejected, but not for a bad request", async () => {
+  const originalFetch = globalThis.fetch;
+  const old = { ...process.env };
+  process.env.AI_API_KEY = "main-key";
+  process.env.AI_API_KEY_BACKUP = "backup-key";
+  process.env.AI_PROVIDER = "gemini";
+  delete process.env.AI_ENDPOINT;
+  delete process.env.AI_PROTOCOL;
+  delete process.env.AI_HEADERS_JSON;
+  const fixture = JSON.parse(await readFile(new URL("./fixtures/caterer-b-marwar-feasts.json", import.meta.url), "utf8")) as unknown;
+  try {
+    for (const status of [429, 403]) {
+      const used: string[] = [];
+      globalThis.fetch = async (_url, init) => {
+        const key = new Headers(init?.headers).get("x-goog-api-key")!;
+        used.push(key);
+        if (key === "main-key") return new Response("quota", { status });
+        return Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify(fixture) }] } }] });
+      };
+      assert.equal((await extractQuote("An unknown but valid new quote")).data.vendorName, "Marwar Feasts");
+      assert.deepEqual(used, ["main-key", "backup-key"]);
+    }
+    const used: string[] = [];
+    globalThis.fetch = async (_url, init) => {
+      used.push(new Headers(init?.headers).get("x-goog-api-key")!);
+      return new Response("bad request", { status: 400 });
+    };
+    await assert.rejects(extractQuote("Unknown text"), /400/);
+    assert.deepEqual(used, ["main-key"]);
   } finally {
     globalThis.fetch = originalFetch;
     for (const key of Object.keys(process.env)) if (!(key in old)) delete process.env[key];
