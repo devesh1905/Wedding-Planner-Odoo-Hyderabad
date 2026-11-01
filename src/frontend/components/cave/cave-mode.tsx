@@ -177,6 +177,8 @@ function Cave() {
       st.slotId = id;
       st.mode = "gliding";
       diya.classList.remove("is-carried");
+      // heading into a niche: the "place it" hint has done its job
+      if (hintRef.current === "drop") setHint(null);
     };
     const goToNearest = () => {
       if (phone) return goToSlot(HOME);
@@ -187,7 +189,8 @@ function Cave() {
     // ── pointer: grab, carry, drop ──
     const onDown = (e: PointerEvent) => {
       e.preventDefault();
-      if (hintRef.current === "grab") setHint("drop");
+      // while the lamp is out of a niche, a small line says where it belongs (cleared in goToSlot)
+      setHint("drop");
       if (diya.classList.contains("at-dock")) {
         // hand over from CSS pinning to JS: start exactly where the diya is drawn right now
         const c = homePos();
@@ -215,7 +218,6 @@ function Cave() {
     const onUp = (e: PointerEvent) => {
       if (st.mode !== "dragging") return;
       diya.releasePointerCapture?.(e.pointerId);
-      if (hintRef.current === "drop") setTimeout(() => setHint(null), 1200);
       if (phone) {
         const h = homePos();
         if (Math.hypot(h.x - st.x, h.y - st.y) < SNAP_DISTANCE) return goToSlot(HOME);
@@ -259,6 +261,7 @@ function Cave() {
         st.tx = st.x;
         st.ty = st.y;
         diya.classList.add("is-carried");
+        setHint("drop");
       } else goToNearest();
     };
     addEventListener("scroll", onScroll, { passive: true });
@@ -420,8 +423,8 @@ function Cave() {
       >
         <DiyaGraphic />
         {hint && (
-          <span key={hint} role="status" className="diya-hint">
-            {hint === "grab" ? "Hold & drag to carry the light" : "Drop it into a niche to light the page"}
+          <span key={hint} role="status" className={hint === "drop" ? "diya-hint diya-hint-sm" : "diya-hint"}>
+            {hint === "grab" ? "Hold & drag to carry the light" : "Place it in a niche to light up the page"}
           </span>
         )}
       </div>

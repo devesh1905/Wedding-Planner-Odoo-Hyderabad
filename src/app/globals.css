@@ -532,6 +532,8 @@ main h2 { text-wrap: balance; }
   border-right: 1px solid rgb(232 163 61 / 0.45);
   border-bottom: 1px solid rgb(232 163 61 / 0.45);
 }
+/* the "place it" line while carrying: smaller and quieter, it stays until the lamp is slotted */
+.diya-hint-sm { padding: 5px 10px; border-radius: 10px; font-size: 12px; font-weight: 400; color: oklch(0.95 0.03 80 / 0.9); animation: hint-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
 @media (prefers-reduced-motion: reduce) { .diya-hint { animation: none; } }
 
 /* HD diya: photo bowl + vector flame on the wick tip (spout, left side of the bowl). */
