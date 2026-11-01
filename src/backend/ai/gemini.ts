@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import { aiKeys, shouldTryNextKey } from "./keys";
 
 /**
  * One small client for every assistant feature (ask, risk brief, negotiation, voice notes, call prep).
@@ -8,7 +9,7 @@ import { z } from "zod";
  * outage never breaks a screen. Server only: the key never reaches the browser.
  */
 
-export const aiConfigured = () => Boolean(process.env.AI_API_KEY);
+export const aiConfigured = () => aiKeys().length > 0;
 
 export class AiUnavailableError extends Error {
   constructor(message = "The assistant is not available right now") {
@@ -23,32 +24,42 @@ const geminiResponse = z.object({
 });
 
 async function callGemini(system: string, parts: Part[], temperature: number): Promise<string> {
-  const key = process.env.AI_API_KEY;
-  if (!key) throw new AiUnavailableError("No assistant key is configured");
+  const keys = aiKeys();
+  if (!keys.length) throw new AiUnavailableError("No assistant key is configured");
   const model = process.env.AI_MODEL || "gemini-3.1-flash-lite";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
-  let res: Response;
-  try {
-    res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": key },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: system }] },
-        contents: [{ role: "user", parts }],
-        generationConfig: { responseMimeType: "application/json", temperature },
-      }),
-      signal: AbortSignal.timeout(25_000),
-    });
-  } catch {
-    throw new AiUnavailableError();
+  let failure = new AiUnavailableError();
+  // Try the main key, then the backup when the main one is out of quota, rejected or the call fails.
+  for (const key of keys) {
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: system }] },
+          contents: [{ role: "user", parts }],
+          generationConfig: { responseMimeType: "application/json", temperature },
+        }),
+        signal: AbortSignal.timeout(25_000),
+      });
+    } catch {
+      failure = new AiUnavailableError();
+      continue;
+    }
+    if (!res.ok) {
+      failure = new AiUnavailableError(res.status === 429 ? "The assistant is busy — try again in a minute" : undefined);
+      if (shouldTryNextKey(res.status)) continue;
+      throw failure;
+    }
+    const raw = geminiResponse
+      .parse(await res.json())
+      .candidates?.[0]?.content.parts.map((p) => p.text ?? "")
+      .join("");
+    if (!raw) throw new AiUnavailableError("The assistant returned nothing");
+    return raw;
   }
-  if (!res.ok) throw new AiUnavailableError(res.status === 429 ? "The assistant is busy — try again in a minute" : undefined);
-  const raw = geminiResponse
-    .parse(await res.json())
-    .candidates?.[0]?.content.parts.map((p) => p.text ?? "")
-    .join("");
-  if (!raw) throw new AiUnavailableError("The assistant returned nothing");
-  return raw;
+  throw failure;
 }
 
 /** Ask for JSON matching `schema`. `parts` may include audio (inlineData) as well as text. */
